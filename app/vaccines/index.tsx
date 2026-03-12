@@ -9,12 +9,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useVaccines } from '../../../src/hooks/useVaccines';
-import { VaccineCard } from '../../../src/components/vaccines/VaccineCard';
-import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
-import { Card } from '../../../src/components/ui/Card';
-import { EmptyState } from '../../../src/components/ui/EmptyState';
-import { COLORS } from '../../../src/lib/constants';
+import { useVaccines } from '../../src/hooks/useVaccines';
+import { VaccineCard } from '../../src/components/vaccines/VaccineCard';
+import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
+import { Card } from '../../src/components/ui/Card';
+import { EmptyState } from '../../src/components/ui/EmptyState';
+import { COLORS } from '../../src/lib/constants';
 import { useSWRConfig } from 'swr';
 
 export default function VaccineScreen() {

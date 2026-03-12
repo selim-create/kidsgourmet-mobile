@@ -11,11 +11,11 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getBlogPost } from '../../../src/services/blog-service';
-import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
-import { Badge } from '../../../src/components/ui/Badge';
-import { Avatar } from '../../../src/components/ui/Avatar';
-import { COLORS, API_ENDPOINTS } from '../../../src/lib/constants';
+import { getBlogPost } from '../../src/services/blog-service';
+import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
+import { Badge } from '../../src/components/ui/Badge';
+import { Avatar } from '../../src/components/ui/Avatar';
+import { COLORS, API_ENDPOINTS } from '../../src/lib/constants';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '';

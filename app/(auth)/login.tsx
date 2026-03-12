@@ -117,14 +117,42 @@ export default function LoginScreen() {
               Giriş Yap
             </Button>
 
-            {/* Google Sign-In Placeholder */}
-            <TouchableOpacity
-              className="mt-3 flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white"
-              onPress={() => Toast.show({ type: 'info', text1: 'Yakında', text2: 'Google ile giriş özelliği yakında eklenecek.' })}
-            >
-              <Ionicons name="logo-google" size={18} color="#EA4335" />
-              <Text className="text-dark text-sm font-medium ml-2">Google ile Giriş Yap</Text>
-            </TouchableOpacity>
+            {/* Social Sign-In Placeholders */}
+            <View className="mt-4">
+              <View className="flex-row items-center mb-4">
+                <View className="flex-1 h-px bg-gray-200" />
+                <Text className="text-gray-400 text-sm px-3">veya</Text>
+                <View className="flex-1 h-px bg-gray-200" />
+              </View>
+
+              <TouchableOpacity
+                className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
+                activeOpacity={0.8}
+                onPress={() => Toast.show({ type: 'info', text1: 'Yakında', text2: 'Google ile giriş özelliği yakında eklenecek.' })}
+              >
+                <Ionicons name="logo-google" size={18} color="#EA4335" />
+                <Text className="text-dark text-sm font-medium ml-2 flex-1">
+                  Google ile Giriş Yap
+                </Text>
+                <View className="bg-gray-100 rounded-full px-2 py-0.5">
+                  <Text className="text-gray-400 text-xs">Yakında</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-black"
+                activeOpacity={0.8}
+                onPress={() => Toast.show({ type: 'info', text1: 'Yakında', text2: 'Apple ile giriş özelliği yakında eklenecek.' })}
+              >
+                <Ionicons name="logo-apple" size={18} color="#fff" />
+                <Text className="text-white text-sm font-medium ml-2 flex-1">
+                  Apple ile Giriş Yap
+                </Text>
+                <View className="bg-white/20 rounded-full px-2 py-0.5">
+                  <Text className="text-white/80 text-xs">Yakında</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
 
             <View className="flex-row items-center justify-center mt-6">
               <Text className="text-gray-500 text-sm">Hesabınız yok mu? </Text>

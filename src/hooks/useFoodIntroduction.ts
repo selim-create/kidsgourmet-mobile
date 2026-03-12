@@ -12,7 +12,7 @@ export function useFoodIntroduction() {
     ? calculateAgeInMonths(activeChild.birth_date)
     : undefined;
 
-  const key = `${API_ENDPOINTS.FOOD_INTRODUCTION}${ageMonths ? `?age_months=${ageMonths}` : ''}`;
+  const key = `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}${ageMonths ? `?age_months=${ageMonths}` : ''}`;
 
   const { data, error, isLoading } = useSWR<FoodIntroductionItem[]>(
     key,

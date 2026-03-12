@@ -8,5 +8,5 @@ export async function getRecommendations(): Promise<Recipe[]> {
 
 export async function getDashboardRecommendations(childId?: number): Promise<Recipe[]> {
   const params = childId ? `?child_id=${childId}` : '';
-  return api.get<Recipe[]>(`${API_ENDPOINTS.DASHBOARD_RECOMMENDATIONS}${params}`);
+  return api.get<Recipe[]>(`${API_ENDPOINTS.RECOMMENDATIONS}${params}`);
 }

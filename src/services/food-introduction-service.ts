@@ -7,6 +7,6 @@ export async function getFoodIntroductionItems(
 ): Promise<FoodIntroductionItem[]> {
   const params = ageMonths ? `?age_months=${ageMonths}` : '';
   return api.get<FoodIntroductionItem[]>(
-    `${API_ENDPOINTS.FOOD_INTRODUCTION}${params}`,
+    `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}${params}`,
   );
 }

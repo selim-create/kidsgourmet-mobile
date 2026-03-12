@@ -17,16 +17,15 @@ export const API_ENDPOINTS = {
   RECIPE: (slug: string) => `/kg/v1/recipes/${slug}`,
 
   // Favorites
-  FAVORITES: '/kg/v1/favorites',
-  FAVORITE_TOGGLE: (recipeId: number) => `/kg/v1/favorites/${recipeId}`,
+  FAVORITES: '/kg/v1/user/favorites',
 
   // Meal Plan
   MEAL_PLAN: '/kg/v1/meal-plan',
   MEAL_PLAN_WEEK: (year: number, week: number) => `/kg/v1/meal-plan/${year}/${week}`,
 
-  // Blog
-  BLOG: '/kg/v1/blog',
-  BLOG_POST: (slug: string) => `/kg/v1/blog/${slug}`,
+  // Blog (WordPress native)
+  BLOG: '/wp/v2/posts',
+  BLOG_POST: (slug: string) => `/wp/v2/posts?slug=${slug}&_embed`,
 
   // Taxonomy
   AGE_GROUPS: '/kg/v1/age-groups',
@@ -37,16 +36,18 @@ export const API_ENDPOINTS = {
   SEARCH: '/kg/v1/search',
 
   // Recommendations
-  RECOMMENDATIONS: '/kg/v1/recommendations',
-  DASHBOARD_RECOMMENDATIONS: '/kg/v1/recommendations/dashboard',
+  RECOMMENDATIONS: '/kg/v1/recommendations/daily',
+  RECOMMENDATIONS_DAILY: '/kg/v1/recommendations/daily',
 
   // Nutrition
   NUTRITION: '/kg/v1/nutrition',
-  NUTRITION_SUMMARY: '/kg/v1/nutrition/summary',
+  NUTRITION_WEEKLY_SUMMARY: '/kg/v1/nutrition/weekly-summary',
+  NUTRITION_MISSING: '/kg/v1/nutrition/missing-nutrients',
 
   // Safety
-  SAFETY: '/kg/v1/safety',
-  SAFETY_CHECK: '/kg/v1/safety/check',
+  SAFETY_CHECK_INGREDIENT: '/kg/v1/safety/check-ingredient',
+  SAFETY_CHECK_RECIPE: '/kg/v1/safety/check-recipe',
+  SAFETY_BATCH_CHECK: '/kg/v1/safety/batch-check',
 
   // Ingredients
   INGREDIENTS: '/kg/v1/ingredients',
@@ -59,10 +60,12 @@ export const API_ENDPOINTS = {
   CONTACT: '/kg/v1/contact',
 
   // Food Introduction
-  FOOD_INTRODUCTION: '/kg/v1/food-introduction',
+  FOOD_INTRODUCTION_SUGGESTED: '/kg/v1/food-introduction/suggested',
 
   // Vaccines
-  VACCINES: '/kg/v1/vaccines',
+  VACCINES_MASTER: '/kg/v1/health/vaccines/master',
+  VACCINES_BY_CHILD: (childId: string) => `/kg/v1/health/vaccines?child_id=${childId}`,
+  VACCINES_MARK_DONE: '/kg/v1/health/vaccines/mark-done',
 
   // Featured
   FEATURED: '/kg/v1/featured',

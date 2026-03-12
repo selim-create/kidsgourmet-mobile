@@ -4,7 +4,7 @@ import type { BlogPost, PaginatedResponse } from '../lib/types';
 import { API_ENDPOINTS } from '../lib/constants';
 
 export function useBlog(page = 1, perPage = 10, category?: string) {
-  const key = `${API_ENDPOINTS.BLOG}?page=${page}&per_page=${perPage}${category ? `&category=${category}` : ''}`;
+  const key = `/wp/v2/posts?page=${page}&per_page=${perPage}${category ? `&categories=${category}` : ''}&_embed`;
 
   const { data, error, isLoading } = useSWR<PaginatedResponse<BlogPost>>(
     key,

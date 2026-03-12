@@ -10,7 +10,7 @@ export function useNutritionSummary(period: 'day' | 'week' | 'month' = 'week') {
   const { activeChild } = useActiveChild();
 
   const key = isAuthenticated
-    ? `${API_ENDPOINTS.NUTRITION_SUMMARY}?period=${period}${activeChild ? `&child_id=${activeChild.id}` : ''}`
+    ? `${API_ENDPOINTS.NUTRITION_WEEKLY_SUMMARY}?period=${period}${activeChild ? `&child_id=${activeChild.id}` : ''}`
     : null;
 
   const { data, error, isLoading } = useSWR<NutritionSummary>(

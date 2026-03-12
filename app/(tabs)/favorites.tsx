@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
   FlatList,
   RefreshControl,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
@@ -14,10 +15,20 @@ import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
 import { router } from 'expo-router';
 
+const GRID_COLUMNS = 2;
+const GRID_GAP = 12;
+const SCREEN_PADDING = 16;
+
 export default function FavoritesScreen() {
   const { isAuthenticated } = useAuth();
   const { favorites, isLoading, reload } = useFavorites();
+  const { width } = useWindowDimensions();
   const [refreshing, setRefreshing] = React.useState(false);
+
+  const cardWidth = useMemo(
+    () => (width - SCREEN_PADDING * 2 - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS,
+    [width],
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -63,7 +74,12 @@ export default function FavoritesScreen() {
         <FlatList
           data={favorites}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ padding: 16, flexGrow: 1 }}
+          numColumns={GRID_COLUMNS}
+          contentContainerStyle={{
+            padding: SCREEN_PADDING,
+            flexGrow: 1,
+          }}
+          columnWrapperStyle={{ gap: GRID_GAP }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -81,7 +97,11 @@ export default function FavoritesScreen() {
               onAction={() => router.push('/(tabs)/recipes')}
             />
           }
-          renderItem={({ item }) => <RecipeCard recipe={item} />}
+          renderItem={({ item }) => (
+            <View style={{ width: cardWidth }}>
+              <RecipeCard recipe={item} compact />
+            </View>
+          )}
         />
       )}
     </SafeAreaView>

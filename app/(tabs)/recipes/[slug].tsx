@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Share,
 } from 'react-native';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
@@ -22,7 +22,6 @@ import { API_ENDPOINTS } from '../../../src/lib/constants';
 
 export default function RecipeDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const navigation = useNavigation();
   const { isFavorite, toggle } = useFavorites();
   const [activeTab, setActiveTab] = useState<'ingredients' | 'steps'>('ingredients');
 
@@ -68,11 +67,21 @@ export default function RecipeDetailScreen() {
           />
           <View className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
 
+          {/* Floating Back Button */}
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={22} color="#455A64" />
+          </TouchableOpacity>
+
           {/* Action Buttons Overlay */}
           <View className="absolute top-4 right-4 gap-2">
             <TouchableOpacity
               onPress={() => toggle(recipe.id)}
               className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
+              activeOpacity={0.8}
             >
               <Ionicons
                 name={favorite ? 'heart' : 'heart-outline'}
@@ -83,6 +92,7 @@ export default function RecipeDetailScreen() {
             <TouchableOpacity
               onPress={handleShare}
               className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
+              activeOpacity={0.8}
             >
               <Ionicons name="share-outline" size={22} color="#6B7280" />
             </TouchableOpacity>

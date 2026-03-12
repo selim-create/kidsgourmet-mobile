@@ -116,3 +116,16 @@ export async function getBlogPost(slug: string): Promise<BlogPost> {
 
   return transformWPPost(data[0]);
 }
+
+export async function getBlogCategories(): Promise<BlogCategory[]> {
+  const data = await api.get<Array<{ id: number; name: string; slug: string; description?: string }>>(
+    `/wp/v2/categories?per_page=100&hide_empty=true`,
+    { skipAuth: true },
+  );
+  return data.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description,
+  }));
+}

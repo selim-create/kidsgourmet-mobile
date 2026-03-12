@@ -3,25 +3,21 @@ import { getFoodIntroductionItems } from '../services/food-introduction-service'
 import type { FoodIntroductionItem } from '../lib/types';
 import { API_ENDPOINTS } from '../lib/constants';
 import { useActiveChild } from '../contexts/ActiveChildContext';
-import { calculateAgeInMonths } from '../utils/ageCalculator';
 
 export function useFoodIntroduction() {
   const { activeChild } = useActiveChild();
 
-  const ageMonths = activeChild?.birth_date
-    ? calculateAgeInMonths(activeChild.birth_date)
-    : undefined;
-
-  const key = `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}${ageMonths ? `?age_months=${ageMonths}` : ''}`;
+  const key = activeChild
+    ? `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}?child_id=${activeChild.id}`
+    : API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED;
 
   const { data, error, isLoading } = useSWR<FoodIntroductionItem[]>(
     key,
-    () => getFoodIntroductionItems(ageMonths),
+    () => getFoodIntroductionItems(activeChild?.id),
   );
 
   return {
     items: data ?? [],
-    ageMonths,
     isLoading,
     error,
   };

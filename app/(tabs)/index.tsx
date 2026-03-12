@@ -14,6 +14,8 @@ import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useDashboardRecommendations } from '../../src/hooks/useDashboardRecommendations';
 import { useMealPlan } from '../../src/hooks/useMealPlan';
+import { useNutritionSummary } from '../../src/hooks/useNutritionSummary';
+import { useFoodIntroduction } from '../../src/hooks/useFoodIntroduction';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
@@ -22,7 +24,7 @@ import { Button } from '../../src/components/ui/Button';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { formatDuration } from '../../src/utils/helpers';
 import { useSWRConfig } from 'swr';
-import type { Recipe } from '../../src/lib/types';
+import type { Recipe, FoodIntroductionItem } from '../../src/lib/types';
 
 function GuestDashboard() {
   return (
@@ -72,16 +74,18 @@ function GuestDashboard() {
                 Yüzlerce sağlıklı tarif
               </Text>
             </TouchableOpacity>
-            <View
-              className="flex-1 bg-white rounded-2xl p-4 items-center opacity-50"
+            <TouchableOpacity
+              className="flex-1 bg-white rounded-2xl p-4 items-center"
+              activeOpacity={0.8}
+              onPress={() => router.push('/blog')}
               style={{ elevation: 2 }}
             >
-              <Ionicons name="calendar-outline" size={24} color="#7CB342" />
-              <Text className="text-dark font-semibold text-sm mt-2">Haftalık Plan</Text>
+              <Ionicons name="newspaper-outline" size={24} color="#7CB342" />
+              <Text className="text-dark font-semibold text-sm mt-2">Blog</Text>
               <Text className="text-gray-400 text-xs text-center mt-1">
-                Giriş gerektirir
+                Keşfet & Öğren
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -147,11 +151,53 @@ function RecipeMiniCard({ recipe }: { recipe: Recipe }) {
   );
 }
 
+function FoodIntroMiniCard({ item }: { item: FoodIntroductionItem }) {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => router.push(`/ingredient/${item.id}`)}
+      className="bg-white rounded-2xl overflow-hidden mr-3 p-3 items-center"
+      style={{
+        width: 120,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+      }}
+    >
+      {item.image ? (
+        <Image
+          source={{ uri: item.image }}
+          style={{ width: 56, height: 56, borderRadius: 28 }}
+          contentFit="cover"
+        />
+      ) : (
+        <View
+          className="w-14 h-14 rounded-full bg-secondary/20 items-center justify-center"
+        >
+          <Text style={{ fontSize: 28 }}>🥦</Text>
+        </View>
+      )}
+      <Text className="text-dark font-semibold text-xs mt-2 text-center" numberOfLines={2}>
+        {item.food_name}
+      </Text>
+      {item.introduction_method ? (
+        <Text className="text-gray-400 text-xs text-center mt-0.5" numberOfLines={2}>
+          {item.introduction_method}
+        </Text>
+      ) : null}
+    </TouchableOpacity>
+  );
+}
+
 export default function DashboardScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { activeChild } = useActiveChild();
   const { recommendations, isLoading: loadingRecs } = useDashboardRecommendations();
   const { mealPlan, isLoading: loadingPlan } = useMealPlan();
+  const { summary: nutritionSummary, isLoading: loadingNutrition } = useNutritionSummary('week');
+  const { items: foodItems, isLoading: loadingFood } = useFoodIntroduction();
   const { mutate } = useSWRConfig();
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -239,6 +285,7 @@ export default function DashboardScreen() {
         </View>
 
         <View className="px-4 -mt-4">
+          {/* Stats row */}
           <View className="flex-row gap-3 mb-6">
             <Card className="flex-1" padding="sm">
               <View className="flex-row items-center mb-2">
@@ -271,6 +318,123 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Nutrition Summary Widget */}
+          {activeChild && (
+            <Card className="mb-6">
+              <View className="flex-row items-center justify-between mb-3">
+                <Text className="text-dark font-bold text-base">Haftalık Beslenme</Text>
+                <Badge variant="info" size="sm">Bu Hafta</Badge>
+              </View>
+
+              {loadingNutrition ? (
+                <LoadingSpinner size="small" />
+              ) : nutritionSummary ? (
+                <View className="gap-3">
+                  {/* Calories */}
+                  {nutritionSummary.calories_total !== undefined && (
+                    <View>
+                      <View className="flex-row items-center justify-between mb-1">
+                        <Text className="text-gray-500 text-sm">🔥 Kalori</Text>
+                        <Text className="text-dark text-sm font-semibold">
+                          {nutritionSummary.calories_total}
+                          {nutritionSummary.calories_target ? ` / ${nutritionSummary.calories_target} kcal` : ' kcal'}
+                        </Text>
+                      </View>
+                      {nutritionSummary.calories_target ? (
+                        <View className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <View
+                            className="h-full rounded-full bg-primary"
+                            style={{
+                              width: `${Math.min(100, Math.round((nutritionSummary.calories_total / nutritionSummary.calories_target) * 100))}%`,
+                            }}
+                          />
+                        </View>
+                      ) : null}
+                    </View>
+                  )}
+
+                  {/* Protein */}
+                  {nutritionSummary.protein_total !== undefined && (
+                    <View>
+                      <View className="flex-row items-center justify-between mb-1">
+                        <Text className="text-gray-500 text-sm">🍗 Protein</Text>
+                        <Text className="text-dark text-sm font-semibold">
+                          {nutritionSummary.protein_total}g
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Meals count */}
+                  {nutritionSummary.meals_count !== undefined && (
+                    <View className="flex-row items-center">
+                      <Ionicons name="restaurant-outline" size={14} color="#9CA3AF" />
+                      <Text className="text-gray-400 text-xs ml-1">
+                        {nutritionSummary.meals_count} öğün kaydedildi
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <Text className="text-gray-400 text-sm text-center py-2">
+                  Haftalık öğün ekleyerek beslenme takibi yapın.
+                </Text>
+              )}
+            </Card>
+          )}
+
+          {/* Food Introduction — "Bu Hafta Denenebilir" */}
+          {activeChild && (
+            <View className="mb-6">
+              <View className="flex-row items-center justify-between mb-3">
+                <Text className="text-dark text-lg font-bold">Bu Hafta Denenebilir 🍼</Text>
+                <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/ingredient')}>
+                  <Text className="text-primary text-sm font-medium">Tümünü Gör</Text>
+                </TouchableOpacity>
+              </View>
+
+              {loadingFood ? (
+                <LoadingSpinner label="Yükleniyor..." />
+              ) : foodItems.length > 0 ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingRight: 4 }}
+                >
+                  {foodItems.slice(0, 6).map((item) => (
+                    <FoodIntroMiniCard key={item.id} item={item} />
+                  ))}
+                </ScrollView>
+              ) : (
+                <Card>
+                  <View className="items-center py-4">
+                    <Text className="text-gray-400 text-center">
+                      Yaşa uygun gıda önerisi için çocuk profili ekleyin
+                    </Text>
+                  </View>
+                </Card>
+              )}
+            </View>
+          )}
+
+          {/* Blog shortcut */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push('/blog')}
+            className="mb-6 bg-white rounded-2xl p-4 flex-row items-center"
+            style={{ elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 }}
+          >
+            <View className="w-12 h-12 rounded-2xl bg-secondary/20 items-center justify-center mr-3">
+              <Ionicons name="newspaper-outline" size={24} color="#7CB342" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-dark font-bold text-base">Blog & Keşfet</Text>
+              <Text className="text-gray-400 text-sm">Beslenme, gelişim ve sağlık yazıları</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+          </TouchableOpacity>
+
+          {/* Recommended Recipes */}
           <View className="mb-6">
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-dark text-lg font-bold">Önerilen Tarifler</Text>

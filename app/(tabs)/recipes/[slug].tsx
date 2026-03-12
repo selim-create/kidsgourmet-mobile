@@ -16,9 +16,12 @@ import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
+import { SafetyBanner } from '../../../src/components/safety/SafetyBanner';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
+import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration } from '../../../src/utils/helpers';
 import { API_ENDPOINTS } from '../../../src/lib/constants';
+import type { SafetyCheck } from '../../../src/lib/types';
 
 export default function RecipeDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -30,6 +33,9 @@ export default function RecipeDetailScreen() {
     () => getRecipe(slug!),
   );
 
+  const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
+    useRecipeSafetyCheck(recipe);
+
   const favorite = recipe ? isFavorite(recipe.id) : false;
 
   const handleShare = async () => {
@@ -39,6 +45,22 @@ export default function RecipeDetailScreen() {
       message: `KidsGourmet'ta harika bir tarif: ${recipe.title}`,
     });
   };
+
+  // Combine API safety checks with age-group check into a single banner datum
+  const bannerData: SafetyCheck[] | null = (() => {
+    if (!hasActiveChild) return null;
+    const combined: SafetyCheck[] = [...safetyChecks];
+    if (ageGroupSafe === false) {
+      combined.push({
+        ingredient: 'Yaş uygunluğu',
+        age_months: childAgeMonths ?? 0,
+        is_safe: false,
+        safety_level: 'caution',
+        notes: 'Bu tarif çocuğunuzun yaş grubuna uygun olmayabilir.',
+      });
+    }
+    return combined.length > 0 ? combined : null;
+  })();
 
   if (isLoading) {
     return <LoadingSpinner fullScreen label="Tarif yükleniyor..." />;
@@ -123,6 +145,12 @@ export default function RecipeDetailScreen() {
               </Text>
             </View>
           ) : null}
+
+          {/* Safety Banner */}
+          <SafetyBanner
+            safetyData={bannerData}
+            isLoading={safetyLoading && hasActiveChild}
+          />
 
           {/* Stats Row */}
           <Card className="mb-4">

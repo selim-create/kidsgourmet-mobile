@@ -94,6 +94,21 @@ export const API_ENDPOINTS = {
 
   // Tools
   TOOLS: '/kg/v1/tools',
+  TOOL_BLW_TEST: '/kg/v1/tools/blw-test',
+  TOOL_BLW_RESULTS: '/kg/v1/tools/blw-test/results',
+  TOOL_PERCENTILE: '/kg/v1/tools/percentile',
+  TOOL_PERCENTILE_RESULTS: '/kg/v1/tools/percentile/results',
+  TOOL_SOLID_FOOD: '/kg/v1/tools/solid-food-readiness',
+  TOOL_SOLID_FOOD_RESULTS: '/kg/v1/tools/solid-food-readiness/results',
+
+  // Growth
+  GROWTH_DATA: '/kg/v1/health/growth',
+  GROWTH_RECORD: (childId: number) => `/kg/v1/health/growth?child_id=${childId}`,
+  GROWTH_ADD: '/kg/v1/health/growth',
+
+  // Allergens
+  ALLERGENS: '/kg/v1/allergens',
+  CHILD_ALLERGENS: (childId: number) => `/kg/v1/user/children/${childId}/allergens`,
 
   // Newsletter
   NEWSLETTER: '/kg/v1/newsletter',

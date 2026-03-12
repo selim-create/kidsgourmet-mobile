@@ -11,8 +11,10 @@ import { useAuth } from './AuthContext';
 
 interface ActiveChildContextValue {
   activeChild: Child | null;
+  children: Child[];
   setActiveChild: (child: Child | null) => void;
   clearActiveChild: () => void;
+  reloadChildren: () => Promise<void>;
 }
 
 const ActiveChildContext = createContext<ActiveChildContextValue | null>(null);
@@ -20,24 +22,32 @@ const ActiveChildContext = createContext<ActiveChildContextValue | null>(null);
 export function ActiveChildProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   const [activeChild, setActiveChildState] = useState<Child | null>(null);
+  const [childList, setChildList] = useState<Child[]>([]);
 
-  // Load children and set the first as active when authenticated
-  useEffect(() => {
+  const loadChildren = useCallback(async () => {
     if (!isAuthenticated) {
+      setChildList([]);
       setActiveChildState(null);
       return;
     }
-    getChildren()
-      .then((childList) => {
-        if (childList && childList.length > 0) {
-          // Use functional update to avoid stale closure — only set if not already set
-          setActiveChildState((prev) => prev ?? childList[0]);
-        }
-      })
-      .catch(() => {
-        // ignore errors
-      });
+    try {
+      const list = await getChildren();
+      if (list && list.length > 0) {
+        setChildList(list);
+        // Only set active child if not already set
+        setActiveChildState((prev) => prev ?? list[0]);
+      } else {
+        setChildList([]);
+      }
+    } catch {
+      // ignore errors
+    }
   }, [isAuthenticated]);
+
+  // Load children and set the first as active when authenticated
+  useEffect(() => {
+    loadChildren();
+  }, [loadChildren]);
 
   const setActiveChild = useCallback((child: Child | null) => {
     setActiveChildState(child);
@@ -49,7 +59,13 @@ export function ActiveChildProvider({ children }: { children: React.ReactNode })
 
   return (
     <ActiveChildContext.Provider
-      value={{ activeChild, setActiveChild, clearActiveChild }}
+      value={{
+        activeChild,
+        children: childList,
+        setActiveChild,
+        clearActiveChild,
+        reloadChildren: loadChildren,
+      }}
     >
       {children}
     </ActiveChildContext.Provider>

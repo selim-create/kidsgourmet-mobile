@@ -38,3 +38,31 @@ export function formatAgeGroup(minMonths?: number, maxMonths?: number): string {
   }
   return `${formatMonths(maxMonths!)} altı`;
 }
+
+/**
+ * Format a recommended starting age in months as a Turkish label.
+ * E.g. 6 → "6. ay+", 12 → "1 yaş+", 15 → "1 yaş 3 ay+"
+ */
+export function formatStartAge(months?: number): string {
+  if (!months) return '';
+  if (months === 0) return 'Doğumda';
+  if (months < 12) return `${months}. ay+`;
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  if (rem === 0) return `${years} yaş+`;
+  return `${years} yaş ${rem} ay+`;
+}
+
+/**
+ * Format a recommended age in months as a readable Turkish label (without '+').
+ * E.g. 0 → "Doğumda", 6 → "6. ay", 12 → "1 yaş"
+ */
+export function formatAgeMonths(months?: number): string {
+  if (months === undefined || months === null) return '';
+  if (months === 0) return 'Doğumda';
+  if (months < 12) return `${months}. ay`;
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  if (rem === 0) return `${years} yaş`;
+  return `${years} yaş ${rem} ay`;
+}

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { formatStartAge } from '../../utils/ageFormatter';
 import type { FoodIntroductionItem } from '../../lib/types';
 
 interface IngredientCardProps {
@@ -15,15 +16,6 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
   medium: { label: 'Orta Alerji', color: '#CA8A04', bg: '#FEF9C3' },
   high: { label: 'Yüksek Alerji', color: '#DC2626', bg: '#FEE2E2' },
 };
-
-function ageLabel(months?: number): string {
-  if (!months) return '';
-  if (months < 12) return `${months}. ay+`;
-  const years = Math.floor(months / 12);
-  const rem = months % 12;
-  if (rem === 0) return `${years} yaş+`;
-  return `${years} yaş ${rem} ay+`;
-}
 
 export function IngredientCard({ item, onPress }: IngredientCardProps) {
   const riskKey = item.allergen_risk ?? 'low';
@@ -83,7 +75,7 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
             {item.recommended_age_months ? (
               <View className="bg-primary/10 rounded-full px-2 py-0.5">
                 <Text className="text-primary text-xs font-semibold">
-                  {ageLabel(item.recommended_age_months)}
+                  {formatStartAge(item.recommended_age_months)}
                 </Text>
               </View>
             ) : null}

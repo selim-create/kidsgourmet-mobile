@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 import { useActiveChild } from '../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../utils/ageCalculator';
 
-export function useFoodIntroduction(childId?: string) {
+export function useFoodIntroduction() {
   const { activeChild } = useActiveChild();
 
   const ageMonths = activeChild?.birth_date

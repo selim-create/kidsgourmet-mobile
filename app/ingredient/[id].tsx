@@ -10,6 +10,7 @@ import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Card } from '../../../src/components/ui/Card';
 import { COLORS, API_ENDPOINTS } from '../../../src/lib/constants';
+import { formatStartAge } from '../../../src/utils/ageFormatter';
 import type { FoodIntroductionItem } from '../../../src/lib/types';
 
 const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -17,15 +18,6 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
   medium: { label: 'Orta Alerji Riski', color: '#CA8A04', bg: '#FEF9C3' },
   high: { label: 'Yüksek Alerji Riski', color: '#DC2626', bg: '#FEE2E2' },
 };
-
-function ageLabel(months?: number): string {
-  if (!months) return '';
-  if (months < 12) return `${months}. ay ve sonrası`;
-  const years = Math.floor(months / 12);
-  const rem = months % 12;
-  if (rem === 0) return `${years} yaş ve sonrası`;
-  return `${years} yaş ${rem} ay ve sonrası`;
-}
 
 export default function IngredientDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -109,7 +101,7 @@ export default function IngredientDetailScreen() {
                 </Text>
                 <Text className="text-primary font-semibold text-xs mt-0.5 text-center">
                   {item.recommended_age_months
-                    ? ageLabel(item.recommended_age_months)
+                    ? formatStartAge(item.recommended_age_months)
                     : 'Belirtilmemiş'}
                 </Text>
               </View>

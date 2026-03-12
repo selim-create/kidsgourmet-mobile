@@ -64,6 +64,7 @@ export function useRecipeSafetyCheck(recipe: Recipe | null | undefined) {
   return {
     safetyChecks: data ?? [],
     ageGroupSafe,
+    ageMonths,
     isLoading,
     error,
     hasActiveChild: Boolean(activeChild),

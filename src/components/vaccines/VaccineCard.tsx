@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { formatAgeMonths } from '../../utils/ageFormatter';
 import type { Vaccine } from '../../lib/types';
 
 interface VaccineCardProps {
@@ -10,16 +11,6 @@ interface VaccineCardProps {
   /** Whether the vaccine is overdue */
   overdue?: boolean;
   onMarkDone?: (vaccineId: number) => void;
-}
-
-function ageLabel(months?: number): string {
-  if (months === undefined || months === null) return '';
-  if (months === 0) return 'Doğumda';
-  if (months < 12) return `${months}. ay`;
-  const years = Math.floor(months / 12);
-  const rem = months % 12;
-  if (rem === 0) return `${years} yaş`;
-  return `${years} yaş ${rem} ay`;
 }
 
 export function VaccineCard({
@@ -96,7 +87,7 @@ export function VaccineCard({
               <View className="flex-row items-center">
                 <Ionicons name="calendar-outline" size={12} color="#9CA3AF" />
                 <Text className="text-gray-400 text-xs ml-1">
-                  Önerilen: {ageLabel(vaccine.recommended_age_months)}
+                  Önerilen: {formatAgeMonths(vaccine.recommended_age_months)}
                 </Text>
               </View>
             )}

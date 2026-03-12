@@ -33,7 +33,7 @@ export default function RecipeDetailScreen() {
     () => getRecipe(slug!),
   );
 
-  const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild } =
+  const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
 
   const favorite = recipe ? isFavorite(recipe.id) : false;
@@ -53,7 +53,7 @@ export default function RecipeDetailScreen() {
     if (ageGroupSafe === false) {
       combined.push({
         ingredient: 'Yaş uygunluğu',
-        age_months: 0,
+        age_months: childAgeMonths ?? 0,
         is_safe: false,
         safety_level: 'caution',
         notes: 'Bu tarif çocuğunuzun yaş grubuna uygun olmayabilir.',

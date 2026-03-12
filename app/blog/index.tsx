@@ -11,10 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useBlog } from '../../../src/hooks/use-blog';
-import { BlogCard } from '../../../src/components/blog/BlogCard';
-import { EmptyState } from '../../../src/components/ui/EmptyState';
-import { COLORS } from '../../../src/lib/constants';
+import { useBlog } from '../../src/hooks/use-blog';
+import { BlogCard } from '../../src/components/blog/BlogCard';
+import { EmptyState } from '../../src/components/ui/EmptyState';
+import { COLORS } from '../../src/lib/constants';
 import { useSWRConfig } from 'swr';
 
 const CATEGORIES = [

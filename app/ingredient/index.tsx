@@ -10,10 +10,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useIngredients } from '../../../src/hooks/useIngredients';
-import { IngredientCard } from '../../../src/components/ingredients/IngredientCard';
-import { EmptyState } from '../../../src/components/ui/EmptyState';
-import { COLORS } from '../../../src/lib/constants';
+import { useIngredients } from '../../src/hooks/useIngredients';
+import { IngredientCard } from '../../src/components/ingredients/IngredientCard';
+import { EmptyState } from '../../src/components/ui/EmptyState';
+import { COLORS } from '../../src/lib/constants';
 
 const AGE_FILTERS: { label: string; months: number | undefined }[] = [
   { label: 'Tümü', months: undefined },

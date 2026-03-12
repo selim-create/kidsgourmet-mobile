@@ -5,13 +5,13 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getFoodIntroductionItems } from '../../../src/services/food-introduction-service';
-import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
-import { Badge } from '../../../src/components/ui/Badge';
-import { Card } from '../../../src/components/ui/Card';
-import { COLORS, API_ENDPOINTS } from '../../../src/lib/constants';
-import { formatStartAge } from '../../../src/utils/ageFormatter';
-import type { FoodIntroductionItem } from '../../../src/lib/types';
+import { getFoodIntroductionItems } from '../../src/services/food-introduction-service';
+import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
+import { Badge } from '../../src/components/ui/Badge';
+import { Card } from '../../src/components/ui/Card';
+import { COLORS, API_ENDPOINTS } from '../../src/lib/constants';
+import { formatStartAge } from '../../src/utils/ageFormatter';
+import type { FoodIntroductionItem } from '../../src/lib/types';
 
 const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   low: { label: 'Düşük Alerji Riski', color: '#16A34A', bg: '#DCFCE7' },

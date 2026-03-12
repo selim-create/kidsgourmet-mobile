@@ -19,6 +19,7 @@ import { useSWRConfig } from 'swr';
 
 export default function VaccineScreen() {
   const { vaccines, isLoading } = useVaccines();
+  const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
   const [administered, setAdministered] = useState<Record<number, string>>({});
   const [refreshing, setRefreshing] = useState(false);
   const { mutate } = useSWRConfig();
@@ -36,8 +37,8 @@ export default function VaccineScreen() {
     }));
   };
 
-  const total = vaccines.length;
-  const done = vaccines.filter((v) => administered[v.id]).length;
+  const total = safeVaccines.length;
+  const done = safeVaccines.filter((v) => administered[v.id]).length;
   const pending = total - done;
   const completionPct = total > 0 ? Math.round((done / total) * 100) : 0;
 
@@ -96,7 +97,7 @@ export default function VaccineScreen() {
       >
         {isLoading ? (
           <LoadingSpinner label="Aşı takvimi yükleniyor..." />
-        ) : vaccines.length === 0 ? (
+        ) : safeVaccines.length === 0 ? (
           <EmptyState
             icon="medical-outline"
             title="Aşı bilgisi bulunamadı"
@@ -105,7 +106,7 @@ export default function VaccineScreen() {
         ) : (
           <>
             {/* Overdue warning */}
-            {vaccines.some((v) => !administered[v.id]) && (
+            {safeVaccines.some((v) => !administered[v.id]) && (
               <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4 flex-row items-start">
                 <Ionicons name="warning-outline" size={20} color="#CA8A04" />
                 <View className="ml-2 flex-1">
@@ -119,7 +120,7 @@ export default function VaccineScreen() {
               </View>
             )}
 
-            {vaccines.map((vaccine) => (
+            {safeVaccines.map((vaccine) => (
               <VaccineCard
                 key={vaccine.id}
                 vaccine={vaccine}

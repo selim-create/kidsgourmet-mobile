@@ -18,7 +18,7 @@ export function useFoodIntroduction() {
   );
 
   return {
-    items: data ?? [],
+    items: Array.isArray(data) ? data : [],
     isLoading,
     error,
   };

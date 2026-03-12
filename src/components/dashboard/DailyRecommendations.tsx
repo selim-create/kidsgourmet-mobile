@@ -11,6 +11,8 @@ interface DailyRecommendationsProps {
 }
 
 export function DailyRecommendations({ recommendations, isLoading }: DailyRecommendationsProps) {
+  const safeRecommendations = Array.isArray(recommendations) ? recommendations : [];
+
   if (isLoading) {
     return (
       <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 16, marginBottom: 12 }}>
@@ -19,7 +21,7 @@ export function DailyRecommendations({ recommendations, isLoading }: DailyRecomm
     );
   }
 
-  if (recommendations.length === 0) return null;
+  if (safeRecommendations.length === 0) return null;
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -38,7 +40,7 @@ export function DailyRecommendations({ recommendations, isLoading }: DailyRecomm
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingRight: 4, gap: 10 }}
       >
-        {recommendations.slice(0, 6).map((recipe) => (
+        {safeRecommendations.slice(0, 6).map((recipe) => (
           <TouchableOpacity
             key={recipe.id}
             activeOpacity={0.8}

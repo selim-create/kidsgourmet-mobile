@@ -10,8 +10,9 @@ interface ShoppingListWidgetProps {
 }
 
 export function ShoppingListWidget({ items, isLoading }: ShoppingListWidgetProps) {
-  const uncheckedCount = items.filter((i) => !i.is_checked).length;
-  const totalCount = items.length;
+  const safeItems = Array.isArray(items) ? items : [];
+  const uncheckedCount = safeItems.filter((i) => !i.is_checked).length;
+  const totalCount = safeItems.length;
 
   return (
     <TouchableOpacity

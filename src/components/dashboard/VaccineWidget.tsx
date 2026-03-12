@@ -11,7 +11,8 @@ interface VaccineWidgetProps {
 }
 
 export function VaccineWidget({ vaccines, isLoading }: VaccineWidgetProps) {
-  const upcomingCount = vaccines.filter(
+  const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
+  const upcomingCount = safeVaccines.filter(
     (v) => !v.recommended_age_months || v.recommended_age_months >= 0,
   ).length;
 

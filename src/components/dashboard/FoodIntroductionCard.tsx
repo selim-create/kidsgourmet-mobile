@@ -10,6 +10,8 @@ interface FoodIntroductionCardProps {
 }
 
 export function FoodIntroductionCard({ items, isLoading }: FoodIntroductionCardProps) {
+  const safeItems = Array.isArray(items) ? items : [];
+
   if (isLoading) {
     return (
       <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 16, marginBottom: 12 }}>
@@ -18,7 +20,7 @@ export function FoodIntroductionCard({ items, isLoading }: FoodIntroductionCardP
     );
   }
 
-  if (items.length === 0) return null;
+  if (safeItems.length === 0) return null;
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -37,7 +39,7 @@ export function FoodIntroductionCard({ items, isLoading }: FoodIntroductionCardP
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingRight: 4, gap: 10 }}
       >
-        {items.slice(0, 6).map((item) => (
+        {safeItems.slice(0, 6).map((item) => (
           <TouchableOpacity
             key={item.id}
             activeOpacity={0.8}

@@ -15,7 +15,7 @@ export function useShoppingList() {
   );
 
   return {
-    items: data ?? [],
+    items: Array.isArray(data) ? data : [],
     isLoading,
     error,
     mutate,

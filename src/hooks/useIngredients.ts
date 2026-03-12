@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 export function useIngredients(filters?: { search?: string; age?: number }) {
   const search = filters?.search?.trim() ?? '';
 
-  const key = `${API_ENDPOINTS.FOOD_INTRODUCTION}`;
+  const key = `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}`;
 
   const { data, error, isLoading } = useSWR<FoodIntroductionItem[]>(
     key,

@@ -24,7 +24,7 @@ export default function IngredientDetailScreen() {
 
   // Fetch all items and find the one with matching id
   const { data: items, isLoading } = useSWR<FoodIntroductionItem[]>(
-    API_ENDPOINTS.FOOD_INTRODUCTION,
+    API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED,
     () => getFoodIntroductionItems(),
   );
 

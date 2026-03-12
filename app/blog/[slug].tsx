@@ -15,7 +15,7 @@ import { getBlogPost } from '../../src/services/blog-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
-import { COLORS, API_ENDPOINTS } from '../../src/lib/constants';
+import { COLORS } from '../../src/lib/constants';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '';
@@ -44,7 +44,7 @@ export default function BlogDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
 
   const { data: post, isLoading } = useSWR(
-    slug ? API_ENDPOINTS.BLOG_POST(slug) : null,
+    slug ? `/wp/v2/posts?slug=${slug}&_embed` : null,
     () => getBlogPost(slug!),
   );
 

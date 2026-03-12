@@ -79,9 +79,53 @@ export async function apiRequest<T>(
   throw new Error('Unexpected non-JSON response from server');
 }
 
+export async function apiRequestWithHeaders<T>(
+  endpoint: string,
+  options: RequestOptions = {},
+): Promise<{ data: T; headers: Record<string, string> }> {
+  const { skipAuth = false, headers: extraHeaders, ...rest } = options;
+
+  const baseHeaders = await buildHeaders(skipAuth);
+  const url = `${API_URL}${endpoint}`;
+
+  const response = await fetch(url, {
+    ...rest,
+    headers: {
+      ...baseHeaders,
+      ...(extraHeaders as Record<string, string>),
+    },
+  });
+
+  if (!response.ok) {
+    let errorMessage = `HTTP error ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message ?? errorData.error ?? errorMessage;
+    } catch {
+      // ignore parse errors
+    }
+    throw new Error(errorMessage);
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    const data = (await response.json()) as T;
+    const headers: Record<string, string> = {};
+    response.headers.forEach((value: string, key: string) => {
+      headers[key] = value;
+    });
+    return { data, headers };
+  }
+
+  throw new Error('Unexpected non-JSON response from server');
+}
+
 export const api = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
     apiRequest<T>(endpoint, { method: 'GET', ...options }),
+
+  getWithHeaders: <T>(endpoint: string, options?: RequestOptions) =>
+    apiRequestWithHeaders<T>(endpoint, { method: 'GET', ...options }),
 
   post: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
     apiRequest<T>(endpoint, {

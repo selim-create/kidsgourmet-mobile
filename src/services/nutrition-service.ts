@@ -13,7 +13,7 @@ export async function getNutritionSummary(
   const query = params.toString();
   return api.get<NutritionSummary>(
     query
-      ? `${API_ENDPOINTS.NUTRITION_SUMMARY}?${query}`
-      : API_ENDPOINTS.NUTRITION_SUMMARY,
+      ? `${API_ENDPOINTS.NUTRITION_WEEKLY_SUMMARY}?${query}`
+      : API_ENDPOINTS.NUTRITION_WEEKLY_SUMMARY,
   );
 }

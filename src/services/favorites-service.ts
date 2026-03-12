@@ -8,10 +8,13 @@ export async function getFavorites(): Promise<Recipe[]> {
 
 export async function toggleFavorite(recipeId: number): Promise<{ is_favorite: boolean }> {
   return api.post<{ is_favorite: boolean }>(
-    API_ENDPOINTS.FAVORITE_TOGGLE(recipeId),
+    API_ENDPOINTS.FAVORITES,
+    { item_id: recipeId, item_type: 'recipe' },
   );
 }
 
 export async function removeFavorite(recipeId: number): Promise<void> {
-  return api.delete(API_ENDPOINTS.FAVORITE_TOGGLE(recipeId));
+  return api.delete(API_ENDPOINTS.FAVORITES, {
+    body: JSON.stringify({ item_id: recipeId, item_type: 'recipe' }),
+  });
 }

@@ -10,7 +10,7 @@ export function useDashboardRecommendations() {
   const { activeChild } = useActiveChild();
 
   const key = isAuthenticated
-    ? `${API_ENDPOINTS.DASHBOARD_RECOMMENDATIONS}${activeChild ? `?child_id=${activeChild.id}` : ''}`
+    ? `${API_ENDPOINTS.RECOMMENDATIONS}${activeChild ? `?child_id=${activeChild.id}` : ''}`
     : null;
 
   const { data, error, isLoading } = useSWR<Recipe[]>(

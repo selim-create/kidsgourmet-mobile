@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
@@ -16,15 +15,29 @@ import { useDashboardRecommendations } from '../../src/hooks/useDashboardRecomme
 import { useMealPlan } from '../../src/hooks/useMealPlan';
 import { useNutritionSummary } from '../../src/hooks/useNutritionSummary';
 import { useFoodIntroduction } from '../../src/hooks/useFoodIntroduction';
+import { useVaccines } from '../../src/hooks/useVaccines';
+import { useShoppingList } from '../../src/hooks/useShoppingList';
+import { useGrowthData } from '../../src/hooks/useGrowthData';
+import { useBLWResults } from '../../src/hooks/useBLWResults';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Button } from '../../src/components/ui/Button';
+import { ChildSwitcher } from '../../src/components/dashboard/ChildSwitcher';
+import { AllergyBanner } from '../../src/components/dashboard/AllergyBanner';
+import { WeeklyOverview } from '../../src/components/dashboard/WeeklyOverview';
+import { TodaysMeals } from '../../src/components/dashboard/TodaysMeals';
+import { NutritionSummaryCard } from '../../src/components/dashboard/NutritionSummaryCard';
+import { FoodIntroductionCard } from '../../src/components/dashboard/FoodIntroductionCard';
+import { DailyRecommendations } from '../../src/components/dashboard/DailyRecommendations';
+import { ShoppingListWidget } from '../../src/components/dashboard/ShoppingListWidget';
+import { VaccineWidget } from '../../src/components/dashboard/VaccineWidget';
+import { GrowthTrackingWidget } from '../../src/components/dashboard/GrowthTrackingWidget';
+import { BLWReadinessWidget } from '../../src/components/dashboard/BLWReadinessWidget';
 import { formatAge } from '../../src/utils/ageFormatter';
-import { formatDuration } from '../../src/utils/helpers';
+import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 import { useSWRConfig } from 'swr';
-import type { Recipe, FoodIntroductionItem } from '../../src/lib/types';
 
 function GuestDashboard() {
   return (
@@ -93,114 +106,23 @@ function GuestDashboard() {
   );
 }
 
-const MINI_CARD_WIDTH = 160;
-
-function RecipeMiniCard({ recipe }: { recipe: Recipe }) {
-  const totalTime = recipe.total_time ?? (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
-  const primaryAgeGroup = recipe.age_groups?.[0];
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => router.push(`/(tabs)/recipes/${recipe.slug}`)}
-      className="bg-white rounded-2xl overflow-hidden mr-3"
-      style={{
-        width: MINI_CARD_WIDTH,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-      }}
-    >
-      <View className="relative">
-        <Image
-          source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
-          style={{ width: MINI_CARD_WIDTH, height: 110 }}
-          contentFit="cover"
-          placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
-        />
-        {primaryAgeGroup ? (
-          <View
-            className="absolute top-2 left-2 rounded-full px-2 py-0.5"
-            style={{ backgroundColor: primaryAgeGroup.color ?? '#FF8A65' }}
-          >
-            <Text className="text-white font-medium" style={{ fontSize: 10 }}>
-              {primaryAgeGroup.name}
-            </Text>
-          </View>
-        ) : null}
-        {totalTime > 0 ? (
-          <View
-            className="absolute bottom-2 right-2 flex-row items-center rounded-full px-2 py-0.5"
-            style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
-          >
-            <Ionicons name="time-outline" size={10} color="#fff" />
-            <Text className="text-white font-medium ml-0.5" style={{ fontSize: 10 }}>
-              {formatDuration(totalTime)}
-            </Text>
-          </View>
-        ) : null}
-      </View>
-      <View className="p-2.5">
-        <Text className="text-dark font-bold text-sm" numberOfLines={2}>
-          {recipe.title}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function FoodIntroMiniCard({ item }: { item: FoodIntroductionItem }) {
-  return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => router.push(`/ingredient/${item.id}`)}
-      className="bg-white rounded-2xl overflow-hidden mr-3 p-3 items-center"
-      style={{
-        width: 120,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      }}
-    >
-      {item.image ? (
-        <Image
-          source={{ uri: item.image }}
-          style={{ width: 56, height: 56, borderRadius: 28 }}
-          contentFit="cover"
-        />
-      ) : (
-        <View
-          className="w-14 h-14 rounded-full bg-secondary/20 items-center justify-center"
-        >
-          <Text style={{ fontSize: 28 }}>🥦</Text>
-        </View>
-      )}
-      <Text className="text-dark font-semibold text-xs mt-2 text-center" numberOfLines={2}>
-        {item.food_name}
-      </Text>
-      {item.introduction_method ? (
-        <Text className="text-gray-400 text-xs text-center mt-0.5" numberOfLines={2}>
-          {item.introduction_method}
-        </Text>
-      ) : null}
-    </TouchableOpacity>
-  );
-}
-
 export default function DashboardScreen() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { activeChild } = useActiveChild();
+  const { activeChild, children: childList, setActiveChild } = useActiveChild();
   const { recommendations, isLoading: loadingRecs } = useDashboardRecommendations();
   const { mealPlan, isLoading: loadingPlan } = useMealPlan();
   const { summary: nutritionSummary, isLoading: loadingNutrition } = useNutritionSummary('week');
   const { items: foodItems, isLoading: loadingFood } = useFoodIntroduction();
+  const { vaccines, isLoading: loadingVaccines } = useVaccines();
+  const { items: shoppingItems, isLoading: loadingShopping } = useShoppingList();
+  const { growthData, isLoading: loadingGrowth } = useGrowthData();
+  const { blwResult, isLoading: loadingBLW } = useBLWResults();
   const { mutate } = useSWRConfig();
 
   const [refreshing, setRefreshing] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState(
+    new Date().toISOString().split('T')[0],
+  );
 
   if (isLoading) {
     return <LoadingSpinner fullScreen label="Yükleniyor..." />;
@@ -223,14 +145,7 @@ export default function DashboardScreen() {
     return 'İyi akşamlar';
   };
 
-  const totalMeals =
-    mealPlan?.days.reduce((acc, d) => acc + d.meals.length, 0) ?? 0;
-  const completedMeals =
-    mealPlan?.days.reduce(
-      (acc, d) => acc + d.meals.filter((m) => m.is_completed).length,
-      0,
-    ) ?? 0;
-  const completionRate = totalMeals > 0 ? Math.round((completedMeals / totalMeals) * 100) : 0;
+  const ageMonths = activeChild ? getAgeInMonths(activeChild.birth_date) : 0;
 
   return (
     <SafeAreaView className="flex-1 bg-light">
@@ -240,6 +155,7 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF8A65" />
         }
       >
+        {/* Header */}
         <View className="bg-primary px-5 pt-4 pb-8">
           <View className="flex-row items-center justify-between mb-4">
             <View>
@@ -284,7 +200,45 @@ export default function DashboardScreen() {
           )}
         </View>
 
+        {/* Child Switcher (only when multiple children) */}
+        {childList.length > 1 && (
+          <View style={{ backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
+            <ChildSwitcher
+              children={childList}
+              activeChild={activeChild}
+              onSelect={setActiveChild}
+            />
+          </View>
+        )}
+
         <View className="px-4 -mt-4">
+          {/* Banners */}
+          {activeChild && (
+            <View style={{ marginTop: 8, marginBottom: 4 }}>
+              <AllergyBanner child={activeChild} />
+            </View>
+          )}
+
+          {/* Weekly Overview */}
+          {activeChild && (
+            <View style={{ marginTop: 16, marginBottom: 4 }}>
+              <WeeklyOverview
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                mealPlanDays={mealPlan?.days}
+              />
+            </View>
+          )}
+
+          {/* Today's Meals */}
+          {activeChild && (
+            <TodaysMeals
+              selectedDate={selectedDate}
+              mealPlanDays={mealPlan?.days}
+              isLoading={loadingPlan}
+            />
+          )}
+
           {/* Stats row */}
           <View className="flex-row gap-3 mb-6">
             <Card className="flex-1" padding="sm">
@@ -296,10 +250,16 @@ export default function DashboardScreen() {
                 <LoadingSpinner size="small" />
               ) : (
                 <>
-                  <Text className="text-2xl font-bold text-dark">%{completionRate}</Text>
-                  <Text className="text-gray-400 text-xs">
-                    {completedMeals}/{totalMeals} öğün tamamlandı
+                  <Text className="text-2xl font-bold text-dark">
+                    %{mealPlan
+                      ? (() => {
+                          const total = mealPlan.days.reduce((a, d) => a + d.meals.length, 0);
+                          const done = mealPlan.days.reduce((a, d) => a + d.meals.filter((m) => m.is_completed).length, 0);
+                          return total > 0 ? Math.round((done / total) * 100) : 0;
+                        })()
+                      : 0}
                   </Text>
+                  <Text className="text-gray-400 text-xs">tamamlandı</Text>
                 </>
               )}
             </Card>
@@ -318,102 +278,93 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Nutrition Summary Widget */}
+          {/* Nutrition Summary Card */}
           {activeChild && (
-            <Card className="mb-6">
-              <View className="flex-row items-center justify-between mb-3">
-                <Text className="text-dark font-bold text-base">Haftalık Beslenme</Text>
-                <Badge variant="info" size="sm">Bu Hafta</Badge>
-              </View>
-
-              {loadingNutrition ? (
-                <LoadingSpinner size="small" />
-              ) : nutritionSummary ? (
-                <View className="gap-3">
-                  {/* Calories */}
-                  {nutritionSummary.calories_total !== undefined && (
-                    <View>
-                      <View className="flex-row items-center justify-between mb-1">
-                        <Text className="text-gray-500 text-sm">🔥 Kalori</Text>
-                        <Text className="text-dark text-sm font-semibold">
-                          {nutritionSummary.calories_total}
-                          {nutritionSummary.calories_target ? ` / ${nutritionSummary.calories_target} kcal` : ' kcal'}
-                        </Text>
-                      </View>
-                      {nutritionSummary.calories_target ? (
-                        <View className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <View
-                            className="h-full rounded-full bg-primary"
-                            style={{
-                              width: `${Math.min(100, Math.round((nutritionSummary.calories_total / nutritionSummary.calories_target) * 100))}%`,
-                            }}
-                          />
-                        </View>
-                      ) : null}
-                    </View>
-                  )}
-
-                  {/* Protein */}
-                  {nutritionSummary.protein_total !== undefined && (
-                    <View>
-                      <View className="flex-row items-center justify-between mb-1">
-                        <Text className="text-gray-500 text-sm">🍗 Protein</Text>
-                        <Text className="text-dark text-sm font-semibold">
-                          {nutritionSummary.protein_total}g
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-
-                  {/* Meals count */}
-                  {nutritionSummary.meals_count !== undefined && (
-                    <View className="flex-row items-center">
-                      <Ionicons name="restaurant-outline" size={14} color="#9CA3AF" />
-                      <Text className="text-gray-400 text-xs ml-1">
-                        {nutritionSummary.meals_count} öğün kaydedildi
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              ) : (
-                <Text className="text-gray-400 text-sm text-center py-2">
-                  Haftalık öğün ekleyerek beslenme takibi yapın.
-                </Text>
-              )}
-            </Card>
+            <NutritionSummaryCard
+              summary={nutritionSummary}
+              isLoading={loadingNutrition}
+            />
           )}
 
-          {/* Food Introduction — "Bu Hafta Denenebilir" */}
+          {/* Food Introduction */}
           {activeChild && (
-            <View className="mb-6">
-              <View className="flex-row items-center justify-between mb-3">
-                <Text className="text-dark text-lg font-bold">Bu Hafta Denenebilir 🍼</Text>
-                <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/ingredient')}>
-                  <Text className="text-primary text-sm font-medium">Tümünü Gör</Text>
-                </TouchableOpacity>
-              </View>
+            <FoodIntroductionCard
+              items={foodItems}
+              isLoading={loadingFood}
+            />
+          )}
 
-              {loadingFood ? (
-                <LoadingSpinner label="Yükleniyor..." />
-              ) : foodItems.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingRight: 4 }}
-                >
-                  {foodItems.slice(0, 6).map((item) => (
-                    <FoodIntroMiniCard key={item.id} item={item} />
-                  ))}
-                </ScrollView>
-              ) : (
-                <Card>
-                  <View className="items-center py-4">
-                    <Text className="text-gray-400 text-center">
-                      Yaşa uygun gıda önerisi için çocuk profili ekleyin
-                    </Text>
-                  </View>
-                </Card>
-              )}
+          {/* Daily Recommendations */}
+          <DailyRecommendations
+            recommendations={recommendations}
+            isLoading={loadingRecs}
+          />
+
+          {/* Shopping List Widget */}
+          {isAuthenticated && (
+            <ShoppingListWidget items={shoppingItems} isLoading={loadingShopping} />
+          )}
+
+          {/* Quick Tools */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937', marginBottom: 10 }}>
+              Hızlı Araçlar 🛠️
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push('/food-guide')}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#fff',
+                  borderRadius: 14,
+                  padding: 14,
+                  alignItems: 'center',
+                  elevation: 1,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.06,
+                  shadowRadius: 3,
+                }}
+              >
+                <Text style={{ fontSize: 24, marginBottom: 4 }}>🥣</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#374151', textAlign: 'center' }}>
+                  Ek Gıda Rehberi
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push('/safety-check')}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#fff',
+                  borderRadius: 14,
+                  padding: 14,
+                  alignItems: 'center',
+                  elevation: 1,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.06,
+                  shadowRadius: 3,
+                }}
+              >
+                <Text style={{ fontSize: 24, marginBottom: 4 }}>🔍</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#374151', textAlign: 'center' }}>
+                  Gıda Güvenliği
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Health Widgets */}
+          {activeChild && (
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937', marginBottom: 10 }}>
+                Sağlık & Gelişim 🌱
+              </Text>
+              <VaccineWidget vaccines={vaccines} isLoading={loadingVaccines} />
+              <GrowthTrackingWidget growthData={growthData} isLoading={loadingGrowth} />
+              <BLWReadinessWidget blwResult={blwResult} isLoading={loadingBLW} ageMonths={ageMonths} />
             </View>
           )}
 
@@ -433,46 +384,6 @@ export default function DashboardScreen() {
             </View>
             <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
           </TouchableOpacity>
-
-          {/* Recommended Recipes */}
-          <View className="mb-6">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-dark text-lg font-bold">Önerilen Tarifler</Text>
-              <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/(tabs)/recipes')}>
-                <Text className="text-primary text-sm font-medium">Tümünü Gör</Text>
-              </TouchableOpacity>
-            </View>
-
-            {loadingRecs ? (
-              <LoadingSpinner label="Tarifler yükleniyor..." />
-            ) : recommendations.length > 0 ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingRight: 4 }}
-              >
-                {recommendations.slice(0, 8).map((recipe) => (
-                  <RecipeMiniCard key={recipe.id} recipe={recipe} />
-                ))}
-              </ScrollView>
-            ) : (
-              <Card>
-                <View className="items-center py-4">
-                  <Ionicons name="restaurant-outline" size={32} color="#D1D5DB" />
-                  <Text className="text-gray-400 text-center mt-2">
-                    Öneri için çocuk profili ekleyin
-                  </Text>
-                  <TouchableOpacity
-                    className="mt-2"
-                    activeOpacity={0.8}
-                    onPress={() => router.push('/(tabs)/profile')}
-                  >
-                    <Text className="text-primary font-medium">Profil Ekle →</Text>
-                  </TouchableOpacity>
-                </View>
-              </Card>
-            )}
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

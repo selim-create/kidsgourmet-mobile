@@ -389,3 +389,118 @@ export interface ShoppingItem {
   is_checked: boolean;
   quantity?: string;
 }
+
+export interface ShoppingListItem {
+  id: number;
+  name: string;
+  category?: string;
+  quantity?: string;
+  unit?: string;
+  is_checked: boolean;
+  recipe_id?: number;
+  recipe_title?: string;
+}
+
+export interface ShoppingList {
+  id?: number;
+  name?: string;
+  items: ShoppingListItem[];
+  created_at?: string;
+  updated_at?: string;
+}
+
+// ─── Growth Types ─────────────────────────────────────────────────────────────
+
+export interface GrowthRecord {
+  id?: number;
+  child_id: number;
+  date: string;
+  weight_kg?: number;
+  height_cm?: number;
+  head_circumference_cm?: number;
+  notes?: string;
+}
+
+export interface GrowthData {
+  records: GrowthRecord[];
+  latest?: GrowthRecord;
+  percentile?: PercentileResult;
+}
+
+export interface PercentileResult {
+  id?: number;
+  child_id?: number;
+  weight_percentile?: number;
+  height_percentile?: number;
+  bmi_percentile?: number;
+  age_months?: number;
+  calculated_at?: string;
+  interpretation?: string;
+}
+
+// ─── BLW / Solid Food Types ───────────────────────────────────────────────────
+
+export interface BLWTestResult {
+  id?: number;
+  child_id?: number;
+  score?: number;
+  max_score?: number;
+  readiness_level?: 'not_ready' | 'almost_ready' | 'ready';
+  readiness_label?: string;
+  recommendations?: string[];
+  completed_at?: string;
+}
+
+export interface SolidFoodReadinessResult {
+  id?: number;
+  child_id?: number;
+  is_ready: boolean;
+  readiness_score?: number;
+  factors?: {
+    can_sit_unsupported?: boolean;
+    shows_interest?: boolean;
+    lost_tongue_thrust?: boolean;
+    can_hold_objects?: boolean;
+  };
+  notes?: string;
+  checked_at?: string;
+}
+
+// ─── Allergen Types ───────────────────────────────────────────────────────────
+
+export interface Allergen {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string;
+  common_sources?: string[];
+  icon?: string;
+  severity_default?: 'low' | 'medium' | 'high' | 'critical';
+}
+
+export interface ChildAllergen {
+  id?: number;
+  child_id: number;
+  allergen: Allergen;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  notes?: string;
+}
+
+// ─── Meal Slot Types ──────────────────────────────────────────────────────────
+
+export interface MealSlot {
+  id?: number;
+  meal_type_slug: string;
+  meal_type_name: string;
+  recipe?: Recipe;
+  custom_meal?: string;
+  notes?: string;
+  is_completed?: boolean;
+  scheduled_time?: string;
+}
+
+export interface MealPlanSlot {
+  date: string;
+  day_name: string;
+  slots: MealSlot[];
+}

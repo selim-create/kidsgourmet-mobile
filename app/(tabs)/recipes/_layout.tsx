@@ -13,7 +13,7 @@ export default function RecipesLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ title: 'Tarifler', headerShown: true }}
+        options={{ title: 'Tarifler', headerShown: false }}
       />
       <Stack.Screen
         name="[slug]"

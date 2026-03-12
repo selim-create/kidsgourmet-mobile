@@ -15,6 +15,7 @@ import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { Badge } from '../../../src/components/ui/Badge';
+import { Header } from '../../../src/components/ui/Header';
 import type { SearchFilters } from '../../../src/lib/types';
 import { API_ENDPOINTS, PAGINATION } from '../../../src/lib/constants';
 
@@ -72,7 +73,9 @@ export default function RecipesScreen() {
   const currentPage = filters.page ?? 1;
 
   return (
-    <View className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header showLogo title="Tarifler" />
+
       {/* Search Bar */}
       <View className="bg-white px-4 py-3 border-b border-gray-100">
         <View className="flex-row items-center bg-gray-100 rounded-xl px-3 py-2">

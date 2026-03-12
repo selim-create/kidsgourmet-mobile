@@ -5,8 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/contexts/AuthContext';
@@ -16,6 +16,7 @@ import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
+import { Header } from '../../src/components/ui/Header';
 
 function getWeekOffsetLabel(offset: number): string {
   if (offset === 0) return 'Bu Hafta';
@@ -53,10 +54,8 @@ export default function MealPlanScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-light">
-        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
-          <Text className="text-dark text-2xl font-bold">Haftalık Plan</Text>
-        </View>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <Header showLogo title="Yemek Planı" />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="calendar-outline"
@@ -67,7 +66,7 @@ export default function MealPlanScreen() {
             Giriş Yap
           </Button>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -80,36 +79,33 @@ export default function MealPlanScreen() {
     ) ?? 0;
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-light">
-      {/* Header */}
-      <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
-        <Text className="text-dark text-2xl font-bold">Haftalık Plan</Text>
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header showLogo title="Yemek Planı" />
 
-        {/* Week Navigation */}
-        <View className="flex-row items-center justify-between mt-3">
-          <TouchableOpacity
-            onPress={() => setWeekOffset((o) => o - 1)}
-            className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center"
-          >
-            <Ionicons name="chevron-back" size={18} color="#455A64" />
-          </TouchableOpacity>
+      {/* Week Navigation */}
+      <View style={styles.weekNav}>
+        <TouchableOpacity
+          onPress={() => setWeekOffset((o) => o - 1)}
+          style={styles.navButton}
+        >
+          <Ionicons name="chevron-back" size={18} color="#455A64" />
+        </TouchableOpacity>
 
-          <View className="items-center">
-            <Text className="text-dark font-semibold">
-              {getWeekOffsetLabel(weekOffset)}
-            </Text>
-            <Text className="text-gray-400 text-xs">
-              {year} - {currentWeek}. Hafta
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => setWeekOffset((o) => o + 1)}
-            className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center"
-          >
-            <Ionicons name="chevron-forward" size={18} color="#455A64" />
-          </TouchableOpacity>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ color: '#455A64', fontWeight: '600' }}>
+            {getWeekOffsetLabel(weekOffset)}
+          </Text>
+          <Text style={{ color: '#9CA3AF', fontSize: 12 }}>
+            {year} - {currentWeek}. Hafta
+          </Text>
         </View>
+
+        <TouchableOpacity
+          onPress={() => setWeekOffset((o) => o + 1)}
+          style={styles.navButton}
+        >
+          <Ionicons name="chevron-forward" size={18} color="#455A64" />
+        </TouchableOpacity>
       </View>
 
       {isLoading ? (
@@ -209,7 +205,28 @@ export default function MealPlanScreen() {
           )}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  weekNav: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  navButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 

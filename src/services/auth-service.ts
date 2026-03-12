@@ -5,7 +5,10 @@ import type { LoginCredentials, RegisterData, AuthResponse, User } from '../lib/
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>(
     API_ENDPOINTS.LOGIN,
-    credentials,
+    {
+      email: credentials.username, // Backend expects 'email' parameter
+      password: credentials.password,
+    },
     { skipAuth: true },
   );
   if (response.token) {

@@ -7,12 +7,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
+import { useAuth } from '../../src/contexts/AuthContext';
 import { RecipeCard } from '../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
+import { Button } from '../../src/components/ui/Button';
 import { router } from 'expo-router';
 
 export default function FavoritesScreen() {
+  const { isAuthenticated } = useAuth();
   const { favorites, isLoading, reload } = useFavorites();
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -21,6 +24,26 @@ export default function FavoritesScreen() {
     await reload();
     setRefreshing(false);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView edges={['top']} className="flex-1 bg-light">
+        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
+          <Text className="text-dark text-2xl font-bold">Favorilerim</Text>
+        </View>
+        <View className="flex-1 items-center justify-center px-6">
+          <EmptyState
+            icon="heart-outline"
+            title="Favorilere erişmek için giriş yapın"
+            description="Beğendiğiniz tarifleri kalp ikonuna tıklayarak favorilere ekleyebilirsiniz"
+          />
+          <Button onPress={() => router.push('/(auth)/login')} className="mt-4 w-full">
+            Giriş Yap
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-light">

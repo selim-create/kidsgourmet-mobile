@@ -50,7 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     const response = await loginService(credentials);
-    setUser(response.user);
+    // Fetch full profile after login
+    try {
+      const profile = await getProfile();
+      setUser(profile);
+    } catch {
+      setUser(response.user);
+    }
     return response;
   }, []);
 

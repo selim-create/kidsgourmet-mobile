@@ -300,18 +300,34 @@ export interface DashboardAlert {
 // ─── Auth Types ────────────────────────────────────────────────────────────────
 
 export interface LoginCredentials {
-  email: string;
+  username: string; // email OR username
   password: string;
 }
 
 export interface RegisterData {
-  name: string;
   email: string;
   password: string;
-  password_confirmation?: string;
+  name: string;
+  username?: string;
+  child?: {
+    name: string;
+    birth_date: string;
+  };
+  consents?: {
+    terms_accepted: boolean;
+    terms_accepted_at: string | null;
+    marketing_consent: boolean;
+    marketing_consent_at: string | null;
+    sensitive_data_consent: boolean;
+    sensitive_data_consent_at: string | null;
+    guardian_declaration?: boolean;
+    guardian_declaration_at?: string | null;
+  };
 }
 
 export interface AuthResponse {
   token: string;
   user: User;
+  redirect_url?: string;
+  is_expert?: boolean;
 }

@@ -9,13 +9,15 @@ export function useDashboardRecommendations() {
   const { isAuthenticated } = useAuth();
   const { activeChild } = useActiveChild();
 
-  const key = isAuthenticated
-    ? `${API_ENDPOINTS.RECOMMENDATIONS}${activeChild ? `?child_id=${activeChild.id}` : ''}`
-    : null;
+  // Dashboard recommendations require both authentication and an active child
+  const key =
+    isAuthenticated && activeChild
+      ? `${API_ENDPOINTS.RECOMMENDATIONS_DASHBOARD}?child_id=${activeChild.id}`
+      : null;
 
   const { data, error, isLoading } = useSWR<Recipe[]>(
     key,
-    () => getDashboardRecommendations(activeChild?.id),
+    () => getDashboardRecommendations(activeChild!.id),
   );
 
   return {

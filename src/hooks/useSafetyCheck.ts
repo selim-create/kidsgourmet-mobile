@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { checkIngredientSafety } from '../services/safety-service';
+import { checkIngredientSafetyByName } from '../services/safety-service';
 import type { SafetyCheck, Recipe } from '../lib/types';
 import { useActiveChild } from '../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../utils/ageCalculator';
@@ -12,7 +12,7 @@ export function useSafetyCheck(ingredient: string | null, ageMonths: number | nu
 
   const { data, error, isLoading } = useSWR<SafetyCheck>(
     key,
-    () => checkIngredientSafety(ingredient!, ageMonths!),
+    () => checkIngredientSafetyByName(ingredient!, ageMonths!),
   );
 
   return {
@@ -44,7 +44,7 @@ export function useRecipeSafetyCheck(recipe: Recipe | null | undefined) {
   const { data, error, isLoading } = useSWR<SafetyCheck[]>(key, async () => {
     if (!ageMonths) return [];
     const results = await Promise.allSettled(
-      ingredients.map((ing) => checkIngredientSafety(ing.name, ageMonths)),
+      ingredients.map((ing) => checkIngredientSafetyByName(ing.name, ageMonths)),
     );
     return results
       .filter((r): r is PromiseFulfilledResult<SafetyCheck> => r.status === 'fulfilled')

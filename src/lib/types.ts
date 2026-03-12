@@ -22,12 +22,19 @@ export interface Child {
 
 // ─── Recipe Types ──────────────────────────────────────────────────────────────
 
+export interface RecipeExpert {
+  name: string;
+  title?: string;
+  approved?: boolean;
+}
+
 export interface Recipe {
   id: number;
   slug: string;
   title: string;
   excerpt?: string;
   content?: string;
+  image?: string;
   featured_image?: string;
   thumbnail?: string;
   prep_time?: number;
@@ -35,14 +42,19 @@ export interface Recipe {
   total_time?: number;
   servings?: number;
   difficulty?: 'easy' | 'medium' | 'hard';
+  age_group?: string;
+  age_group_color?: string;
+  meal_type?: string;
+  diet_types?: string[];
   age_groups?: AgeGroup[];
   meal_types?: MealType[];
-  diet_types?: DietType[];
   ingredients?: Ingredient[];
   instructions?: Instruction[];
   nutrition?: NutritionInfo;
   author?: Author;
+  expert?: RecipeExpert;
   is_expert_approved?: boolean;
+  is_featured?: boolean;
   is_favorite?: boolean;
   view_count?: number;
   rating?: number;
@@ -215,6 +227,26 @@ export interface SafetyCheck {
   alternatives?: string[];
 }
 
+export interface SafetyAlert {
+  type: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  ingredient?: string;
+  alternative?: string;
+}
+
+export interface SafetyCheckResult {
+  is_safe: boolean;
+  safety_score?: number;
+  alerts: SafetyAlert[];
+  alternatives?: string[];
+}
+
+export interface BatchSafetyResult {
+  recipe_id: number;
+  result: SafetyCheckResult;
+}
+
 // ─── Comment Types ────────────────────────────────────────────────────────────
 
 export interface Comment {
@@ -244,6 +276,14 @@ export interface PaginatedResponse<T> {
   total_pages: number;
   has_next: boolean;
   has_prev: boolean;
+}
+
+export interface RecipePaginatedResponse {
+  recipes: Recipe[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
 }
 
 // ─── Food Introduction Types ───────────────────────────────────────────────────
@@ -330,4 +370,22 @@ export interface AuthResponse {
   user: User;
   redirect_url?: string;
   is_expert?: boolean;
+}
+
+// ─── Favorites Types ──────────────────────────────────────────────────────────
+
+export interface FavoriteCollection {
+  id: number;
+  name: string;
+  icon?: string;
+}
+
+// ─── Shopping List Types ──────────────────────────────────────────────────────
+
+export interface ShoppingItem {
+  id: number;
+  name: string;
+  category?: string;
+  is_checked: boolean;
+  quantity?: string;
 }

@@ -14,35 +14,50 @@ export const API_ENDPOINTS = {
 
   // Recipes
   RECIPES: '/kg/v1/recipes',
-  RECIPE: (slug: string) => `/kg/v1/recipes/${slug}`,
+  RECIPE: (slug: string) => `/kg/v1/recipes/by-slug/${slug}`,
+  RECIPE_BY_SLUG: (slug: string) => `/kg/v1/recipes/by-slug/${slug}`,
+  RECIPES_BY_AGE: (ageSlug: string) => `/kg/v1/recipes/by-age/${ageSlug}`,
+  RECIPE_RELATED: (recipeId: number) => `/kg/v1/recipes/${recipeId}/related`,
 
   // Favorites
   FAVORITES: '/kg/v1/user/favorites',
+  USER_FAVORITES: '/kg/v1/user/favorites',
+  USER_FAVORITES_TOGGLE: '/kg/v1/user/favorites/toggle',
+  USER_FAVORITES_COLLECTIONS: '/kg/v1/user/favorites/collections',
 
   // Meal Plan
   MEAL_PLAN: '/kg/v1/meal-plan',
+  MEAL_PLAN_CURRENT: '/kg/v1/meal-plan/current',
+  MEAL_PLAN_GENERATE: '/kg/v1/meal-plan/generate',
   MEAL_PLAN_WEEK: (year: number, week: number) => `/kg/v1/meal-plan/${year}/${week}`,
+
+  // Shopping List
+  SHOPPING_LIST: '/kg/v1/shopping-list',
 
   // Blog (WordPress native)
   BLOG: '/wp/v2/posts',
   BLOG_POST: (slug: string) => `/wp/v2/posts?slug=${slug}&_embed`,
+  BLOG_CATEGORIES: '/wp/v2/categories',
 
-  // Taxonomy
-  AGE_GROUPS: '/kg/v1/age-groups',
-  MEAL_TYPES: '/kg/v1/meal-types',
-  DIET_TYPES: '/kg/v1/diet-types',
+  // Taxonomy (WordPress native)
+  AGE_GROUPS: '/wp/v2/age-group',
+  MEAL_TYPES: '/wp/v2/meal-type',
+  DIET_TYPES: '/wp/v2/diet-type',
 
   // Search
   SEARCH: '/kg/v1/search',
+  SEARCH_ALL: '/kg/v1/search',
 
   // Recommendations
   RECOMMENDATIONS: '/kg/v1/recommendations/daily',
   RECOMMENDATIONS_DAILY: '/kg/v1/recommendations/daily',
+  RECOMMENDATIONS_DASHBOARD: '/kg/v1/recommendations/dashboard',
 
   // Nutrition
   NUTRITION: '/kg/v1/nutrition',
   NUTRITION_WEEKLY_SUMMARY: '/kg/v1/nutrition/weekly-summary',
   NUTRITION_MISSING: '/kg/v1/nutrition/missing-nutrients',
+  NUTRITION_MISSING_NUTRIENTS: '/kg/v1/nutrition/missing-nutrients',
 
   // Safety
   SAFETY_CHECK_INGREDIENT: '/kg/v1/safety/check-ingredient',
@@ -51,6 +66,9 @@ export const API_ENDPOINTS = {
 
   // Ingredients
   INGREDIENTS: '/kg/v1/ingredients',
+  INGREDIENTS_ALL: '/kg/v1/ingredients',
+  INGREDIENT_BY_SLUG: (slug: string) => `/kg/v1/ingredients/${slug}`,
+  INGREDIENT_SEARCH: '/kg/v1/ingredients/search',
 
   // Comments
   COMMENTS: '/kg/v1/comments',
@@ -61,6 +79,7 @@ export const API_ENDPOINTS = {
 
   // Food Introduction
   FOOD_INTRODUCTION_SUGGESTED: '/kg/v1/food-introduction/suggested',
+  FOOD_INTRODUCTION_NEXT: '/kg/v1/food-introduction/next-suggestion',
 
   // Vaccines
   VACCINES_MASTER: '/kg/v1/health/vaccines/master',
@@ -69,7 +88,11 @@ export const API_ENDPOINTS = {
 
   // Featured
   FEATURED: '/kg/v1/featured',
+  FEATURED_ALL: '/kg/v1/featured',
   FEATURED_RECIPES: '/kg/v1/featured/recipes',
+
+  // Tools
+  TOOLS: '/kg/v1/tools',
 
   // Newsletter
   NEWSLETTER: '/kg/v1/newsletter',

@@ -7,7 +7,15 @@ export async function getMealPlan(year: number, week: number): Promise<MealPlan>
 }
 
 export async function getCurrentMealPlan(): Promise<MealPlan> {
-  return api.get<MealPlan>(API_ENDPOINTS.MEAL_PLAN);
+  return api.get<MealPlan>(API_ENDPOINTS.MEAL_PLAN_CURRENT);
+}
+
+export async function generateMealPlan(options?: {
+  child_id?: number;
+  week?: number;
+  year?: number;
+}): Promise<MealPlan> {
+  return api.post<MealPlan>(API_ENDPOINTS.MEAL_PLAN_GENERATE, options ?? {});
 }
 
 export async function addRecipeToMealPlan(data: {

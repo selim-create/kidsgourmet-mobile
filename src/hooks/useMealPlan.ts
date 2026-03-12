@@ -11,7 +11,7 @@ export function useMealPlan(year?: number, week?: number) {
     isAuthenticated
       ? year !== undefined && week !== undefined
         ? `${API_ENDPOINTS.MEAL_PLAN}/${year}/${week}`
-        : API_ENDPOINTS.MEAL_PLAN
+        : API_ENDPOINTS.MEAL_PLAN_CURRENT
       : null;
 
   const fetcher = () =>

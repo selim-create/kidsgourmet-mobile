@@ -18,17 +18,87 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
+import { Button } from '../../src/components/ui/Button';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { useSWRConfig } from 'swr';
 
+function GuestDashboard() {
+  return (
+    <SafeAreaView className="flex-1 bg-light">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="bg-primary px-5 pt-4 pb-10 items-center">
+          <Text className="text-white text-4xl font-bold mb-2">🥗</Text>
+          <Text className="text-white text-2xl font-bold">KidsGourmet</Text>
+          <Text className="text-white/80 text-sm mt-1 text-center">
+            Çocuğunuz için en sağlıklı tarifler
+          </Text>
+        </View>
+
+        <View className="px-4 -mt-4">
+          <Card className="mb-4 items-center py-6">
+            <Ionicons name="leaf-outline" size={40} color="#FF8A65" />
+            <Text className="text-dark text-lg font-bold mt-3 mb-1">
+              Hoş Geldiniz!
+            </Text>
+            <Text className="text-gray-400 text-sm text-center mb-4">
+              Kişiselleştirilmiş tarifler, haftalık planlar ve daha fazlası için giriş yapın.
+            </Text>
+            <Button onPress={() => router.push('/(auth)/login')} className="w-full">
+              Giriş Yap
+            </Button>
+            <TouchableOpacity
+              className="mt-3"
+              onPress={() => router.push('/(auth)/register')}
+            >
+              <Text className="text-primary text-sm font-medium">
+                Hesap Oluştur →
+              </Text>
+            </TouchableOpacity>
+          </Card>
+
+          {/* Feature Highlights */}
+          <View className="flex-row gap-3 mb-4">
+            <TouchableOpacity
+              className="flex-1 bg-white rounded-2xl p-4 items-center"
+              onPress={() => router.push('/(tabs)/recipes')}
+            >
+              <Ionicons name="restaurant-outline" size={24} color="#FF8A65" />
+              <Text className="text-dark font-semibold text-sm mt-2">Tarifler</Text>
+              <Text className="text-gray-400 text-xs text-center mt-1">
+                Yüzlerce sağlıklı tarif
+              </Text>
+            </TouchableOpacity>
+            <View className="flex-1 bg-white rounded-2xl p-4 items-center opacity-50">
+              <Ionicons name="calendar-outline" size={24} color="#7CB342" />
+              <Text className="text-dark font-semibold text-sm mt-2">Haftalık Plan</Text>
+              <Text className="text-gray-400 text-xs text-center mt-1">
+                Giriş gerektirir
+              </Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
 export default function DashboardScreen() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { activeChild } = useActiveChild();
   const { recommendations, isLoading: loadingRecs } = useDashboardRecommendations();
   const { mealPlan, isLoading: loadingPlan } = useMealPlan();
   const { mutate } = useSWRConfig();
 
   const [refreshing, setRefreshing] = React.useState(false);
+
+  if (isLoading) {
+    return <LoadingSpinner fullScreen label="Yükleniyor..." />;
+  }
+
+  if (!isAuthenticated) {
+    return <GuestDashboard />;
+  }
 
   const onRefresh = async () => {
     setRefreshing(true);

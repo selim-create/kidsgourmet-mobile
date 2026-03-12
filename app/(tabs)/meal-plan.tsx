@@ -8,12 +8,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useAuth } from '../../src/contexts/AuthContext';
 import { useMealPlan } from '../../src/hooks/useMealPlan';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { EmptyState } from '../../src/components/ui/EmptyState';
-import { router } from 'expo-router';
+import { Button } from '../../src/components/ui/Button';
 
 function getWeekOffsetLabel(offset: number): string {
   if (offset === 0) return 'Bu Hafta';
@@ -34,6 +36,7 @@ function getISOWeek(date: Date): { year: number; week: number } {
 }
 
 export default function MealPlanScreen() {
+  const { isAuthenticated } = useAuth();
   const now = new Date();
   const { year, week } = getISOWeek(now);
   const [weekOffset, setWeekOffset] = useState(0);
@@ -47,6 +50,26 @@ export default function MealPlanScreen() {
     await mutate();
     setRefreshing(false);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView edges={['top']} className="flex-1 bg-light">
+        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
+          <Text className="text-dark text-2xl font-bold">Haftalık Plan</Text>
+        </View>
+        <View className="flex-1 items-center justify-center px-6">
+          <EmptyState
+            icon="calendar-outline"
+            title="Haftalık planı görmek için giriş yapın"
+            description="Kişisel haftalık yemek planınızı oluşturun ve takip edin"
+          />
+          <Button onPress={() => router.push('/(auth)/login')} className="mt-4 w-full">
+            Giriş Yap
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const totalMeals =
     mealPlan?.days.reduce((acc, d) => acc + d.meals.length, 0) ?? 0;
@@ -189,3 +212,4 @@ export default function MealPlanScreen() {
     </SafeAreaView>
   );
 }
+

@@ -3,8 +3,11 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 import type { Child } from '../lib/types';
+import { getChildren } from '../services/user-service';
+import { useAuth } from './AuthContext';
 
 interface ActiveChildContextValue {
   activeChild: Child | null;
@@ -15,7 +18,26 @@ interface ActiveChildContextValue {
 const ActiveChildContext = createContext<ActiveChildContextValue | null>(null);
 
 export function ActiveChildProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
   const [activeChild, setActiveChildState] = useState<Child | null>(null);
+
+  // Load children and set the first as active when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setActiveChildState(null);
+      return;
+    }
+    getChildren()
+      .then((childList) => {
+        if (childList && childList.length > 0) {
+          // Use functional update to avoid stale closure — only set if not already set
+          setActiveChildState((prev) => prev ?? childList[0]);
+        }
+      })
+      .catch(() => {
+        // ignore errors
+      });
+  }, [isAuthenticated]);
 
   const setActiveChild = useCallback((child: Child | null) => {
     setActiveChildState(child);

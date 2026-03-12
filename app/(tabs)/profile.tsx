@@ -18,17 +18,18 @@ import { Card } from '../../src/components/ui/Card';
 import { Button } from '../../src/components/ui/Button';
 import { Badge } from '../../src/components/ui/Badge';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const { activeChild, setActiveChild } = useActiveChild();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { data: children, isLoading: loadingChildren } = useSWR(
-    API_ENDPOINTS.CHILDREN,
+    isAuthenticated ? API_ENDPOINTS.CHILDREN : null,
     () => getChildren(),
   );
 
@@ -56,6 +57,34 @@ export default function ProfileScreen() {
       ],
     );
   };
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView edges={['top']} className="flex-1 bg-light">
+        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
+          <Text className="text-dark text-2xl font-bold">Profil</Text>
+        </View>
+        <View className="flex-1 items-center justify-center px-6">
+          <EmptyState
+            icon="person-outline"
+            title="Profil için giriş yapın"
+            description="Çocuk profillerinizi yönetin ve hesap ayarlarınıza erişin"
+          />
+          <Button onPress={() => router.push('/(auth)/login')} className="mt-4 w-full">
+            Giriş Yap
+          </Button>
+          <TouchableOpacity
+            className="mt-3"
+            onPress={() => router.push('/(auth)/register')}
+          >
+            <Text className="text-primary text-sm font-medium">
+              Hesap Oluştur →
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const menuItems = [
     {

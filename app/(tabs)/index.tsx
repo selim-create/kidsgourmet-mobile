@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Header } from '../../src/components/ui/Header';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useDashboardRecommendations } from '../../src/hooks/useDashboardRecommendations';
@@ -23,7 +23,6 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
-import { Button } from '../../src/components/ui/Button';
 import { ChildSwitcher } from '../../src/components/dashboard/ChildSwitcher';
 import { AllergyBanner } from '../../src/components/dashboard/AllergyBanner';
 import { WeeklyOverview } from '../../src/components/dashboard/WeeklyOverview';
@@ -41,28 +40,30 @@ import { useSWRConfig } from 'swr';
 
 function GuestDashboard() {
   return (
-    <SafeAreaView className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header showLogo showGreeting />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="bg-primary px-5 pt-4 pb-10 items-center">
-          <Text className="text-white text-4xl font-bold mb-2">🥗</Text>
-          <Text className="text-white text-2xl font-bold">KidsGourmet</Text>
-          <Text className="text-white/80 text-sm mt-1 text-center">
-            Çocuğunuz için en sağlıklı tarifler
-          </Text>
-        </View>
-
-        <View className="px-4 -mt-4">
-          <Card className="mb-4 items-center py-6">
+        <View className="px-4 pt-4">
+          <View
+            className="bg-white rounded-2xl items-center py-6 mb-4"
+            style={{ elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 }}
+          >
             <Ionicons name="leaf-outline" size={40} color="#FF8A65" />
             <Text className="text-dark text-lg font-bold mt-3 mb-1">
               Hoş Geldiniz! 👋
             </Text>
-            <Text className="text-gray-400 text-sm text-center mb-4">
+            <Text className="text-gray-400 text-sm text-center mb-4 px-4">
               Hesap oluşturarak kişiselleştirilmiş öneriler, haftalık planlar ve daha fazlasına erişin.
             </Text>
-            <Button onPress={() => router.push('/(auth)/login')} className="w-full">
-              Giriş Yap
-            </Button>
+            <View className="w-full px-4">
+              <TouchableOpacity
+                className="bg-primary rounded-xl py-3 items-center"
+                activeOpacity={0.8}
+                onPress={() => router.push('/(auth)/login')}
+              >
+                <Text className="text-white font-semibold">Giriş Yap</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               className="mt-3"
               activeOpacity={0.8}
@@ -72,7 +73,7 @@ function GuestDashboard() {
                 Hesap Oluştur →
               </Text>
             </TouchableOpacity>
-          </Card>
+          </View>
 
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
@@ -102,12 +103,12 @@ function GuestDashboard() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 export default function DashboardScreen() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const { activeChild, children: childList, setActiveChild } = useActiveChild();
   const { recommendations, isLoading: loadingRecs } = useDashboardRecommendations();
   const { mealPlan, isLoading: loadingPlan } = useMealPlan();
@@ -138,45 +139,35 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
-  const greeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Günaydın';
-    if (h < 17) return 'İyi öğleden sonralar';
-    return 'İyi akşamlar';
-  };
-
   const ageMonths = activeChild ? getAgeInMonths(activeChild.birth_date) : 0;
 
   return (
-    <SafeAreaView className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header
+        showLogo
+        showGreeting
+        rightContent={
+          <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/search')}>
+            <Ionicons name="search-outline" size={22} color="#455A64" />
+          </TouchableOpacity>
+        }
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF8A65" />
         }
       >
-        {/* Header */}
-        <View className="bg-primary px-5 pt-4 pb-8">
-          <View className="flex-row items-center justify-between mb-4">
-            <View>
-              <Text className="text-white/80 text-sm">
-                {greeting()},
-              </Text>
-              <Text className="text-white text-xl font-bold">
-                {user?.name ?? 'Kullanıcı'}
-              </Text>
-            </View>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/(tabs)/profile')}>
-              <Avatar uri={user?.avatar_url} name={user?.name} size={44} />
-            </TouchableOpacity>
-          </View>
-
+        {/* Child Info Card */}
+        <View className="px-4 pt-4">
           {activeChild ? (
-            <View className="bg-white/20 rounded-2xl p-3 flex-row items-center">
+            <View
+              style={{ backgroundColor: '#fff', borderRadius: 16, padding: 12, flexDirection: 'row', alignItems: 'center', marginBottom: 12, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3 }}
+            >
               <Avatar uri={activeChild.avatar_url} name={activeChild.name} size={36} />
-              <View className="ml-3 flex-1">
-                <Text className="text-white font-semibold">{activeChild.name}</Text>
-                <Text className="text-white/70 text-xs">
+              <View style={{ marginLeft: 12, flex: 1 }}>
+                <Text style={{ fontWeight: '600', color: '#455A64', fontSize: 14 }}>{activeChild.name}</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 12 }}>
                   {formatAge(activeChild.birth_date)}
                 </Text>
               </View>
@@ -184,18 +175,18 @@ export default function DashboardScreen() {
             </View>
           ) : (
             <TouchableOpacity
-              className="bg-white/20 rounded-2xl p-3 flex-row items-center"
+              style={{ backgroundColor: '#fff', borderRadius: 16, padding: 12, flexDirection: 'row', alignItems: 'center', marginBottom: 12, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3 }}
               activeOpacity={0.8}
               onPress={() => router.push('/(tabs)/profile')}
             >
-              <View className="w-9 h-9 rounded-full bg-white/30 items-center justify-center">
-                <Ionicons name="add" size={20} color="#fff" />
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#FF8A6520', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="add" size={20} color="#FF8A65" />
               </View>
-              <View className="ml-3 flex-1">
-                <Text className="text-white font-semibold">Çocuk profili ekle</Text>
-                <Text className="text-white/70 text-xs">Kişiselleştirilmiş öneriler için</Text>
+              <View style={{ marginLeft: 12, flex: 1 }}>
+                <Text style={{ fontWeight: '600', color: '#455A64', fontSize: 14 }}>Çocuk profili ekle</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 12 }}>Kişiselleştirilmiş öneriler için</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color="#fff" />
+              <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
             </TouchableOpacity>
           )}
         </View>
@@ -211,7 +202,7 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        <View className="px-4 -mt-4">
+        <View className="px-4">
           {/* Banners */}
           {activeChild && (
             <View style={{ marginTop: 8, marginBottom: 4 }}>
@@ -386,6 +377,6 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

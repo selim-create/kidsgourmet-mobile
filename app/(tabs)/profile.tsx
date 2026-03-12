@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
@@ -19,6 +18,7 @@ import { Button } from '../../src/components/ui/Button';
 import { Badge } from '../../src/components/ui/Badge';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
+import { Header } from '../../src/components/ui/Header';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
@@ -60,10 +60,8 @@ export default function ProfileScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-light">
-        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
-          <Text className="text-dark text-2xl font-bold">Profil</Text>
-        </View>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <Header showLogo title="Profilim" />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="person-outline"
@@ -82,7 +80,7 @@ export default function ProfileScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -130,11 +128,11 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header showLogo title="Profilim" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="bg-primary px-5 pt-6 pb-10">
-          <Text className="text-white text-xl font-bold mb-4">Profil</Text>
+        {/* User Info */}
+        <View className="bg-primary px-5 pt-5 pb-10">
           <View className="flex-row items-center">
             <Avatar
               uri={user?.avatar_url}
@@ -233,6 +231,6 @@ export default function ProfileScreen() {
           </Button>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

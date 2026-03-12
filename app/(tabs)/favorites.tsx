@@ -6,13 +6,13 @@ import {
   RefreshControl,
   useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { RecipeCard } from '../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
+import { Header } from '../../src/components/ui/Header';
 import { router } from 'expo-router';
 
 const GRID_COLUMNS = 2;
@@ -38,10 +38,8 @@ export default function FavoritesScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-light">
-        <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
-          <Text className="text-dark text-2xl font-bold">Favorilerim</Text>
-        </View>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <Header showLogo title="Favorilerim" />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="heart-outline"
@@ -52,21 +50,20 @@ export default function FavoritesScreen() {
             Giriş Yap
           </Button>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-light">
-      {/* Header */}
-      <View className="bg-white px-5 pt-4 pb-4 border-b border-gray-100">
-        <Text className="text-dark text-2xl font-bold">Favorilerim</Text>
-        {favorites.length > 0 ? (
-          <Text className="text-gray-400 text-sm mt-0.5">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <Header showLogo title="Favorilerim" />
+      {favorites.length > 0 ? (
+        <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 2 }}>
+          <Text style={{ color: '#9CA3AF', fontSize: 13 }}>
             {favorites.length} tarif kaydedildi
           </Text>
-        ) : null}
-      </View>
+        </View>
+      ) : null}
 
       {isLoading ? (
         <LoadingSpinner fullScreen label="Favoriler yükleniyor..." />
@@ -104,6 +101,6 @@ export default function FavoritesScreen() {
           )}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }

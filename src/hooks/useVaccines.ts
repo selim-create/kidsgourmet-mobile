@@ -10,7 +10,7 @@ export function useVaccines() {
   );
 
   return {
-    vaccines: data ?? [],
+    vaccines: Array.isArray(data) ? data : [],
     isLoading,
     error,
   };

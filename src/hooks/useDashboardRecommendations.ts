@@ -21,7 +21,7 @@ export function useDashboardRecommendations() {
   );
 
   return {
-    recommendations: data ?? [],
+    recommendations: Array.isArray(data) ? data : [],
     isLoading,
     error,
   };

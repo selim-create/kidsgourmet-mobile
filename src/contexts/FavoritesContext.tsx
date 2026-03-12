@@ -26,7 +26,10 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const favoriteIds = useMemo(() => new Set(favorites.map((r) => r.id)), [favorites]);
+  const favoriteIds = useMemo(
+    () => new Set((favorites ?? []).map((r) => r.id)),
+    [favorites],
+  );
 
   const load = useCallback(async () => {
     if (!isAuthenticated) {
@@ -36,7 +39,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const data = await getFavorites();
-      setFavorites(data);
+      setFavorites(Array.isArray(data) ? data : []);
     } catch {
       setFavorites([]);
     } finally {

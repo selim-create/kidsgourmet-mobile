@@ -3,7 +3,16 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { Recipe, FavoriteCollection } from '../lib/types';
 
 export async function getFavorites(): Promise<Recipe[]> {
-  return api.get<Recipe[]>(API_ENDPOINTS.USER_FAVORITES);
+  const data = await api.get<Recipe[] | { items?: Recipe[]; recipes?: Recipe[] }>(
+    API_ENDPOINTS.USER_FAVORITES,
+  );
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') {
+    const obj = data as { items?: Recipe[]; recipes?: Recipe[] };
+    if (Array.isArray(obj.items)) return obj.items;
+    if (Array.isArray(obj.recipes)) return obj.recipes;
+  }
+  return [];
 }
 
 export async function toggleFavorite(

@@ -98,6 +98,21 @@ export default function ProfileScreen() {
       onPress: () => {},
     },
     {
+      icon: 'book-outline' as const,
+      label: 'Blog & Keşfet',
+      onPress: () => router.push('/blog'),
+    },
+    {
+      icon: 'medical-outline' as const,
+      label: 'Aşı Takvimi',
+      onPress: () => router.push('/vaccines'),
+    },
+    {
+      icon: 'nutrition-outline' as const,
+      label: 'Beslenme Rehberi',
+      onPress: () => router.push('/ingredient'),
+    },
+    {
       icon: 'shield-checkmark-outline' as const,
       label: 'Güvenlik Kontrolü',
       onPress: () => {},

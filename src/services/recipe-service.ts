@@ -40,12 +40,14 @@ export async function getRecipes(
 ): Promise<PaginatedResponse<Recipe>> {
   const params = new URLSearchParams();
   if (filters.query) params.set('search', filters.query);
-  if (filters.age_group) params.set('age_group', filters.age_group);
-  if (filters.meal_type) params.set('meal_type', filters.meal_type);
-  if (filters.diet_type) params.set('diet_type', filters.diet_type);
+  // Use hyphenated param names to match the WordPress custom REST API
+  if (filters.age_group) params.set('age-group', filters.age_group);
+  if (filters.meal_type) params.set('meal-type', filters.meal_type);
+  if (filters.diet_type) params.set('diet-type', filters.diet_type);
   if (filters.difficulty) params.set('difficulty', filters.difficulty);
   if (filters.max_time) params.set('max_time', String(filters.max_time));
-  if (filters.sort) params.set('sort', filters.sort);
+  // WordPress uses `orderby` convention
+  if (filters.sort) params.set('orderby', filters.sort);
   if (filters.page) params.set('page', String(filters.page));
   if (filters.per_page) params.set('per_page', String(filters.per_page));
 
@@ -71,9 +73,20 @@ export async function getRecipes(
   }
 
   const typed = raw as PaginatedResponse<Recipe>;
+  const items = Array.isArray(typed.items) ? typed.items : [];
+  const page = typed.page ?? (filters.page ?? 1);
+  const perPage = typed.per_page ?? (filters.per_page ?? 12);
+  const total = typed.total ?? items.length;
+  const totalPages = typed.total_pages ?? Math.ceil(total / perPage);
   return {
     ...typed,
-    items: typed.items.map(normalizeRecipe),
+    items: items.map(normalizeRecipe),
+    page,
+    per_page: perPage,
+    total,
+    total_pages: totalPages,
+    has_next: page < totalPages,
+    has_prev: page > 1,
   };
 }
 

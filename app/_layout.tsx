@@ -8,6 +8,7 @@ import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { ActiveChildProvider } from '../src/contexts/ActiveChildContext';
 import { FavoritesProvider } from '../src/contexts/FavoritesContext';
+import { ErrorBoundary } from '../src/components/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,20 +18,22 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <SWRProvider>
-      <AuthProvider>
-        <ActiveChildProvider>
-          <FavoritesProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-            <Toast />
-          </FavoritesProvider>
-        </ActiveChildProvider>
-      </AuthProvider>
-    </SWRProvider>
+    <ErrorBoundary>
+      <SWRProvider>
+        <AuthProvider>
+          <ActiveChildProvider>
+            <FavoritesProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="auto" />
+              <Toast />
+            </FavoritesProvider>
+          </ActiveChildProvider>
+        </AuthProvider>
+      </SWRProvider>
+    </ErrorBoundary>
   );
 }

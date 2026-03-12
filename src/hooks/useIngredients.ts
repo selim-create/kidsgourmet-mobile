@@ -8,13 +8,14 @@ export function useIngredients(filters?: { search?: string; age?: number }) {
   const search = filters?.search?.trim() ?? '';
   const { activeChild } = useActiveChild();
 
+  // Only fetch when an active child is known; null key disables the SWR request
   const key = activeChild
     ? `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}?child_id=${activeChild.id}`
-    : API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED;
+    : null;
 
   const { data, error, isLoading } = useSWR<FoodIntroductionItem[]>(
     key,
-    () => getFoodIntroductionItems(activeChild?.id),
+    () => getFoodIntroductionItems(activeChild!.id),
   );
 
   // Client-side filtering for search and age

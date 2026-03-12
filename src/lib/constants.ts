@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
 
   // Shopping List
   SHOPPING_LIST: '/kg/v1/shopping-list',
+  SHOPPING_LIST_GENERATE: '/kg/v1/shopping-list/generate',
 
   // Blog (WordPress native)
   BLOG: '/wp/v2/posts',

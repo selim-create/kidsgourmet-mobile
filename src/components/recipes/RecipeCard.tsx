@@ -6,7 +6,9 @@ import { router } from 'expo-router';
 import type { Recipe } from '../../lib/types';
 import { Avatar } from '../ui/Avatar';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { formatDuration } from '../../utils/helpers';
+import { COLORS } from '../../lib/constants';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -17,6 +19,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps) {
   const { isFavorite, toggle } = useFavorites();
+  const { isAuthenticated } = useAuth();
   const favorite = isFavorite(recipe.id);
 
   const handlePress = () => {
@@ -29,6 +32,10 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
 
   const handleFavoriteToggle = async (e: { stopPropagation?: () => void }) => {
     e?.stopPropagation?.();
+    if (!isAuthenticated) {
+      router.push('/(auth)/login');
+      return;
+    }
     await toggle(recipe.id);
   };
 
@@ -53,10 +60,10 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         />
 
         {/* Age Group Badge — top left overlay */}
-        {primaryAgeGroup ? (
+        {primaryAgeGroup?.name ? (
           <View
             className="absolute top-2 left-2 rounded-full px-2 py-0.5"
-            style={{ backgroundColor: primaryAgeGroup.color ?? '#FF8A65' }}
+            style={{ backgroundColor: primaryAgeGroup.color ?? COLORS.primary }}
           >
             <Text className="text-white text-xs font-medium">{primaryAgeGroup.name}</Text>
           </View>
@@ -78,13 +85,12 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
 
         {/* Expert Approved Badge — below favorite button */}
         {recipe.is_expert_approved ? (
-          <TouchableOpacity
-            className="absolute right-2 w-8 h-8 rounded-full bg-success/90 items-center justify-center"
-            style={{ top: compact ? 44 : 46 }}
-            activeOpacity={1}
+          <View
+            className="absolute right-2 w-8 h-8 rounded-full items-center justify-center"
+            style={{ top: compact ? 44 : 46, backgroundColor: 'rgba(34,197,94,0.9)' }}
           >
             <Ionicons name="shield-checkmark" size={16} color="#fff" />
-          </TouchableOpacity>
+          </View>
         ) : null}
 
         {/* Prep Time Badge — bottom right, glassmorphism */}

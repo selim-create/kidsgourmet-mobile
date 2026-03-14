@@ -53,6 +53,9 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
   const toggle = useCallback(
     async (recipeId: number) => {
+      if (!isAuthenticated) {
+        return;
+      }
       const was = favoriteIds.has(recipeId);
       // Optimistic update
       if (was) {
@@ -68,7 +71,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         await load();
       }
     },
-    [favoriteIds, load],
+    [isAuthenticated, favoriteIds, load],
   );
 
   const isFavorite = useCallback(

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,9 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   StyleSheet,
+  Animated,
+  Dimensions,
+  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +18,25 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from './Avatar';
 import { COLORS } from '../../lib/constants';
+
+const DRAWER_WIDTH = Dimensions.get('window').width * 0.8;
+
+const SOCIAL_LINKS: { name: string; icon: React.ComponentProps<typeof Ionicons>['name']; url: string; color: string }[] = [
+  { name: 'Instagram', icon: 'logo-instagram', url: 'https://www.instagram.com/kidsgourmet/', color: '#E1306C' },
+  { name: 'Facebook', icon: 'logo-facebook', url: 'https://www.facebook.com/kidsandgourmet', color: '#1877F2' },
+  { name: 'Pinterest', icon: 'logo-pinterest', url: 'https://tr.pinterest.com/KidsandGourmet', color: '#E60023' },
+  { name: 'YouTube', icon: 'logo-youtube', url: 'https://www.youtube.com/channel/UCkXtLdtEfhl8Do1pPW4fgsQ', color: '#FF0000' },
+  { name: 'TikTok', icon: 'logo-tiktok', url: 'https://tiktok.com/@kidsgourmet', color: '#000000' },
+  { name: 'Twitter', icon: 'logo-twitter', url: 'https://x.com/kidsandgourmet', color: '#1DA1F2' },
+];
+
+const CORPORATE_LINKS = [
+  { label: 'Hakkımızda', route: '/about' },
+  { label: 'İletişim', route: '/contact' },
+  { label: 'Kullanım Koşulları', route: '/terms' },
+  { label: 'Gizlilik Politikası', route: '/privacy' },
+  { label: 'KVKK', route: '/kvkk' },
+];
 
 interface DrawerMenuProps {
   visible: boolean;
@@ -74,32 +96,74 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   const insets = useSafeAreaInsets();
   const { user, isAuthenticated } = useAuth();
 
+  const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      slideAnim.setValue(-DRAWER_WIDTH);
+      fadeAnim.setValue(0);
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.45,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [visible]);
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -DRAWER_WIDTH,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onClose();
+    });
+  };
+
   const handleNavigate = (route: string) => {
-    onClose();
+    handleClose();
     setTimeout(() => {
       router.push(route as never);
-    }, 300);
+    }, 260);
   };
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       statusBarTranslucent
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         {/* Backdrop */}
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.backdrop} />
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
         </TouchableWithoutFeedback>
 
-        {/* Drawer panel */}
-        <View
+        {/* Drawer panel — slides in from the left */}
+        <Animated.View
           style={[
             styles.drawer,
-            { paddingTop: insets.top, paddingBottom: insets.bottom + 16 },
+            {
+              paddingTop: insets.top,
+              transform: [{ translateX: slideAnim }],
+            },
           ]}
         >
           {/* Drawer header */}
@@ -109,7 +173,7 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
               style={styles.logo}
               contentFit="contain"
             />
-            <TouchableOpacity onPress={onClose} style={styles.closeButton} activeOpacity={0.7}>
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.7}>
               <Ionicons name="close" size={24} color={COLORS.dark} />
             </TouchableOpacity>
           </View>
@@ -130,7 +194,7 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
             </TouchableOpacity>
           )}
 
-          {/* Menu sections */}
+          {/* Menu sections + footer */}
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={styles.menuScroll}
@@ -155,8 +219,64 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 ))}
               </View>
             ))}
+
+            {/* ── Footer ── */}
+            <View style={styles.footer}>
+              <View style={styles.footerDivider} />
+
+              {/* Social media row */}
+              <Text style={styles.footerLabel}>Bizi Takip Edin</Text>
+              <View style={styles.socialRow}>
+                {SOCIAL_LINKS.map((link) => (
+                  <TouchableOpacity
+                    key={link.name}
+                    onPress={() => Linking.openURL(link.url)}
+                    activeOpacity={0.7}
+                    style={styles.socialIcon}
+                  >
+                    <Ionicons name={link.icon} size={22} color={link.color} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Ecosystem links */}
+              <View style={styles.ecosystemRow}>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL('https://rejimde.com')}
+                  activeOpacity={0.7}
+                  style={styles.ecosystemBtn}
+                >
+                  <Text style={[styles.ecosystemLink, { color: '#4CAF50' }]}>Rejimde.com</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL('https://tariften.com')}
+                  activeOpacity={0.7}
+                  style={styles.ecosystemBtn}
+                >
+                  <Text style={[styles.ecosystemLink, { color: '#7E57C2' }]}>Tariften.com</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Corporate links */}
+              <View style={styles.corporateLinks}>
+                {CORPORATE_LINKS.map((link) => (
+                  <TouchableOpacity
+                    key={link.label}
+                    activeOpacity={0.7}
+                    onPress={() => handleNavigate(link.route)}
+                  >
+                    <Text style={styles.corporateLink}>{link.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Copyright */}
+              <Text style={styles.copyright}>
+                © 2026 KidsGourmet bir Hip Medya markasıdır.
+              </Text>
+            </View>
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -165,20 +285,23 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    flexDirection: 'row',
   },
   backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000',
   },
   drawer: {
-    width: 300,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: DRAWER_WIDTH,
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 16,
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 20,
   },
   drawerHeader: {
     flexDirection: 'row',
@@ -260,5 +383,70 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: COLORS.dark,
+  },
+  // ── Footer ──────────────────────────────────────────────────────────────────
+  footer: {
+    marginTop: 8,
+    paddingBottom: 24,
+  },
+  footerDivider: {
+    height: 1,
+    backgroundColor: '#F3F4F6',
+    marginBottom: 16,
+  },
+  footerLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.gray[400],
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+    paddingLeft: 4,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    paddingLeft: 4,
+    marginBottom: 16,
+  },
+  socialIcon: {
+    padding: 4,
+  },
+  ecosystemRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  ecosystemBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#F9FAFB',
+    alignItems: 'center',
+  },
+  ecosystemLink: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  corporateLinks: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginBottom: 14,
+    paddingLeft: 2,
+  },
+  corporateLink: {
+    fontSize: 11,
+    color: COLORS.gray[400],
+    paddingVertical: 3,
+    paddingHorizontal: 2,
+  },
+  copyright: {
+    fontSize: 11,
+    color: COLORS.gray[300],
+    textAlign: 'center',
+    marginTop: 4,
   },
 });

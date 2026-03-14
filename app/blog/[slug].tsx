@@ -3,19 +3,17 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Share,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { getBlogPost } from '../../src/services/blog-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
-import { COLORS } from '../../src/lib/constants';
+import { DetailHeader } from '../../src/components/ui/DetailHeader';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '';
@@ -71,10 +69,10 @@ export default function BlogDetailScreen() {
   const bodyText = post.content ? stripHtml(post.content) : post.excerpt ?? '';
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Image */}
-        <View className="relative">
+        <View>
           {post.featured_image || post.thumbnail ? (
             <Image
               source={{ uri: post.featured_image ?? post.thumbnail }}
@@ -90,24 +88,6 @@ export default function BlogDetailScreen() {
               <Ionicons name="newspaper-outline" size={60} color="#AED581" />
             </View>
           )}
-
-          {/* Back button */}
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
-            activeOpacity={0.8}
-          >
-            <Ionicons name="arrow-back" size={22} color={COLORS.dark} />
-          </TouchableOpacity>
-
-          {/* Share button */}
-          <TouchableOpacity
-            onPress={handleShare}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
-            activeOpacity={0.8}
-          >
-            <Ionicons name="share-outline" size={22} color={COLORS.dark} />
-          </TouchableOpacity>
         </View>
 
         <View className="px-4 pt-5 pb-10">
@@ -175,6 +155,7 @@ export default function BlogDetailScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+      <DetailHeader onShare={handleShare} transparent />
+    </View>
   );
 }

@@ -6,17 +6,17 @@ import {
   TouchableOpacity,
   Share,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { getRecipe } from '../../../src/services/recipe-service';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { SafetyBanner } from '../../../src/components/safety/SafetyBanner';
+import { DetailHeader } from '../../../src/components/ui/DetailHeader';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration } from '../../../src/utils/helpers';
@@ -78,47 +78,16 @@ export default function RecipeDetailScreen() {
     recipe.total_time ?? (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-light">
+    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Image */}
-        <View className="relative">
+        <View>
           <Image
             source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
             style={{ width: '100%', height: 280 }}
             contentFit="cover"
           />
           <View className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
-
-          {/* Floating Back Button */}
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
-            activeOpacity={0.8}
-          >
-            <Ionicons name="arrow-back" size={22} color="#455A64" />
-          </TouchableOpacity>
-
-          {/* Action Buttons Overlay */}
-          <View className="absolute top-4 right-4 gap-2">
-            <TouchableOpacity
-              onPress={() => toggle(recipe.id)}
-              className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={favorite ? 'heart' : 'heart-outline'}
-                size={22}
-                color={favorite ? '#EF4444' : '#6B7280'}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleShare}
-              className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow"
-              activeOpacity={0.8}
-            >
-              <Ionicons name="share-outline" size={22} color="#6B7280" />
-            </TouchableOpacity>
-          </View>
         </View>
 
         <View className="px-4 pt-4">
@@ -316,6 +285,12 @@ export default function RecipeDetailScreen() {
           </Button>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      <DetailHeader
+        onShare={handleShare}
+        onFavorite={() => toggle(recipe.id)}
+        isFavorited={favorite}
+        transparent
+      />
+    </View>
   );
 }

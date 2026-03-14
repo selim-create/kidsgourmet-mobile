@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Header } from '../../src/components/ui/Header';
+import { AppHeader } from '../../src/components/ui/AppHeader';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useDashboardRecommendations } from '../../src/hooks/useDashboardRecommendations';
@@ -41,7 +41,7 @@ import { useSWRConfig } from 'swr';
 function GuestDashboard() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header showLogo showGreeting />
+      <AppHeader />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-4">
           <View
@@ -143,15 +143,7 @@ export default function DashboardScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header
-        showLogo
-        showGreeting
-        rightContent={
-          <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/search')}>
-            <Ionicons name="search-outline" size={22} color="#455A64" />
-          </TouchableOpacity>
-        }
-      />
+      <AppHeader />
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={

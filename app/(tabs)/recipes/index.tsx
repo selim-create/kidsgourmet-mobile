@@ -15,7 +15,7 @@ import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { Badge } from '../../../src/components/ui/Badge';
-import { Header } from '../../../src/components/ui/Header';
+import { AppHeader } from '../../../src/components/ui/AppHeader';
 import type { SearchFilters } from '../../../src/lib/types';
 import { API_ENDPOINTS, PAGINATION } from '../../../src/lib/constants';
 
@@ -74,7 +74,7 @@ export default function RecipesScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header showLogo title="Tarifler" />
+      <AppHeader />
 
       {/* Search Bar */}
       <View className="bg-white px-4 py-3 border-b border-gray-100">

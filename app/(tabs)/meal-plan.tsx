@@ -16,7 +16,7 @@ import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
-import { Header } from '../../src/components/ui/Header';
+import { AppHeader } from '../../src/components/ui/AppHeader';
 
 function getWeekOffsetLabel(offset: number): string {
   if (offset === 0) return 'Bu Hafta';
@@ -55,7 +55,7 @@ export default function MealPlanScreen() {
   if (!isAuthenticated) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-        <Header showLogo title="Yemek Planı" />
+        <AppHeader />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="calendar-outline"
@@ -80,9 +80,7 @@ export default function MealPlanScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header showLogo title="Yemek Planı" />
-
-      {/* Week Navigation */}
+      <AppHeader />
       <View style={styles.weekNav}>
         <TouchableOpacity
           onPress={() => setWeekOffset((o) => o - 1)}

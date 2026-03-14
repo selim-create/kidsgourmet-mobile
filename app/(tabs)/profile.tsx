@@ -18,7 +18,7 @@ import { Button } from '../../src/components/ui/Button';
 import { Badge } from '../../src/components/ui/Badge';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
-import { Header } from '../../src/components/ui/Header';
+import { AppHeader } from '../../src/components/ui/AppHeader';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
@@ -61,7 +61,7 @@ export default function ProfileScreen() {
   if (!isAuthenticated) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-        <Header showLogo title="Profilim" />
+        <AppHeader />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="person-outline"
@@ -129,7 +129,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header showLogo title="Profilim" />
+      <AppHeader />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* User Info */}
         <View className="bg-primary px-5 pt-5 pb-10">

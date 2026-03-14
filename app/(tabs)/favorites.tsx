@@ -12,7 +12,7 @@ import { RecipeCard } from '../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
-import { Header } from '../../src/components/ui/Header';
+import { AppHeader } from '../../src/components/ui/AppHeader';
 import { router } from 'expo-router';
 
 const GRID_COLUMNS = 2;
@@ -39,7 +39,7 @@ export default function FavoritesScreen() {
   if (!isAuthenticated) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-        <Header showLogo title="Favorilerim" />
+        <AppHeader />
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState
             icon="heart-outline"
@@ -56,7 +56,7 @@ export default function FavoritesScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <Header showLogo title="Favorilerim" />
+      <AppHeader />
       {favorites.length > 0 ? (
         <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 2 }}>
           <Text style={{ color: '#9CA3AF', fontSize: 13 }}>

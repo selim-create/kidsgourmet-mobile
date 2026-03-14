@@ -10,6 +10,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe } from '../../../src/services/recipe-service';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
@@ -20,16 +21,16 @@ import { DetailHeader } from '../../../src/components/ui/DetailHeader';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration } from '../../../src/utils/helpers';
-import { API_ENDPOINTS } from '../../../src/lib/constants';
 import type { SafetyCheck } from '../../../src/lib/types';
 
 export default function RecipeDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { isFavorite, toggle } = useFavorites();
   const [activeTab, setActiveTab] = useState<'ingredients' | 'steps'>('ingredients');
+  const insets = useSafeAreaInsets();
 
-  const { data: recipe, isLoading } = useSWR(
-    slug ? API_ENDPOINTS.RECIPE(slug) : null,
+  const { data: recipe, isLoading, error, mutate } = useSWR(
+    slug ? `recipe-detail-${slug}` : null,
     () => getRecipe(slug!),
   );
 
@@ -66,10 +67,22 @@ export default function RecipeDetailScreen() {
     return <LoadingSpinner fullScreen label="Tarif yükleniyor..." />;
   }
 
-  if (!recipe) {
+  if (error || !recipe) {
     return (
-      <View className="flex-1 items-center justify-center bg-light">
-        <Text className="text-gray-500">Tarif bulunamadı</Text>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <DetailHeader transparent />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+          <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
+          <Text style={{ color: '#374151', fontWeight: '700', fontSize: 18, marginTop: 16 }}>
+            Tarif yüklenemedi
+          </Text>
+          <Text style={{ color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
+            Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.
+          </Text>
+          <Button variant="primary" className="mt-6" onPress={() => mutate()}>
+            Tekrar Dene
+          </Button>
+        </View>
       </View>
     );
   }
@@ -79,12 +92,15 @@ export default function RecipeDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+      >
         {/* Hero Image */}
         <View>
           <Image
             source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
-            style={{ width: '100%', height: 280 }}
+            style={{ width: '100%', height: 300 }}
             contentFit="cover"
           />
           <View className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />

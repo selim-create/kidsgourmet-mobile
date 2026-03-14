@@ -17,7 +17,7 @@ export default function RecipesLayout() {
       />
       <Stack.Screen
         name="[slug]"
-        options={{ title: '', headerShown: true }}
+        options={{ title: '', headerShown: false }}
       />
     </Stack>
   );

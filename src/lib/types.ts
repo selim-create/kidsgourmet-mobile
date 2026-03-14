@@ -195,9 +195,13 @@ export interface SearchFilters {
   age_group?: string;
   meal_type?: string;
   diet_type?: string;
+  special_condition?: string;
+  ingredient?: string;
   difficulty?: string;
   max_time?: number;
+  expert_approved?: boolean;
   sort?: 'newest' | 'popular' | 'rating' | 'time';
+  order?: 'asc' | 'desc';
   page?: number;
   per_page?: number;
 }

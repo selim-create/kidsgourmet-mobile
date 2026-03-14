@@ -44,10 +44,14 @@ export async function getRecipes(
   if (filters.age_group) params.set('age-group', filters.age_group);
   if (filters.meal_type) params.set('meal-type', filters.meal_type);
   if (filters.diet_type) params.set('diet-type', filters.diet_type);
+  if (filters.special_condition) params.set('special-condition', filters.special_condition);
+  if (filters.ingredient) params.set('ingredient', filters.ingredient);
+  if (filters.expert_approved) params.set('expert_approved', 'true');
   if (filters.difficulty) params.set('difficulty', filters.difficulty);
   if (filters.max_time) params.set('max_time', String(filters.max_time));
   // WordPress uses `orderby` convention
   if (filters.sort) params.set('orderby', filters.sort);
+  if (filters.order) params.set('order', filters.order);
   if (filters.page) params.set('page', String(filters.page));
   if (filters.per_page) params.set('per_page', String(filters.per_page));
 
@@ -91,8 +95,23 @@ export async function getRecipes(
 }
 
 export async function getRecipe(slug: string): Promise<Recipe> {
-  const recipe = await api.get<Recipe>(API_ENDPOINTS.RECIPE_BY_SLUG(slug), { skipAuth: true });
-  return normalizeRecipe(recipe);
+  try {
+    const raw = await api.get<Recipe | { recipe: Recipe } | { data: Recipe }>(
+      API_ENDPOINTS.RECIPE_BY_SLUG(slug),
+      { skipAuth: true },
+    );
+
+    // Handle different response formats
+    if (raw && typeof raw === 'object') {
+      if ('recipe' in raw && raw.recipe) return normalizeRecipe(raw.recipe);
+      if ('data' in raw && raw.data) return normalizeRecipe(raw.data);
+    }
+
+    return normalizeRecipe(raw as Recipe);
+  } catch (error) {
+    console.error(`[getRecipe] Failed to fetch recipe: ${slug}`, error);
+    throw error;
+  }
 }
 
 export async function getRecipeBySlug(slug: string): Promise<Recipe> {

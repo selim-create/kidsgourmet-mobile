@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { checkIngredientSafetyByName } from '../services/safety-service';
+import { checkIngredientSafety, checkIngredientSafetyByName } from '../services/safety-service';
 import type { SafetyCheck, Recipe } from '../lib/types';
 import { useActiveChild } from '../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../utils/ageCalculator';
@@ -34,17 +34,42 @@ export function useRecipeSafetyCheck(recipe: Recipe | null | undefined) {
     ? calculateAgeInMonths(activeChild.birth_date)
     : null;
 
-  // Build a composite key for up to 4 ingredients
+  // Build a composite key for up to 4 ingredients that have IDs
   const ingredients = recipe?.ingredients?.slice(0, 4) ?? [];
   const key =
-    recipe && ageMonths !== null && ingredients.length > 0
-      ? `recipe-safety:${recipe.id}:${ageMonths}`
+    recipe && activeChild && ingredients.length > 0
+      ? `recipe-safety:${recipe.id}:${activeChild.id}`
       : null;
 
   const { data, error, isLoading } = useSWR<SafetyCheck[]>(key, async () => {
-    if (!ageMonths) return [];
+    if (!activeChild) return [];
+    const ingredientsWithIds = ingredients.filter((ing) => ing.id != null);
+    if (__DEV__ && ingredientsWithIds.length < ingredients.length) {
+      console.warn(
+        `[Safety] Skipping ${ingredients.length - ingredientsWithIds.length} ingredient(s) without IDs`,
+      );
+    }
     const results = await Promise.allSettled(
-      ingredients.map((ing) => checkIngredientSafetyByName(ing.name, ageMonths)),
+      ingredientsWithIds.map(async (ing): Promise<SafetyCheck> => {
+          const result = await checkIngredientSafety(ing.id!, activeChild.id);
+          const maxSeverity = result.alerts.reduce<string | undefined>((acc, a) => {
+            const order = ['critical', 'high', 'medium', 'low'];
+            return acc === undefined || order.indexOf(a.severity) < order.indexOf(acc) ? a.severity : acc;
+          }, undefined);
+          const safetyLevel: SafetyCheck['safety_level'] = result.is_safe
+            ? 'safe'
+            : maxSeverity === 'critical' || maxSeverity === 'high'
+              ? 'avoid'
+              : 'caution';
+          return {
+            ingredient: ing.name,
+            age_months: ageMonths ?? 0,
+            is_safe: result.is_safe,
+            safety_level: safetyLevel,
+            notes: result.alerts.length > 0 ? result.alerts[0].message : undefined,
+            alternatives: result.alternatives,
+          };
+        }),
     );
     return results
       .filter((r): r is PromiseFulfilledResult<SafetyCheck> => r.status === 'fulfilled')

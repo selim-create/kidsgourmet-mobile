@@ -60,6 +60,9 @@ const MENU_SECTIONS: MenuSection[] = [
     items: [
       { label: 'Ana Sayfa', icon: 'home-outline', route: '/(tabs)' },
       { label: 'Tarifler', icon: 'restaurant-outline', route: '/(tabs)/recipes' },
+      { label: 'Keşfet', icon: 'compass-outline', route: '/(tabs)/discover' },
+      { label: 'Akıllı Asistan', icon: 'sparkles-outline', route: '/(tabs)/assistant' },
+      { label: 'Beslenme Rehberi', icon: 'book-outline', route: '/(tabs)/guide' },
       { label: 'Favorilerim', icon: 'heart-outline', route: '/(tabs)/favorites' },
       { label: 'Haftalık Plan', icon: 'calendar-outline', route: '/(tabs)/meal-plan' },
     ],
@@ -67,9 +70,8 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     title: 'Keşfet',
     items: [
-      { label: 'Blog & Keşfet', icon: 'newspaper-outline', route: '/blog' },
+      { label: 'Blog & Haberler', icon: 'newspaper-outline', route: '/blog' },
       { label: 'Arama', icon: 'search-outline', route: '/search' },
-      { label: 'Beslenme Rehberi', icon: 'nutrition-outline', route: '/ingredient' },
     ],
   },
   {

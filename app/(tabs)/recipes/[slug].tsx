@@ -111,7 +111,7 @@ export default function RecipeDetailScreen() {
           {recipe.age_groups && recipe.age_groups.length > 0 ? (
             <View className="flex-row flex-wrap gap-1.5 mb-3">
               {recipe.age_groups.map((ag) => (
-                <Badge key={ag.id} variant="secondary">{ag.name}</Badge>
+                <Badge key={ag.slug ?? String(ag.id)} variant="secondary">{ag.name}</Badge>
               ))}
             </View>
           ) : null}

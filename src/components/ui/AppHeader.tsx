@@ -16,7 +16,7 @@ export function AppHeader() {
 
   const handleAvatarPress = () => {
     if (isAuthenticated) {
-      router.push('/(tabs)');
+      router.push('/(tabs)/profile');
     } else {
       router.push('/(auth)/login');
     }

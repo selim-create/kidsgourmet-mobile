@@ -29,7 +29,7 @@ export function DetailHeader({
     }
   };
 
-  const buttonBg = transparent ? 'rgba(0,0,0,0.4)' : '#FFFFFF';
+  const buttonBg = transparent ? 'rgba(0,0,0,0.5)' : '#FFFFFF';
   const iconColor = transparent ? '#FFFFFF' : COLORS.dark;
 
   return (
@@ -91,9 +91,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   button: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

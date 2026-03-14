@@ -9,6 +9,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBlogPost } from '../../src/services/blog-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../src/components/ui/Badge';
@@ -40,6 +41,7 @@ function stripHtml(html: string): string {
 
 export default function BlogDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const insets = useSafeAreaInsets();
 
   const { data: post, isLoading } = useSWR(
     slug ? `/wp/v2/posts?slug=${slug}&_embed` : null,
@@ -70,7 +72,7 @@ export default function BlogDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}>
         {/* Hero Image */}
         <View>
           {post.featured_image || post.thumbnail ? (

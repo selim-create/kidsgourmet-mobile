@@ -7,9 +7,9 @@ import { COLORS } from '../../src/lib/constants';
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const bottomPadding = Platform.select({
-    ios: insets.bottom > 0 ? insets.bottom : 8,
-    android: insets.bottom > 0 ? insets.bottom + 4 : 12,
-    default: 8,
+    ios: Math.max(insets.bottom, 16),
+    android: Math.max(insets.bottom + 8, 20),
+    default: 16,
   });
 
   return (

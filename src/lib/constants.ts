@@ -14,8 +14,8 @@ export const API_ENDPOINTS = {
 
   // Recipes
   RECIPES: '/kg/v1/recipes',
-  RECIPE: (slug: string) => `/kg/v1/recipes/by-slug/${slug}`,
-  RECIPE_BY_SLUG: (slug: string) => `/kg/v1/recipes/by-slug/${slug}`,
+  RECIPE: (slug: string) => `/kg/v1/recipes/${slug}`,
+  RECIPE_BY_SLUG: (slug: string) => `/kg/v1/recipes/${slug}`,
   RECIPES_BY_AGE: (ageSlug: string) => `/kg/v1/recipes/by-age/${ageSlug}`,
   RECIPE_RELATED: (recipeId: number) => `/kg/v1/recipes/${recipeId}/related`,
 

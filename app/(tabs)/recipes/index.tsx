@@ -85,6 +85,7 @@ function FilterChip({ label, selected, onPress, color }: FilterChipProps) {
 }
 
 interface TempFilters {
+  age_group?: string;
   meal_type?: string;
   diet_type?: string;
   special_condition?: string;
@@ -177,6 +178,7 @@ export default function RecipesScreen() {
 
   const openFilterModal = () => {
     setTempFilters({
+      age_group: filters.age_group,
       meal_type: filters.meal_type,
       diet_type: filters.diet_type,
       special_condition: filters.special_condition,
@@ -189,8 +191,10 @@ export default function RecipesScreen() {
   };
 
   const applyFilters = () => {
+    setSelectedAgeGroup(tempFilters.age_group ?? null);
     setFilters((prev) => ({
       ...prev,
+      age_group: tempFilters.age_group,
       meal_type: tempFilters.meal_type,
       diet_type: tempFilters.diet_type,
       special_condition: tempFilters.special_condition,
@@ -512,11 +516,14 @@ export default function RecipesScreen() {
                       <FilterChip
                         key={ag.slug}
                         label={ag.name}
-                        selected={filters.age_group === ag.slug}
+                        selected={tempFilters.age_group === ag.slug}
                         color={getAgeGroupColor(ag.slug, ag.color)}
-                        onPress={() => handleAgeGroupSelect(
-                          filters.age_group === ag.slug ? null : ag.slug,
-                        )}
+                        onPress={() =>
+                          setTempFilters((f) => ({
+                            ...f,
+                            age_group: f.age_group === ag.slug ? undefined : ag.slug,
+                          }))
+                        }
                       />
                     ))}
                   </FilterSection>

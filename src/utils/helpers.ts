@@ -48,24 +48,43 @@ export function formatDuration(minutes: number): string {
 
 /**
  * Age group color map (consistent with web design).
- * Keys are substrings of age group slugs.
+ * Keys are matched as substrings of the age-group slug (longest key first wins).
  */
 export const AGE_GROUP_COLORS: Record<string, string> = {
+  // 0–6 months
+  '0-6-ay': '#F8BBD0',
+  // 6–8 months
   '6-8-ay': '#AED581',
+  // 8–12 months
   '8-12-ay': '#81D4FA',
+  // 6–12 months (alternative slug)
+  '6-12-ay': '#81D4FA',
+  // 12 months / 1 year
   '12-ay': '#FF8A65',
+  // 1–3 years
   '1-3-yas': '#FFB74D',
-  '3-yas': '#B39DDB',
+  // 3–6 years (before the bare '3-yas' key so longer key matches first)
+  '3-6-yas': '#B39DDB',
+  // 3 years
+  '3-yas': '#CE93D8',
+  // 4 years
   '4-yas': '#F48FB1',
+  // 5 years
   '5-yas': '#80DEEA',
+  // 6+ years
+  '6-yas': '#FFD54F',
 };
 
 /**
  * Return the color for a given age group slug.
+ * Tries the longest matching key first to avoid short-key false positives.
  * Falls back to the API-provided color, then the given fallback.
  */
 export function getAgeGroupColor(slug: string, apiColor?: string | null, fallback?: string): string {
-  const key = Object.keys(AGE_GROUP_COLORS).find((k) => slug.includes(k));
+  // Sort keys by length (descending) so longer/more-specific keys match first
+  const key = Object.keys(AGE_GROUP_COLORS)
+    .sort((a, b) => b.length - a.length)
+    .find((k) => slug.includes(k));
   return key ? AGE_GROUP_COLORS[key] : apiColor ?? fallback ?? '#FF8A65';
 }
 

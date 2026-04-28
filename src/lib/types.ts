@@ -26,6 +26,8 @@ export interface RecipeExpert {
   name: string;
   title?: string;
   approved?: boolean;
+  avatar_url?: string;
+  note?: string;
 }
 
 export interface Recipe {
@@ -53,6 +55,7 @@ export interface Recipe {
   nutrition?: NutritionInfo;
   author?: Author;
   expert?: RecipeExpert;
+  expert_note?: string;
   is_expert_approved?: boolean;
   is_featured?: boolean;
   is_favorite?: boolean;
@@ -71,6 +74,8 @@ export interface Ingredient {
   unit?: string;
   notes?: string;
   is_optional?: boolean;
+  alternatives?: string[];
+  allergen_warning?: string;
 }
 
 export interface Instruction {

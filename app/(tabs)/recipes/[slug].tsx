@@ -9,10 +9,13 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Linking,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
@@ -30,14 +33,13 @@ import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
-import type { SafetyCheck, Comment } from '../../../src/lib/types';
+import type { SafetyCheck, Comment, Ingredient } from '../../../src/lib/types';
 
-// ─── Portion multiplier options ───────────────────────────────────────────────
-const PORTION_MULTIPLIERS = [
-  { label: '½x', value: 0.5 },
-  { label: '1x', value: 1 },
-  { label: '2x', value: 2 },
-  { label: '3x', value: 3 },
+// ─── Portion multiplier options (web-style labels) ───────────────────────────
+const PORTION_OPTIONS = [
+  { label: '1 Öğün', value: 1 },
+  { label: '2 Öğün', value: 2 },
+  { label: '4 Öğün', value: 4 },
 ];
 
 function calculatePortion(amount: string | undefined, multiplier: number): string {
@@ -45,7 +47,6 @@ function calculatePortion(amount: string | undefined, multiplier: number): strin
   const num = parseFloat(amount);
   if (isNaN(num)) return amount;
   const result = num * multiplier;
-  // Format nicely: show integer if whole number, 1 decimal otherwise
   return result % 1 === 0 ? String(result) : result.toFixed(1);
 }
 
@@ -78,17 +79,145 @@ function StarRating({ rating, onRate, size = 24, readonly = false }: StarRatingP
   );
 }
 
+// ─── Ingredient row ───────────────────────────────────────────────────────────
+interface IngredientRowProps {
+  ing: Ingredient;
+  portionMultiplier: number;
+  isChecked: boolean;
+  onToggle: () => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+}
+
+function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded, onToggleExpand }: IngredientRowProps) {
+  const hasExtra = !!(ing.alternatives?.length || ing.notes || ing.allergen_warning);
+
+  return (
+    <View>
+      <TouchableOpacity
+        onPress={onToggle}
+        activeOpacity={0.7}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 12,
+          borderBottomWidth: isExpanded ? 0 : 1,
+          borderBottomColor: '#F3F4F6',
+        }}
+      >
+        {/* Bullet / check */}
+        <View
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            borderWidth: 2,
+            borderColor: isChecked ? COLORS.primary : '#D1D5DB',
+            backgroundColor: isChecked ? COLORS.primary : 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 12,
+            flexShrink: 0,
+          }}
+        >
+          {isChecked ? <Ionicons name="checkmark" size={12} color="#fff" /> : null}
+        </View>
+
+        {/* Name + amount */}
+        <Text
+          style={{
+            color: isChecked ? '#9CA3AF' : COLORS.dark,
+            flex: 1,
+            fontSize: 14,
+            textDecorationLine: isChecked ? 'line-through' : 'none',
+          }}
+        >
+          {ing.amount
+            ? `${calculatePortion(ing.amount, portionMultiplier)} ${ing.unit ?? ''} `
+            : ''}
+          {ing.name}
+        </Text>
+
+        {/* Badges / icons */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {ing.is_optional ? (
+            <Badge variant="gray" size="sm">İsteğe bağlı</Badge>
+          ) : null}
+          {hasExtra ? (
+            <TouchableOpacity
+              onPress={onToggleExpand}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name={isExpanded ? 'chevron-up-circle-outline' : 'information-circle-outline'}
+                size={18}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          ) : null}
+          {ing.allergen_warning ? (
+            <Ionicons name="alert-circle-outline" size={18} color="#F59E0B" />
+          ) : null}
+        </View>
+      </TouchableOpacity>
+
+      {/* Inline expand panel */}
+      {isExpanded && hasExtra ? (
+        <View
+          style={{
+            backgroundColor: '#FFFBE6',
+            borderRadius: 10,
+            padding: 12,
+            marginBottom: 8,
+            borderWidth: 1,
+            borderColor: '#FDE68A',
+          }}
+        >
+          {ing.alternatives && ing.alternatives.length > 0 ? (
+            <View style={{ marginBottom: ing.notes ? 8 : 0 }}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
+                Alternatifler:
+              </Text>
+              <Text style={{ fontSize: 13, color: '#374151' }}>
+                {ing.alternatives.join(', ')}
+              </Text>
+            </View>
+          ) : null}
+          {ing.notes ? (
+            <View style={{ marginBottom: ing.allergen_warning ? 8 : 0 }}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
+                Not:
+              </Text>
+              <Text style={{ fontSize: 13, color: '#374151' }}>{ing.notes}</Text>
+            </View>
+          ) : null}
+          {ing.allergen_warning ? (
+            <View>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: '#B45309', marginBottom: 4 }}>
+                Alerjen Uyarısı:
+              </Text>
+              <Text style={{ fontSize: 13, color: '#92400E' }}>{ing.allergen_warning}</Text>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RecipeDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { isFavorite, toggle } = useFavorites();
   const { isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<'ingredients' | 'steps'>('ingredients');
   const [portionMultiplier, setPortionMultiplier] = useState(1);
   const [userRating, setUserRating] = useState(0);
   const [isRating, setIsRating] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
+  const [expandedIngredientId, setExpandedIngredientId] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
 
   const { data: recipe, isLoading, error, mutate } = useSWR(
@@ -174,6 +303,52 @@ export default function RecipeDetailScreen() {
     }
   }, [recipe, isAuthenticated, commentText, mutateComments]);
 
+  const toggleIngredientCheck = useCallback((id: string) => {
+    setCheckedIngredients((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleIngredientExpand = useCallback((id: string) => {
+    setExpandedIngredientId((prev) => (prev === id ? null : id));
+  }, []);
+
+  const buildShoppingText = useCallback(() => {
+    if (!recipe) return '';
+    const lines = (recipe.ingredients ?? []).map((ing) => {
+      const qty = ing.amount
+        ? `${calculatePortion(ing.amount, portionMultiplier)} ${ing.unit ?? ''}`.trim()
+        : '';
+      return `• ${qty ? qty + ' ' : ''}${ing.name}`;
+    });
+    return `${recipe.title}\n${lines.join('\n')}`;
+  }, [recipe, portionMultiplier]);
+
+  const handleWhatsAppShare = useCallback(async () => {
+    const text = buildShoppingText();
+    const encoded = encodeURIComponent(text);
+    const waUrl = `whatsapp://send?text=${encoded}`;
+    const fallbackUrl = `https://wa.me/?text=${encoded}`;
+    try {
+      const supported = await Linking.canOpenURL(waUrl);
+      await Linking.openURL(supported ? waUrl : fallbackUrl);
+    } catch {
+      await Linking.openURL(fallbackUrl);
+    }
+  }, [buildShoppingText]);
+
+  const handleCopyShoppingList = useCallback(async () => {
+    const text = buildShoppingText();
+    await Clipboard.setStringAsync(text);
+    Alert.alert('Kopyalandı', 'Alışveriş listesi kopyalandı.');
+  }, [buildShoppingText]);
+
   if (isLoading) {
     return <LoadingSpinner fullScreen label="Tarif yükleniyor..." />;
   }
@@ -201,7 +376,6 @@ export default function RecipeDetailScreen() {
   const totalTime =
     recipe.total_time ?? (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
 
-  const primaryAgeGroup = recipe.age_groups?.[0];
   const displayRating = userRating || recipe.rating || 0;
 
   return (
@@ -221,37 +395,31 @@ export default function RecipeDetailScreen() {
             contentFit="cover"
             placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
           />
-          {/* Gradient overlay */}
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 120,
-              backgroundColor: 'rgba(0,0,0,0)',
-            }}
-          />
         </View>
 
         <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-          {/* ── Age Group Badges ── */}
+          {/* ── Age Group Badges (tıklanabilir) ── */}
           {recipe.age_groups && recipe.age_groups.length > 0 ? (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
               {recipe.age_groups.map((ag) => (
-                <View
+                <TouchableOpacity
                   key={ag.slug ?? String(ag.id)}
-                  style={{
-                    backgroundColor: ag.color ?? COLORS.primary,
-                    borderRadius: 999,
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                  }}
+                  activeOpacity={0.7}
+                  onPress={() => router.push(`/(tabs)/recipes?age_group=${ag.slug}` as any)}
                 >
-                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
-                    {ag.name}
-                  </Text>
-                </View>
+                  <View
+                    style={{
+                      backgroundColor: ag.color ?? COLORS.primary,
+                      borderRadius: 999,
+                      paddingHorizontal: 12,
+                      paddingVertical: 5,
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
+                      {ag.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
           ) : null}
@@ -268,7 +436,7 @@ export default function RecipeDetailScreen() {
             </Text>
           ) : null}
 
-          {/* ── Expert Approved ── */}
+          {/* ── Expert Approved badge ── */}
           {recipe.is_expert_approved ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
               <Ionicons name="shield-checkmark" size={16} color="#22C55E" />
@@ -300,11 +468,14 @@ export default function RecipeDetailScreen() {
                 <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
                   {recipe.author.name}
                 </Text>
-                {recipe.expert?.title ? (
-                  <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
-                    {recipe.expert.title}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => router.push(`/(tabs)/recipes?author=${recipe.author!.id}` as any)}
+                >
+                  <Text style={{ fontSize: 12, color: COLORS.primary, marginTop: 2 }}>
+                    Tüm yazılarını görüntüle →
                   </Text>
-                ) : null}
+                </TouchableOpacity>
               </View>
               {recipe.is_expert_approved ? (
                 <View
@@ -317,6 +488,45 @@ export default function RecipeDetailScreen() {
                   <Ionicons name="shield-checkmark" size={18} color="#22C55E" />
                 </View>
               ) : null}
+            </View>
+          ) : null}
+
+          {/* ── Expert Note Card ── */}
+          {recipe.is_expert_approved && recipe.expert ? (
+            <View
+              style={{
+                backgroundColor: '#F0FDF4',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: '#86EFAC',
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Ionicons name="shield-checkmark" size={18} color="#15803D" style={{ marginRight: 8 }} />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#15803D' }}>
+                  Uzman Görüşü
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+                <Avatar uri={recipe.expert.avatar_url} name={recipe.expert.name} size={40} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
+                    {recipe.expert.name}
+                  </Text>
+                  {recipe.expert.title ? (
+                    <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                      {recipe.expert.title}
+                    </Text>
+                  ) : null}
+                  {(recipe.expert.note ?? recipe.expert_note) ? (
+                    <Text style={{ fontSize: 13, color: '#374151', marginTop: 8, lineHeight: 20 }}>
+                      {recipe.expert.note ?? recipe.expert_note}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
             </View>
           ) : null}
 
@@ -376,18 +586,31 @@ export default function RecipeDetailScreen() {
               ) : null}
             </View>
 
-            {/* Meal type & diet type chips */}
+            {/* Meal type & diet type chips (tıklanabilir) */}
             {(recipe.meal_type || (recipe.diet_types && recipe.diet_types.length > 0)) ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F3F4F6' }}>
                 {recipe.meal_type ? (
-                  <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                    <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>{recipe.meal_type}</Text>
-                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type!)}` as any)}
+                  >
+                    <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Ionicons name="restaurant-outline" size={11} color={COLORS.primary} />
+                      <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>{recipe.meal_type}</Text>
+                    </View>
+                  </TouchableOpacity>
                 ) : null}
                 {recipe.diet_types?.map((dt) => (
-                  <View key={dt} style={{ backgroundColor: '#F0FDF4', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                    <Text style={{ fontSize: 12, color: '#15803D', fontWeight: '600' }}>{dt}</Text>
-                  </View>
+                  <TouchableOpacity
+                    key={dt}
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/(tabs)/recipes?diet_type=${encodeURIComponent(dt)}` as any)}
+                  >
+                    <View style={{ backgroundColor: '#F0FDF4', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Ionicons name="leaf-outline" size={11} color="#15803D" />
+                      <Text style={{ fontSize: 12, color: '#15803D', fontWeight: '600' }}>{dt}</Text>
+                    </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             ) : null}
@@ -411,109 +634,112 @@ export default function RecipeDetailScreen() {
             ) : null}
           </Card>
 
-          {/* ── Portion Calculator ── */}
+          {/* ── Malzemeler Kartı ── */}
           <Card style={{ marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark }}>Porsiyon Miktarı</Text>
+            {/* Portion selector */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark }}>Malzemeler</Text>
               <View style={{ flexDirection: 'row', gap: 6 }}>
-                {PORTION_MULTIPLIERS.map((pm) => (
+                {PORTION_OPTIONS.map((pm) => (
                   <TouchableOpacity
                     key={pm.label}
                     onPress={() => setPortionMultiplier(pm.value)}
                     style={{
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
                       borderRadius: 8,
                       backgroundColor: portionMultiplier === pm.value ? COLORS.primary : '#F3F4F6',
                     }}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: portionMultiplier === pm.value ? '#fff' : '#6B7280' }}>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: portionMultiplier === pm.value ? '#fff' : '#6B7280' }}>
                       {pm.label}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
+
             {recipe.servings ? (
-              <Text style={{ fontSize: 13, color: '#6B7280' }}>
+              <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>
                 {Math.round(recipe.servings * portionMultiplier)} kişilik
               </Text>
             ) : null}
+
+            {/* Ingredient list */}
+            {recipe.ingredients && recipe.ingredients.length > 0 ? (
+              recipe.ingredients.map((ing, idx) => {
+                const ingKey = String(ing.id ?? `${ing.name}-${idx}`);
+                return (
+                  <IngredientRow
+                    key={ingKey}
+                    ing={ing}
+                    portionMultiplier={portionMultiplier}
+                    isChecked={checkedIngredients.has(ingKey)}
+                    onToggle={() => toggleIngredientCheck(ingKey)}
+                    isExpanded={expandedIngredientId === ingKey}
+                    onToggleExpand={() => toggleIngredientExpand(ingKey)}
+                  />
+                );
+              })
+            ) : (
+              <Text style={{ color: '#9CA3AF', textAlign: 'center', paddingVertical: 16 }}>
+                Malzeme bilgisi bulunamadı
+              </Text>
+            )}
+
+            {/* Share buttons */}
+            {recipe.ingredients && recipe.ingredients.length > 0 ? (
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#F3F4F6' }}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleWhatsAppShare}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#25D366',
+                    borderRadius: 10,
+                    paddingVertical: 10,
+                    gap: 6,
+                  }}
+                >
+                  <Ionicons name="logo-whatsapp" size={18} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>WhatsApp</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleCopyShoppingList}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#F3F4F6',
+                    borderRadius: 10,
+                    paddingVertical: 10,
+                    gap: 6,
+                  }}
+                >
+                  <Ionicons name="copy-outline" size={18} color={COLORS.dark} />
+                  <Text style={{ color: COLORS.dark, fontSize: 13, fontWeight: '600' }}>Listeyi Kopyala</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </Card>
 
-          {/* ── Tabs: Ingredients / Steps ── */}
-          <View style={{ flexDirection: 'row', backgroundColor: '#F3F4F6', borderRadius: 12, padding: 4, marginBottom: 16 }}>
-            {(['ingredients', 'steps'] as const).map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                style={{
-                  flex: 1,
-                  paddingVertical: 10,
-                  borderRadius: 10,
-                  backgroundColor: activeTab === tab ? '#fff' : 'transparent',
-                  alignItems: 'center',
-                  shadowColor: activeTab === tab ? '#000' : 'transparent',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                  elevation: activeTab === tab ? 2 : 0,
-                }}
-              >
-                <Text style={{ fontSize: 14, fontWeight: '600', color: activeTab === tab ? COLORS.primary : '#6B7280' }}>
-                  {tab === 'ingredients' ? 'Malzemeler' : 'Yapılışı'}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* ── Ingredients ── */}
-          {activeTab === 'ingredients' && (
-            <View style={{ marginBottom: 24 }}>
-              {recipe.ingredients && recipe.ingredients.length > 0 ? (
-                recipe.ingredients.map((ing, idx) => (
-                  <View
-                    key={ing.id ?? `${ing.name}-${idx}`}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingVertical: 12,
-                      borderBottomWidth: 1,
-                      borderBottomColor: '#F3F4F6',
-                    }}
-                  >
-                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.primary, marginRight: 12 }} />
-                    <Text style={{ color: COLORS.dark, flex: 1, fontSize: 14 }}>
-                      {ing.amount
-                        ? `${calculatePortion(ing.amount, portionMultiplier)} ${ing.unit ?? ''} `
-                        : ''}
-                      {ing.name}
-                    </Text>
-                    {ing.is_optional ? (
-                      <Badge variant="gray" size="sm">İsteğe bağlı</Badge>
-                    ) : null}
-                    {ing.notes ? (
-                      <Text style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 4 }}>{ing.notes}</Text>
-                    ) : null}
-                  </View>
-                ))
-              ) : (
-                <Text style={{ color: '#9CA3AF', textAlign: 'center', paddingVertical: 16 }}>
-                  Malzeme bilgisi bulunamadı
-                </Text>
-              )}
-            </View>
-          )}
-
-          {/* ── Steps ── */}
-          {activeTab === 'steps' && (
-            <View style={{ marginBottom: 24 }}>
-              {recipe.instructions && recipe.instructions.length > 0 ? (
-                recipe.instructions.map((step, idx) => {
-                  const stepNumber = step.step ?? idx + 1;
-                  const stepContent = getInstructionContent(step);
-                  return (
+          {/* ── Hazırlanışı Kartı ── */}
+          <Card style={{ marginBottom: 16 }}>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark, marginBottom: 16 }}>
+              Hazırlanışı
+            </Text>
+            {recipe.instructions && recipe.instructions.length > 0 ? (
+              recipe.instructions.map((step, idx) => {
+                const stepNumber = step.step ?? idx + 1;
+                const stepContent = getInstructionContent(step);
+                return (
                   <View key={stepNumber} style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <View
                       style={{
@@ -543,15 +769,14 @@ export default function RecipeDetailScreen() {
                       ) : null}
                     </View>
                   </View>
-                  );
-                })
-              ) : (
-                <Text style={{ color: '#9CA3AF', textAlign: 'center', paddingVertical: 16 }}>
-                  Yapılış bilgisi bulunamadı
-                </Text>
-              )}
-            </View>
-          )}
+                );
+              })
+            ) : (
+              <Text style={{ color: '#9CA3AF', textAlign: 'center', paddingVertical: 16 }}>
+                Yapılış bilgisi bulunamadı
+              </Text>
+            )}
+          </Card>
 
           {/* ── Nutrition ── */}
           {recipe.nutrition ? (
@@ -642,8 +867,6 @@ export default function RecipeDetailScreen() {
               />
             </View>
           ) : null}
-
-          {/* ── TODO: ad placement ── */}
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>
@@ -751,4 +974,3 @@ export default function RecipeDetailScreen() {
     </KeyboardAvoidingView>
   );
 }
-

@@ -26,7 +26,7 @@ export interface FeaturedItem {
     sponsor_name?: string;
     sponsor_logo?: string;
     sponsor_url?: string;
-    direct_redirect?: boolean;
+    direct_redirect?: boolean | string;
   };
 }
 

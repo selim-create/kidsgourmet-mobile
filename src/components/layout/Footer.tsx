@@ -302,6 +302,54 @@ export function Footer() {
         {FOOTER_COLUMNS.map((column) => (
           <FooterColumnBlock key={column.title} column={column} />
         ))}
+
+        {/* Ecosystem Links */}
+        <View style={{ marginBottom: 24 }}>
+          <Text style={{
+            color: '#1E293B',
+            fontSize: 14,
+            fontWeight: '700',
+            marginBottom: 10,
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+          }}>
+            Ekosistemimiz
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://rejimde.com').catch(() => {})}
+              activeOpacity={0.75}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 14,
+                borderRadius: 12,
+                backgroundColor: '#fff',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: '#E2E8F0',
+              }}
+            >
+              <Text style={{ color: '#4CAF50', fontSize: 14, fontWeight: '700' }}>Rejimde.com</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://tariften.com').catch(() => {})}
+              activeOpacity={0.75}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 14,
+                borderRadius: 12,
+                backgroundColor: '#fff',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: '#E2E8F0',
+              }}
+            >
+              <Text style={{ color: '#7E57C2', fontSize: 14, fontWeight: '700' }}>Tariften.com</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
 
       {/* ── 3. Bottom Bar ────────────────────────────────────────────── */}

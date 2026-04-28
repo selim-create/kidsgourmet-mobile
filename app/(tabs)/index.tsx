@@ -18,7 +18,6 @@ import { QuickSearch } from '../../src/components/home/QuickSearch';
 import { ToolsSection } from '../../src/components/home/ToolsSection';
 import { CrossSellBanner } from '../../src/components/home/CrossSellBanner';
 import { FeaturesSection } from '../../src/components/home/FeaturesSection';
-import { NewsletterSection } from '../../src/components/home/NewsletterSection';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useBlog } from '../../src/hooks/use-blog';
 import { getRecipes } from '../../src/services/recipe-service';
@@ -177,9 +176,6 @@ export default function HomeScreen() {
 
         {/* ── SECTION 9: Features ────────────────────────────────────────── */}
         <FeaturesSection />
-
-        {/* ── SECTION 10: Newsletter ─────────────────────────────────────── */}
-        <NewsletterSection />
 
         {/* ── FOOTER ─────────────────────────────────────────────────────── */}
         <Footer />

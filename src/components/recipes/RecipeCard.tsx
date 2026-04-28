@@ -243,8 +243,8 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
           {recipe.title}
         </Text>
 
-        {/* Diet type & meal type chips */}
-        {((recipe.diet_types && recipe.diet_types.length > 0) || recipe.meal_type) ? (
+        {/* Diet type & meal type chips — hidden in compact mode */}
+        {!compact && ((recipe.diet_types && recipe.diet_types.length > 0) || recipe.meal_type) ? (
           <View
             style={{
               flexDirection: 'row',

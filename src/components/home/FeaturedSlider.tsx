@@ -7,7 +7,6 @@ import {
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
-  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +14,7 @@ import { router } from 'expo-router';
 import useSWR from 'swr';
 import { getAllFeatured } from '../../services/featured-service';
 import type { FeaturedItem } from '../../services/featured-service';
+import { handleSponsorPress } from '../../utils/sponsorRedirect';
 import { COLORS } from '../../lib/constants';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -198,19 +198,13 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
 
 function SponsorFeaturedCard({ item }: { item: MappedFeaturedItem }) {
   const { data } = item;
-  const sponsorName = data.meta.sponsor_name ?? data.title;
+  const sponsorName = data.meta.sponsor_name ?? data.title ?? 'Sponsorlu';
   const sponsorLogo = data.meta.sponsor_logo;
-
-  const handlePress = () => {
-    if (data.meta.sponsor_url) {
-      Linking.openURL(data.meta.sponsor_url).catch(() => {/* ignore */});
-    }
-  };
 
   return (
     <TouchableOpacity
       activeOpacity={0.88}
-      onPress={handlePress}
+      onPress={() => handleSponsorPress(data)}
       style={{ width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10, borderWidth: 2, borderColor: '#334155' }}
     >
       <View style={{ position: 'relative' }}>
@@ -225,6 +219,7 @@ function SponsorFeaturedCard({ item }: { item: MappedFeaturedItem }) {
             )}
           </View>
         )}
+        {/* Brand badge: logo + name (graceful fallback: "Sponsorlu") */}
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#334155', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           {sponsorLogo ? (
             <Image source={{ uri: sponsorLogo }} style={{ width: 16, height: 16, borderRadius: 8 }} contentFit="contain" />

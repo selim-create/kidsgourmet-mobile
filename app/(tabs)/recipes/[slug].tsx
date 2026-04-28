@@ -405,7 +405,7 @@ export default function RecipeDetailScreen() {
                 <TouchableOpacity
                   key={ag.slug ?? String(ag.id)}
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/(tabs)/recipes?age_group=${ag.slug}` as any)}
+                  onPress={() => router.push(`/(tabs)/recipes?age_group=${ag.slug}` as never)}
                 >
                   <View
                     style={{
@@ -470,7 +470,7 @@ export default function RecipeDetailScreen() {
                 </Text>
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/(tabs)/recipes?author=${recipe.author!.id}` as any)}
+                  onPress={() => router.push(`/(tabs)/recipes?author=${recipe.author!.id}` as never)}
                 >
                   <Text style={{ fontSize: 12, color: COLORS.primary, marginTop: 2 }}>
                     Tüm yazılarını görüntüle →
@@ -592,7 +592,7 @@ export default function RecipeDetailScreen() {
                 {recipe.meal_type ? (
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type!)}` as any)}
+                    onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type!)}` as never)}
                   >
                     <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <Ionicons name="restaurant-outline" size={11} color={COLORS.primary} />
@@ -604,7 +604,7 @@ export default function RecipeDetailScreen() {
                   <TouchableOpacity
                     key={dt}
                     activeOpacity={0.7}
-                    onPress={() => router.push(`/(tabs)/recipes?diet_type=${encodeURIComponent(dt)}` as any)}
+                    onPress={() => router.push(`/(tabs)/recipes?diet_type=${encodeURIComponent(dt)}` as never)}
                   >
                     <View style={{ backgroundColor: '#F0FDF4', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <Ionicons name="leaf-outline" size={11} color="#15803D" />

@@ -47,8 +47,38 @@ export function formatDuration(minutes: number): string {
 }
 
 /**
- * Check if a value is a non-empty string.
+ * Age group color map (consistent with web design).
+ * Keys are substrings of age group slugs.
  */
+export const AGE_GROUP_COLORS: Record<string, string> = {
+  '6-8-ay': '#AED581',
+  '8-12-ay': '#81D4FA',
+  '12-ay': '#FF8A65',
+  '1-3-yas': '#FFB74D',
+  '3-yas': '#B39DDB',
+  '4-yas': '#F48FB1',
+  '5-yas': '#80DEEA',
+};
+
+/**
+ * Return the color for a given age group slug.
+ * Falls back to the API-provided color, then the given fallback.
+ */
+export function getAgeGroupColor(slug: string, apiColor?: string | null, fallback?: string): string {
+  const key = Object.keys(AGE_GROUP_COLORS).find((k) => slug.includes(k));
+  return key ? AGE_GROUP_COLORS[key] : apiColor ?? fallback ?? '#FF8A65';
+}
+
+/**
+ * Translate a difficulty slug to a human-readable label.
+ */
+export const DIFFICULTY_LABELS: Record<string, string> = {
+  easy: 'Kolay',
+  medium: 'Orta',
+  hard: 'Zor',
+};
+
+
 export function isNonEmpty(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }

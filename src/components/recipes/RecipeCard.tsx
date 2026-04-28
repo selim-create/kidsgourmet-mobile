@@ -7,24 +7,8 @@ import type { Recipe } from '../../lib/types';
 import { Avatar } from '../ui/Avatar';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDuration } from '../../utils/helpers';
+import { formatDuration, getAgeGroupColor } from '../../utils/helpers';
 import { COLORS } from '../../lib/constants';
-
-// Age group color map (consistent with web)
-const AGE_GROUP_COLORS: Record<string, string> = {
-  '6-8-ay': '#AED581',
-  '8-12-ay': '#81D4FA',
-  '12-ay': '#FF8A65',
-  '1-3-yas': '#FFB74D',
-  '3-yas': '#B39DDB',
-  '4-yas': '#F48FB1',
-  '5-yas': '#80DEEA',
-};
-
-function getAgeGroupColor(slug: string, fallback?: string): string {
-  const key = Object.keys(AGE_GROUP_COLORS).find((k) => slug.includes(k));
-  return key ? AGE_GROUP_COLORS[key] : fallback ?? COLORS.primary;
-}
 
 interface RecipeCardProps {
   recipe: Recipe;

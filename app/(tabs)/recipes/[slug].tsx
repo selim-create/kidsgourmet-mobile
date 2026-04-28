@@ -28,7 +28,7 @@ import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
-import { formatDuration, stripHtml } from '../../../src/utils/helpers';
+import { formatDuration, stripHtml, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
 import type { SafetyCheck, Comment } from '../../../src/lib/types';
 
@@ -58,9 +58,6 @@ interface StarRatingProps {
 }
 
 function StarRating({ rating, onRate, size = 24, readonly = false }: StarRatingProps) {
-  const [hovered, setHovered] = useState<number | null>(null);
-  const displayRating = hovered ?? rating;
-
   return (
     <View style={{ flexDirection: 'row', gap: 4 }}>
       {[1, 2, 3, 4, 5].map((star) => (
@@ -71,9 +68,9 @@ function StarRating({ rating, onRate, size = 24, readonly = false }: StarRatingP
           activeOpacity={readonly ? 1 : 0.7}
         >
           <Ionicons
-            name={displayRating >= star ? 'star' : 'star-outline'}
+            name={rating >= star ? 'star' : 'star-outline'}
             size={size}
-            color={displayRating >= star ? '#F59E0B' : '#D1D5DB'}
+            color={rating >= star ? '#F59E0B' : '#D1D5DB'}
           />
         </TouchableOpacity>
       ))}
@@ -373,7 +370,7 @@ export default function RecipeDetailScreen() {
                   <Ionicons name="bar-chart-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Zorluk</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
-                    {recipe.difficulty === 'easy' ? 'Kolay' : recipe.difficulty === 'medium' ? 'Orta' : 'Zor'}
+                    {DIFFICULTY_LABELS[recipe.difficulty] ?? recipe.difficulty}
                   </Text>
                 </View>
               ) : null}

@@ -26,6 +26,7 @@ import { useSpecialConditions } from '../../../src/hooks/useSpecialConditions';
 import type { SearchFilters } from '../../../src/lib/types';
 import { API_ENDPOINTS, PAGINATION, COLORS } from '../../../src/lib/constants';
 import { searchIngredients } from '../../../src/services/ingredient-service';
+import { getAgeGroupColor } from '../../../src/utils/helpers';
 
 const SORT_OPTIONS: { value: NonNullable<SearchFilters['sort']>; label: string }[] = [
   { value: 'newest', label: 'En Yeni' },
@@ -81,22 +82,6 @@ function FilterChip({ label, selected, onPress, color }: FilterChipProps) {
       </Text>
     </TouchableOpacity>
   );
-}
-
-// Age group color map (consistent with RecipeCard)
-const AGE_GROUP_COLORS: Record<string, string> = {
-  '6-8-ay': '#AED581',
-  '8-12-ay': '#81D4FA',
-  '12-ay': '#FF8A65',
-  '1-3-yas': '#FFB74D',
-  '3-yas': '#B39DDB',
-  '4-yas': '#F48FB1',
-  '5-yas': '#80DEEA',
-};
-
-function getAgeGroupColor(slug: string, fallback?: string): string {
-  const key = Object.keys(AGE_GROUP_COLORS).find((k) => slug.includes(k));
-  return key ? AGE_GROUP_COLORS[key] : fallback ?? COLORS.primary;
 }
 
 interface TempFilters {
@@ -529,13 +514,9 @@ export default function RecipesScreen() {
                         label={ag.name}
                         selected={filters.age_group === ag.slug}
                         color={getAgeGroupColor(ag.slug, ag.color)}
-                        onPress={() =>
-                          setFilters((f) => ({
-                            ...f,
-                            age_group: f.age_group === ag.slug ? undefined : ag.slug,
-                            page: 1,
-                          }))
-                        }
+                        onPress={() => handleAgeGroupSelect(
+                          filters.age_group === ag.slug ? null : ag.slug,
+                        )}
                       />
                     ))}
                   </FilterSection>

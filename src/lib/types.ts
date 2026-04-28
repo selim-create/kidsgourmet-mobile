@@ -74,8 +74,12 @@ export interface Ingredient {
 }
 
 export interface Instruction {
-  step: number;
-  content: string;
+  step?: number;
+  content?: string;
+  /** Alternative field names that some API versions return */
+  text?: string;
+  description?: string;
+  instruction?: string;
   image?: string;
 }
 

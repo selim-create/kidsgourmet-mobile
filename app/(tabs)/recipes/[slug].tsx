@@ -28,7 +28,7 @@ import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
-import { formatDuration, stripHtml, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
+import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
 import type { SafetyCheck, Comment } from '../../../src/lib/types';
 
@@ -474,7 +474,7 @@ export default function RecipeDetailScreen() {
               {recipe.ingredients && recipe.ingredients.length > 0 ? (
                 recipe.ingredients.map((ing, idx) => (
                   <View
-                    key={idx}
+                    key={ing.id ?? `${ing.name}-${idx}`}
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -510,8 +510,11 @@ export default function RecipeDetailScreen() {
           {activeTab === 'steps' && (
             <View style={{ marginBottom: 24 }}>
               {recipe.instructions && recipe.instructions.length > 0 ? (
-                recipe.instructions.map((step) => (
-                  <View key={step.step} style={{ flexDirection: 'row', marginBottom: 20 }}>
+                recipe.instructions.map((step, idx) => {
+                  const stepNumber = step.step ?? idx + 1;
+                  const stepContent = getInstructionContent(step);
+                  return (
+                  <View key={stepNumber} style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <View
                       style={{
                         width: 32,
@@ -525,11 +528,11 @@ export default function RecipeDetailScreen() {
                         flexShrink: 0,
                       }}
                     >
-                      <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{step.step}</Text>
+                      <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{stepNumber}</Text>
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ color: COLORS.dark, lineHeight: 24, fontSize: 14 }}>
-                        {stripHtml(step.content)}
+                        {stripHtml(stepContent)}
                       </Text>
                       {step.image ? (
                         <Image
@@ -540,7 +543,8 @@ export default function RecipeDetailScreen() {
                       ) : null}
                     </View>
                   </View>
-                ))
+                  );
+                })
               ) : (
                 <Text style={{ color: '#9CA3AF', textAlign: 'center', paddingVertical: 16 }}>
                   Yapılış bilgisi bulunamadı

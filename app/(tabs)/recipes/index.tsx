@@ -407,7 +407,7 @@ export default function RecipesScreen() {
         <FlatList
           data={recipes}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={{ padding: 16, gap: 12 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl

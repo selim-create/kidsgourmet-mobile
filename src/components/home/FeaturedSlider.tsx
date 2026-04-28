@@ -338,6 +338,10 @@ export function FeaturedSlider() {
 
   const { data: apiItems = [] } = useSWR<FeaturedItem[]>('all-featured', () => getAllFeatured(5));
 
+  const lastSponsor = useMemo(() => apiItems.find(i => i.type === 'sponsor'), [apiItems]);
+  const sponsorName = lastSponsor?.meta.sponsor_name || 'Sponsor';
+  const sponsorLogo = lastSponsor?.meta.sponsor_logo || '';
+
   const allItems: MappedFeaturedItem[] = useMemo(() => [
     ...apiItems.map((item): MappedFeaturedItem => ({
       id: item.id,
@@ -398,6 +402,7 @@ export function FeaturedSlider() {
       >
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.type;
+          const isSponsored = tab.type === 'sponsored';
           return (
             <TouchableOpacity
               key={tab.type}
@@ -413,11 +418,21 @@ export function FeaturedSlider() {
                 gap: 5,
               }}
             >
-              {tab.icon ? (
+              {isSponsored ? (
+                sponsorLogo ? (
+                  <Image
+                    source={{ uri: sponsorLogo }}
+                    style={{ width: 14, height: 14, borderRadius: 7 }}
+                    contentFit="contain"
+                  />
+                ) : (
+                  <Ionicons name="business-outline" size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
+                )
+              ) : tab.icon ? (
                 <Ionicons name={tab.icon} size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
               ) : null}
               <Text style={{ fontSize: 13, fontWeight: '600', color: isActive ? tab.activeColor : tab.inactiveColor }}>
-                {tab.label}
+                {isSponsored ? sponsorName : tab.label}
               </Text>
             </TouchableOpacity>
           );

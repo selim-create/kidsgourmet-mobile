@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Share,
-  FlatList,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -28,11 +27,13 @@ import { Avatar } from '../../../src/components/ui/Avatar';
 import { SafetyBanner } from '../../../src/components/safety/SafetyBanner';
 import { DetailHeader } from '../../../src/components/ui/DetailHeader';
 import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
+import { NewsletterSection } from '../../../src/components/home/NewsletterSection';
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
+import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
 import type { SafetyCheck, Comment, Ingredient } from '../../../src/lib/types';
 
 // ─── Portion multiplier options (web-style labels) ───────────────────────────
@@ -90,7 +91,10 @@ interface IngredientRowProps {
 }
 
 function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded, onToggleExpand }: IngredientRowProps) {
-  const hasExtra = !!(ing.alternatives?.length || ing.notes || ing.allergen_warning);
+  const hasNotes = !!ing.notes;
+  const hasAlternatives = !!(ing.alternatives && ing.alternatives.length > 0);
+  const hasAllergen = !!ing.allergen_warning;
+  const hasExtra = hasNotes || hasAlternatives || hasAllergen;
 
   return (
     <View>
@@ -143,21 +147,32 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
           {ing.is_optional ? (
             <Badge variant="gray" size="sm">İsteğe bağlı</Badge>
           ) : null}
-          {hasExtra ? (
+          {hasNotes ? (
             <TouchableOpacity
               onPress={onToggleExpand}
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons
-                name={isExpanded ? 'chevron-up-circle-outline' : 'information-circle-outline'}
-                size={18}
-                color={COLORS.primary}
-              />
+              <Ionicons name="document-text-outline" size={18} color="#6B7280" />
             </TouchableOpacity>
           ) : null}
-          {ing.allergen_warning ? (
-            <Ionicons name="alert-circle-outline" size={18} color="#F59E0B" />
+          {hasAlternatives ? (
+            <TouchableOpacity
+              onPress={onToggleExpand}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="swap-horizontal-outline" size={18} color={COLORS.primary} />
+            </TouchableOpacity>
+          ) : null}
+          {hasAllergen ? (
+            <TouchableOpacity
+              onPress={onToggleExpand}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="alert-circle-outline" size={18} color="#F59E0B" />
+            </TouchableOpacity>
           ) : null}
         </View>
       </TouchableOpacity>
@@ -174,28 +189,28 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
             borderColor: '#FDE68A',
           }}
         >
-          {ing.alternatives && ing.alternatives.length > 0 ? (
-            <View style={{ marginBottom: ing.notes ? 8 : 0 }}>
+          {hasAlternatives ? (
+            <View style={{ marginBottom: hasNotes || hasAllergen ? 8 : 0 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
-                Alternatifler:
+                🔄 Alternatifler:
               </Text>
               <Text style={{ fontSize: 13, color: '#374151' }}>
-                {ing.alternatives.join(', ')}
+                {ing.alternatives!.join(', ')}
               </Text>
             </View>
           ) : null}
-          {ing.notes ? (
-            <View style={{ marginBottom: ing.allergen_warning ? 8 : 0 }}>
+          {hasNotes ? (
+            <View style={{ marginBottom: hasAllergen ? 8 : 0 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
-                Not:
+                📝 Not:
               </Text>
               <Text style={{ fontSize: 13, color: '#374151' }}>{ing.notes}</Text>
             </View>
           ) : null}
-          {ing.allergen_warning ? (
+          {hasAllergen ? (
             <View>
               <Text style={{ fontSize: 12, fontWeight: '700', color: '#B45309', marginBottom: 4 }}>
-                Alerjen Uyarısı:
+                ⚠️ Alerjen Uyarısı:
               </Text>
               <Text style={{ fontSize: 13, color: '#92400E' }}>{ing.allergen_warning}</Text>
             </View>
@@ -218,7 +233,11 @@ export default function RecipeDetailScreen() {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
   const [expandedIngredientId, setExpandedIngredientId] = useState<string | null>(null);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const insets = useSafeAreaInsets();
+
+  // Pick 4 random tools once per render (stable across re-renders)
+  const randomTools = useMemo(() => pickRandom(ALL_TOOLS, 4), []);
 
   const { data: recipe, isLoading, error, mutate } = useSWR(
     slug ? `recipe-detail-${slug}` : null,
@@ -319,6 +338,18 @@ export default function RecipeDetailScreen() {
     setExpandedIngredientId((prev) => (prev === id ? null : id));
   }, []);
 
+  const toggleStep = useCallback((stepNum: number) => {
+    setCompletedSteps((prev) => {
+      const next = new Set(prev);
+      if (next.has(stepNum)) {
+        next.delete(stepNum);
+      } else {
+        next.add(stepNum);
+      }
+      return next;
+    });
+  }, []);
+
   const buildShoppingText = useCallback(() => {
     if (!recipe) return '';
     const lines = (recipe.ingredients ?? []).map((ing) => {
@@ -378,6 +409,25 @@ export default function RecipeDetailScreen() {
 
   const displayRating = userRating || recipe.rating || 0;
 
+  // Ingredient CTA: prefer first ingredient with alternatives, else first ingredient
+  const ctaIngredient = recipe.ingredients?.find(
+    (ing) => ing.alternatives && ing.alternatives.length > 0,
+  ) ?? recipe.ingredients?.[0];
+  const ctaAlternative = ctaIngredient?.alternatives?.[0];
+
+  // Nutrition rows – filter out null, undefined, 0, and empty string
+  const nutritionRows = recipe.nutrition
+    ? [
+        { label: 'Kalori', value: recipe.nutrition.calories, unit: 'kcal' },
+        { label: 'Protein', value: recipe.nutrition.protein, unit: 'g' },
+        { label: 'Karbonhidrat', value: recipe.nutrition.carbs, unit: 'g' },
+        { label: 'Yağ', value: recipe.nutrition.fat, unit: 'g' },
+        { label: 'Lif', value: recipe.nutrition.fiber, unit: 'g' },
+        { label: 'Şeker', value: recipe.nutrition.sugar, unit: 'g' },
+        { label: 'Sodyum', value: recipe.nutrition.sodium, unit: 'mg' },
+      ].filter((n) => n.value !== undefined && n.value !== null && n.value !== 0)
+    : [];
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: '#FFFBE6' }}
@@ -416,7 +466,7 @@ export default function RecipeDetailScreen() {
                     }}
                   >
                     <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
-                      {ag.name}
+                      {ag.name ?? ag.slug}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -491,45 +541,6 @@ export default function RecipeDetailScreen() {
             </View>
           ) : null}
 
-          {/* ── Expert Note Card ── */}
-          {recipe.is_expert_approved && recipe.expert ? (
-            <View
-              style={{
-                backgroundColor: '#F0FDF4',
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-                borderWidth: 1,
-                borderColor: '#86EFAC',
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="shield-checkmark" size={18} color="#15803D" style={{ marginRight: 8 }} />
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#15803D' }}>
-                  Uzman Görüşü
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
-                <Avatar uri={recipe.expert.avatar_url} name={recipe.expert.name} size={40} />
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
-                    {recipe.expert.name}
-                  </Text>
-                  {recipe.expert.title ? (
-                    <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
-                      {recipe.expert.title}
-                    </Text>
-                  ) : null}
-                  {(recipe.expert.note ?? recipe.expert_note) ? (
-                    <Text style={{ fontSize: 13, color: '#374151', marginTop: 8, lineHeight: 20 }}>
-                      {recipe.expert.note ?? recipe.expert_note}
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-            </View>
-          ) : null}
-
           {/* ── Safety Banner ── */}
           <SafetyBanner
             safetyData={bannerData}
@@ -584,6 +595,24 @@ export default function RecipeDetailScreen() {
                   </Text>
                 </View>
               ) : null}
+              {recipe.is_freezable !== undefined ? (
+                <View style={{ alignItems: 'center', minWidth: 64 }}>
+                  <Text style={{ fontSize: 20 }}>❄️</Text>
+                  <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Dondurulabilir</Text>
+                  <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
+                    {recipe.is_freezable ? 'Evet' : 'Hayır'}
+                  </Text>
+                </View>
+              ) : null}
+              {recipe.storage_duration ? (
+                <View style={{ alignItems: 'center', minWidth: 64 }}>
+                  <Text style={{ fontSize: 20 }}>📦</Text>
+                  <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Saklama</Text>
+                  <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
+                    {recipe.storage_duration}
+                  </Text>
+                </View>
+              ) : null}
             </View>
 
             {/* Meal type & diet type chips (tıklanabilir) */}
@@ -635,7 +664,7 @@ export default function RecipeDetailScreen() {
           </Card>
 
           {/* ── Malzemeler Kartı ── */}
-          <Card style={{ marginBottom: 16 }}>
+          <Card style={{ marginBottom: 8 }}>
             {/* Portion selector */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark }}>Malzemeler</Text>
@@ -730,6 +759,60 @@ export default function RecipeDetailScreen() {
             ) : null}
           </Card>
 
+          {/* ── Malzemeye Göre Tarif Öneri (CTA) ── */}
+          {ctaIngredient ? (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => {
+                if (ctaAlternative) {
+                  const altSlug = ctaAlternative.toLowerCase().replace(/\s+/g, '-');
+                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(altSlug)}` as never);
+                } else {
+                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaIngredient.name)}` as never);
+                }
+              }}
+              style={{ marginBottom: 16 }}
+            >
+              <View
+                style={{
+                  backgroundColor: '#FFF3EE',
+                  borderRadius: 14,
+                  padding: 14,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: '#FFD0B0',
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: COLORS.primary,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Ionicons name="swap-horizontal-outline" size={20} color="#fff" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
+                    Evde {ctaIngredient.name} yok mu?
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                    {ctaAlternative
+                      ? `${ctaAlternative} ile alternatif tariflere git →`
+                      : 'Alternatif tariflere git →'}
+                  </Text>
+                </View>
+                <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
+              </View>
+            </TouchableOpacity>
+          ) : null}
+
           {/* ── Hazırlanışı Kartı ── */}
           <Card style={{ marginBottom: 16 }}>
             <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark, marginBottom: 16 }}>
@@ -739,14 +822,20 @@ export default function RecipeDetailScreen() {
               recipe.instructions.map((step, idx) => {
                 const stepNumber = step.step ?? idx + 1;
                 const stepContent = getInstructionContent(step);
+                const isCompleted = completedSteps.has(stepNumber);
                 return (
-                  <View key={stepNumber} style={{ flexDirection: 'row', marginBottom: 20 }}>
+                  <TouchableOpacity
+                    key={stepNumber}
+                    onPress={() => toggleStep(stepNumber)}
+                    activeOpacity={0.8}
+                    style={{ flexDirection: 'row', marginBottom: 20 }}
+                  >
                     <View
                       style={{
                         width: 32,
                         height: 32,
                         borderRadius: 16,
-                        backgroundColor: COLORS.primary,
+                        backgroundColor: isCompleted ? '#22C55E' : COLORS.primary,
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: 12,
@@ -754,10 +843,21 @@ export default function RecipeDetailScreen() {
                         flexShrink: 0,
                       }}
                     >
-                      <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{stepNumber}</Text>
+                      {isCompleted ? (
+                        <Ionicons name="checkmark" size={18} color="#fff" />
+                      ) : (
+                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{stepNumber}</Text>
+                      )}
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: COLORS.dark, lineHeight: 24, fontSize: 14 }}>
+                      <Text
+                        style={{
+                          color: isCompleted ? '#9CA3AF' : COLORS.dark,
+                          lineHeight: 24,
+                          fontSize: 14,
+                          textDecorationLine: isCompleted ? 'line-through' : 'none',
+                        }}
+                      >
                         {stripHtml(stepContent)}
                       </Text>
                       {step.image ? (
@@ -768,7 +868,7 @@ export default function RecipeDetailScreen() {
                         />
                       ) : null}
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })
             ) : (
@@ -778,42 +878,111 @@ export default function RecipeDetailScreen() {
             )}
           </Card>
 
+          {/* ── Expert Note Card (Hazırlanışı'nın altında) ── */}
+          {recipe.is_expert_approved && recipe.expert ? (
+            <View
+              style={{
+                backgroundColor: '#F0FDF4',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: '#86EFAC',
+              }}
+            >
+              {/* Header */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <Ionicons name="shield-checkmark" size={18} color="#15803D" style={{ marginRight: 8 }} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#15803D' }}>
+                  Uzman Görüşü
+                </Text>
+              </View>
+              {/* Expert info row */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <Avatar uri={recipe.expert.avatar_url} name={recipe.expert.name} size={44} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12, color: '#6B7280' }}>
+                    Bu tarif ile ilgili Uzman Notu:
+                  </Text>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark, marginTop: 2 }}>
+                    {recipe.expert.title ? `${recipe.expert.title} ` : ''}{recipe.expert.name}
+                  </Text>
+                </View>
+              </View>
+              {/* Expert note text */}
+              {(recipe.expert.note ?? recipe.expert_note) ? (
+                <View
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.7)',
+                    borderRadius: 10,
+                    padding: 12,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#15803D', marginBottom: 6 }}>
+                    Uzman Notu:
+                  </Text>
+                  <Text style={{ fontSize: 13, color: '#374151', lineHeight: 20 }}>
+                    {recipe.expert.note ?? recipe.expert_note}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+
           {/* ── Nutrition ── */}
-          {recipe.nutrition ? (
-            <Card style={{ marginBottom: 20 }}>
+          {nutritionRows.length > 0 ? (
+            <Card style={{ marginBottom: 16 }}>
               <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.dark, marginBottom: 12 }}>
                 Besin Değerleri
               </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                {[
-                  { label: 'Kalori', value: recipe.nutrition.calories, unit: 'kcal' },
-                  { label: 'Protein', value: recipe.nutrition.protein, unit: 'g' },
-                  { label: 'Karbonhidrat', value: recipe.nutrition.carbs, unit: 'g' },
-                  { label: 'Yağ', value: recipe.nutrition.fat, unit: 'g' },
-                  { label: 'Lif', value: recipe.nutrition.fiber, unit: 'g' },
-                  { label: 'Şeker', value: recipe.nutrition.sugar, unit: 'g' },
-                ]
-                  .filter((n) => n.value !== undefined)
-                  .map((n) => (
-                    <View
-                      key={n.label}
-                      style={{
-                        backgroundColor: '#FFFBE6',
-                        borderRadius: 12,
-                        paddingHorizontal: 14,
-                        paddingVertical: 10,
-                        alignItems: 'center',
-                        minWidth: 72,
-                      }}
-                    >
-                      <Text style={{ color: COLORS.dark, fontWeight: '800', fontSize: 18 }}>
-                        {n.value}
-                      </Text>
-                      <Text style={{ color: '#9CA3AF', fontSize: 10 }}>{n.unit}</Text>
-                      <Text style={{ color: '#6B7280', fontSize: 11, marginTop: 2 }}>{n.label}</Text>
-                    </View>
-                  ))}
+              {nutritionRows.map((n, idx) => (
+                <View
+                  key={n.label}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingVertical: 8,
+                    borderBottomWidth: idx < nutritionRows.length - 1 ? 1 : 0,
+                    borderBottomColor: '#F3F4F6',
+                  }}
+                >
+                  <Text style={{ fontSize: 14, color: '#6B7280' }}>{n.label}</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark }}>
+                    {n.value} {n.unit}
+                  </Text>
+                </View>
+              ))}
+            </Card>
+          ) : null}
+
+          {/* ── Alerjen Uyarısı ── */}
+          {recipe.allergens && recipe.allergens.length > 0 ? (
+            <Card style={{ marginBottom: 16, backgroundColor: '#FFFBE6', borderWidth: 1, borderColor: '#FDE68A' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Ionicons name="warning-outline" size={18} color="#D97706" style={{ marginRight: 8 }} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#D97706' }}>
+                  Alerjen Uyarısı
+                </Text>
               </View>
+              <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 20 }}>
+                {recipe.allergens.join(', ')}
+              </Text>
+            </Card>
+          ) : null}
+
+          {/* ── Özel Notlar ── */}
+          {recipe.special_notes ? (
+            <Card style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Ionicons name="document-text-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark }}>
+                  Özel Notlar
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, color: '#374151', lineHeight: 20 }}>
+                {stripHtml(recipe.special_notes)}
+              </Text>
             </Card>
           ) : null}
 
@@ -846,27 +1015,6 @@ export default function RecipeDetailScreen() {
           >
             Haftalık Plana Ekle
           </Button>
-
-          {/* ── Similar / Related Recipes ── */}
-          {relatedRecipes && relatedRecipes.length > 0 ? (
-            <View style={{ marginBottom: 24 }}>
-              <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
-                Benzer Tarifler
-              </Text>
-              <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={relatedRecipes}
-                keyExtractor={(item) => String(item.id)}
-                contentContainerStyle={{ gap: 12 }}
-                renderItem={({ item }) => (
-                  <View style={{ width: 180 }}>
-                    <RecipeCard recipe={item} compact />
-                  </View>
-                )}
-              />
-            </View>
-          ) : null}
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>
@@ -956,6 +1104,191 @@ export default function RecipeDetailScreen() {
               </Text>
             )}
           </View>
+
+          {/* ══════════════════════════════════════════════════════
+              SIDEBAR BLOCKS — displayed vertically at the bottom
+          ══════════════════════════════════════════════════════ */}
+
+          {/* ── 1. Rastgele 4 Faydalı Araç ── */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
+              Faydalı Araçlar
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+              {randomTools.map((tool) => (
+                <TouchableOpacity
+                  key={tool.id}
+                  activeOpacity={0.85}
+                  onPress={() => router.push(tool.route as never)}
+                  style={{
+                    width: '47%',
+                    backgroundColor: '#fff',
+                    borderRadius: 16,
+                    padding: 14,
+                    elevation: 2,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.07,
+                    shadowRadius: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 12,
+                      backgroundColor: tool.bg,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Ionicons name={tool.icon} size={22} color={tool.color} />
+                  </View>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }} numberOfLines={2}>
+                    {tool.name}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#6B7280', lineHeight: 15 }} numberOfLines={3}>
+                    {tool.description}
+                  </Text>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: tool.color, marginTop: 8 }}>
+                    Keşfet →
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* ── 2. "Bizimkiler Ne Yiyecek?" Banner ── */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push('/(tabs)/meal-plan' as never)}
+            style={{ marginBottom: 16 }}
+          >
+            <View
+              style={{
+                backgroundColor: '#7E57C2',
+                borderRadius: 20,
+                padding: 20,
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <View
+                style={{
+                  position: 'absolute',
+                  width: 140,
+                  height: 140,
+                  borderRadius: 70,
+                  backgroundColor: '#5E35B1',
+                  top: -40,
+                  right: -20,
+                  opacity: 0.5,
+                }}
+              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
+                <Ionicons name="star" size={10} color="#7E57C2" />
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#7E57C2', marginLeft: 4 }}>HAFTALIK PLAN</Text>
+              </View>
+              <Ionicons name="calendar-outline" size={32} color="#fff" style={{ marginBottom: 8 }} />
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
+                Bizimkiler Ne Yiyecek?
+              </Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)', lineHeight: 18, marginBottom: 14 }}>
+                Haftanın her günü için sağlıklı ve lezzetli tarifler planla.
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#7E57C2' }}>Planla</Text>
+                <Ionicons name="arrow-forward" size={15} color="#7E57C2" />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* ── 3. "Aklınıza Takılan mı Var?" Banner ── */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push('/(tabs)/profile' as never)}
+            style={{ marginBottom: 16 }}
+          >
+            <View
+              style={{
+                backgroundColor: '#2E7D32',
+                borderRadius: 20,
+                padding: 20,
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <View
+                style={{
+                  position: 'absolute',
+                  width: 140,
+                  height: 140,
+                  borderRadius: 70,
+                  backgroundColor: '#1B5E20',
+                  top: -40,
+                  right: -20,
+                  opacity: 0.5,
+                }}
+              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
+                <Ionicons name="star" size={10} color="#2E7D32" />
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#2E7D32', marginLeft: 4 }}>UZMAN DANIŞMA</Text>
+              </View>
+              <Ionicons name="chatbubble-ellipses-outline" size={32} color="#fff" style={{ marginBottom: 8 }} />
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
+                Aklınıza Takılan mı Var?
+              </Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)', lineHeight: 18, marginBottom: 14 }}>
+                Uzmanlarımıza soru sorun, çocuğunuz için en doğru yanıtı alın.
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#2E7D32' }}>Soru Sor</Text>
+                <Ionicons name="arrow-forward" size={15} color="#2E7D32" />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* ── 4. Tarifin Malzemeleri (kompakt chips) ── */}
+          {recipe.ingredients && recipe.ingredients.length > 0 ? (
+            <Card style={{ marginBottom: 16 }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark, marginBottom: 10 }}>
+                Tarifin Malzemeleri
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {recipe.ingredients.map((ing, idx) => (
+                  <View
+                    key={ing.id ?? `chip-${idx}`}
+                    style={{
+                      backgroundColor: '#F3F4F6',
+                      borderRadius: 999,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: COLORS.dark }}>
+                      {ing.amount ? `${ing.amount}${ing.unit ? ' ' + ing.unit : ''} ` : ''}{ing.name}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </Card>
+          ) : null}
+
+          {/* ── 5. Alt Alta Benzer Tarifler ── */}
+          {relatedRecipes && relatedRecipes.length > 0 ? (
+            <View style={{ marginBottom: 24 }}>
+              <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
+                Benzer Tarifler
+              </Text>
+              {relatedRecipes.map((item) => (
+                <RecipeCard key={String(item.id)} recipe={item} />
+              ))}
+            </View>
+          ) : null}
+
+          {/* ── 6. K&G Bülten ── */}
+          <NewsletterSection />
         </View>
       </ScrollView>
 

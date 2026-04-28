@@ -97,6 +97,82 @@ function normalizeRecipe(recipe: Recipe): Recipe {
     }
   }
 
+  // ── expert.avatar_url: map alternative API field names ───────────────────────
+  if (normalized.expert && !normalized.expert.avatar_url) {
+    const expertRaw = normalized.expert as unknown as Record<string, unknown>;
+    const alt = expertRaw.avatar ?? expertRaw.image ?? expertRaw.profile_image ?? expertRaw.photo;
+    if (typeof alt === 'string' && alt) {
+      normalized.expert = { ...normalized.expert, avatar_url: alt };
+    }
+  }
+
+  // ── is_freezable: map from `freezable` alias ─────────────────────────────────
+  if (normalized.is_freezable === undefined && raw.freezable !== undefined) {
+    normalized.is_freezable = Boolean(raw.freezable);
+  }
+
+  // ── storage_duration: map from alternative field names ───────────────────────
+  if (!normalized.storage_duration) {
+    const alt = raw.storage_time ?? raw.storage ?? raw.shelf_life;
+    if (typeof alt === 'string' && alt) {
+      normalized.storage_duration = alt;
+    }
+  }
+
+  // ── allergens: map from alternative field names ───────────────────────────────
+  if (!normalized.allergens) {
+    const alt = raw.allergy_warnings ?? raw.allergen_list ?? raw.allergy_list;
+    if (Array.isArray(alt)) {
+      normalized.allergens = alt.map((a) =>
+        typeof a === 'string' ? a : (a as Record<string, unknown>).name ? String((a as Record<string, unknown>).name) : String(a),
+      );
+    } else if (typeof alt === 'string' && alt) {
+      normalized.allergens = [alt];
+    }
+  }
+
+  // ── special_notes: map from `notes` alias ────────────────────────────────────
+  if (!normalized.special_notes) {
+    const alt = raw.notes ?? raw.note;
+    if (typeof alt === 'string' && alt) {
+      normalized.special_notes = alt;
+    }
+  }
+
+  // ── age_groups[].name: map from `title` if name is missing ───────────────────
+  if (normalized.age_groups && normalized.age_groups.length > 0) {
+    normalized.age_groups = normalized.age_groups.map((ag) => {
+      if (!ag.name) {
+        const agRaw = ag as unknown as Record<string, unknown>;
+        const nameAlt = agRaw.title ?? agRaw.label ?? agRaw.age_group_name;
+        if (typeof nameAlt === 'string' && nameAlt) {
+          return { ...ag, name: nameAlt };
+        }
+      }
+      return ag;
+    });
+  }
+
+  // ── ingredient alternatives: map from alternative field names ─────────────────
+  if (normalized.ingredients && normalized.ingredients.length > 0) {
+    normalized.ingredients = normalized.ingredients.map((ing) => {
+      if (!ing.alternatives || ing.alternatives.length === 0) {
+        const ingRaw = ing as unknown as Record<string, unknown>;
+        const altField =
+          ingRaw.alternative_ingredients ?? ingRaw.substitutes ?? ingRaw.alternates;
+        if (Array.isArray(altField)) {
+          return {
+            ...ing,
+            alternatives: altField.map((a) =>
+              typeof a === 'string' ? a : (a as Record<string, unknown>).name ? String((a as Record<string, unknown>).name) : String(a),
+            ),
+          };
+        }
+      }
+      return ing;
+    });
+  }
+
   return normalized;
 }
 

@@ -59,6 +59,11 @@ export interface Recipe {
   is_expert_approved?: boolean;
   is_featured?: boolean;
   is_favorite?: boolean;
+  is_freezable?: boolean;
+  freezable?: boolean;
+  storage_duration?: string;
+  allergens?: string[];
+  special_notes?: string;
   view_count?: number;
   rating?: number;
   rating_count?: number;
@@ -113,7 +118,7 @@ export interface Author {
 
 export interface AgeGroup {
   id: number;
-  name: string;
+  name?: string;
   slug: string;
   min_age?: number;
   max_age?: number;

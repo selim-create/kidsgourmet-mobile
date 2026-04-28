@@ -44,6 +44,10 @@ export const API_ENDPOINTS = {
   AGE_GROUPS: '/wp/v2/age-group',
   MEAL_TYPES: '/wp/v2/meal-type',
   DIET_TYPES: '/wp/v2/diet-type',
+  SPECIAL_CONDITIONS: '/wp/v2/special-condition',
+
+  // Recipe Rating
+  RECIPE_RATING: (recipeId: number) => `/kg/v1/recipes/${recipeId}/rating`,
 
   // Search
   SEARCH: '/kg/v1/search',

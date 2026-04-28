@@ -10,6 +10,22 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatDuration } from '../../utils/helpers';
 import { COLORS } from '../../lib/constants';
 
+// Age group color map (consistent with web)
+const AGE_GROUP_COLORS: Record<string, string> = {
+  '6-8-ay': '#AED581',
+  '8-12-ay': '#81D4FA',
+  '12-ay': '#FF8A65',
+  '1-3-yas': '#FFB74D',
+  '3-yas': '#B39DDB',
+  '4-yas': '#F48FB1',
+  '5-yas': '#80DEEA',
+};
+
+function getAgeGroupColor(slug: string, fallback?: string): string {
+  const key = Object.keys(AGE_GROUP_COLORS).find((k) => slug.includes(k));
+  return key ? AGE_GROUP_COLORS[key] : fallback ?? COLORS.primary;
+}
+
 interface RecipeCardProps {
   recipe: Recipe;
   onPress?: () => void;
@@ -41,6 +57,9 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
 
   const totalTime = recipe.total_time ?? (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
   const primaryAgeGroup = recipe.age_groups?.[0];
+  const ageGroupColor = primaryAgeGroup
+    ? getAgeGroupColor(primaryAgeGroup.slug ?? '', primaryAgeGroup.color)
+    : undefined;
   const imageHeight = compact ? 130 : 200;
 
   return (
@@ -51,7 +70,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
       style={{ elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 }}
     >
       {/* Image */}
-      <View className="relative">
+      <View style={{ position: 'relative' }}>
         <Image
           source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
           style={{ width: '100%', height: imageHeight }}
@@ -62,19 +81,41 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         {/* Age Group Badge — top left overlay */}
         {primaryAgeGroup?.name ? (
           <View
-            className="absolute top-2 left-2 rounded-full px-2 py-0.5"
-            style={{ backgroundColor: primaryAgeGroup.color ?? COLORS.primary }}
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              borderRadius: 999,
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              backgroundColor: ageGroupColor ?? COLORS.primary,
+            }}
           >
-            <Text className="text-white text-xs font-medium">{primaryAgeGroup.name}</Text>
+            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>
+              {primaryAgeGroup.name}
+            </Text>
           </View>
         ) : null}
 
         {/* Favorite Button — top right */}
         <TouchableOpacity
           onPress={handleFavoriteToggle}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 items-center justify-center"
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.15,
+            shadowRadius: 3,
+          }}
           activeOpacity={0.8}
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3 }}
         >
           <Ionicons
             name={favorite ? 'heart' : 'heart-outline'}
@@ -86,21 +127,82 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         {/* Expert Approved Badge — below favorite button */}
         {recipe.is_expert_approved ? (
           <View
-            className="absolute right-2 w-8 h-8 rounded-full items-center justify-center"
-            style={{ top: compact ? 44 : 46, backgroundColor: 'rgba(34,197,94,0.9)' }}
+            style={{
+              position: 'absolute',
+              top: compact ? 44 : 46,
+              right: 8,
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(34,197,94,0.9)',
+            }}
           >
             <Ionicons name="shield-checkmark" size={16} color="#fff" />
+          </View>
+        ) : null}
+
+        {/* Author center overlay — only in non-compact mode */}
+        {!compact && recipe.author ? (
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: imageHeight * 0.45,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: 10,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: imageHeight * 0.45,
+                backgroundColor: 'rgba(0,0,0,0.45)',
+              }}
+            />
+            <Avatar uri={recipe.author.avatar_url} name={recipe.author.name} size={32} />
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: '600',
+                marginTop: 4,
+                textShadowColor: 'rgba(0,0,0,0.7)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}
+              numberOfLines={1}
+            >
+              {recipe.author.name}
+            </Text>
           </View>
         ) : null}
 
         {/* Prep Time Badge — bottom right, glassmorphism */}
         {totalTime > 0 ? (
           <View
-            className="absolute bottom-2 right-2 flex-row items-center rounded-full px-2 py-1"
-            style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderRadius: 999,
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              backgroundColor: 'rgba(0,0,0,0.55)',
+            }}
           >
             <Ionicons name="time-outline" size={11} color="#fff" />
-            <Text className="text-white font-medium ml-1" style={{ fontSize: 11 }}>
+            <Text style={{ color: '#fff', fontWeight: '600', marginLeft: 4, fontSize: 11 }}>
               {formatDuration(totalTime)}
             </Text>
           </View>
@@ -108,25 +210,51 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
       </View>
 
       {/* Content */}
-      <View className="p-3">
+      <View style={{ padding: 12 }}>
         {/* Title */}
         <Text
-          className="text-dark font-bold text-sm mb-1.5"
+          style={{ color: COLORS.dark, fontWeight: '700', fontSize: 13, marginBottom: 6 }}
           numberOfLines={2}
         >
           {recipe.title}
         </Text>
 
-        {/* Author row — hidden in compact mode */}
-        {!compact && recipe.author ? (
-          <View className="flex-row items-center mt-1">
-            <Avatar uri={recipe.author.avatar_url} name={recipe.author.name} size={20} />
-            <Text className="text-gray-400 text-xs ml-1.5 flex-1" numberOfLines={1}>
-              {recipe.author.name}
-            </Text>
+        {/* Diet type & meal type chips */}
+        {!compact && ((recipe.diet_types && recipe.diet_types.length > 0) || recipe.meal_type) ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+            {recipe.meal_type ? (
+              <View
+                style={{
+                  backgroundColor: '#FFF3EE',
+                  borderRadius: 999,
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                }}
+              >
+                <Text style={{ fontSize: 10, color: COLORS.primary, fontWeight: '600' }}>
+                  {recipe.meal_type}
+                </Text>
+              </View>
+            ) : null}
+            {recipe.diet_types?.map((dt) => (
+              <View
+                key={dt}
+                style={{
+                  backgroundColor: '#F0FDF4',
+                  borderRadius: 999,
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                }}
+              >
+                <Text style={{ fontSize: 10, color: '#15803D', fontWeight: '600' }}>
+                  {dt}
+                </Text>
+              </View>
+            ))}
           </View>
         ) : null}
       </View>
     </TouchableOpacity>
   );
 }
+

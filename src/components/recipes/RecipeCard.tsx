@@ -7,7 +7,7 @@ import type { Recipe } from '../../lib/types';
 import { Avatar } from '../ui/Avatar';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDuration, getAgeGroupColor } from '../../utils/helpers';
+import { formatDuration, getAgeGroupColor, getAgeGroupTextColor } from '../../utils/helpers';
 import { COLORS } from '../../lib/constants';
 
 interface RecipeCardProps {
@@ -21,6 +21,14 @@ interface RecipeCardProps {
 const AVATAR_SIZE = 56;
 /** Width of the white border ring around the avatar. */
 const AVATAR_BORDER = 3;
+
+/** Asymmetric border radius for the age group badge — matches web design. */
+const BADGE_BORDER_RADIUS = {
+  borderTopLeftRadius: 12,
+  borderTopRightRadius: 4,
+  borderBottomRightRadius: 12,
+  borderBottomLeftRadius: 4,
+};
 
 export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps) {
   const { isFavorite, toggle } = useFavorites();
@@ -44,12 +52,19 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
   };
 
   const totalTime = recipe.total_time ?? (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
-  const primaryAgeGroup = recipe.age_groups?.[0];
-  const ageGroupColor = primaryAgeGroup
-    ? getAgeGroupColor(primaryAgeGroup.slug ?? '', primaryAgeGroup.color)
-    : undefined;
+
+  // Use the age_group string field first (full name, e.g. "Aile Sofrasına Geçiş (12-24 Ay)"),
+  // fall back to the first item in the age_groups array.
+  const ageGroupText = recipe.age_group ?? recipe.age_groups?.[0]?.name;
+  const ageGroupColor = getAgeGroupColor(
+    ageGroupText,
+    recipe.age_groups?.[0]?.color,
+  );
+  const ageGroupTextColor = getAgeGroupTextColor(ageGroupText);
+
   const imageHeight = compact ? 130 : 200;
   const hasAuthor = !compact && !!recipe.author;
+  const isExpertApproved = (recipe.is_expert_approved ?? recipe.expert?.approved) === true;
 
   return (
     <Pressable
@@ -68,65 +83,102 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         overflow: 'visible',
       })}
     >
-      {/* ── Image container (clips the photo to rounded top corners) ───────────── */}
-      <View
-        style={{
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          overflow: 'hidden',
-        }}
-      >
-        <Image
-          source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
-          style={{ width: '100%', height: imageHeight }}
-          contentFit="cover"
-          placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
-        />
+      {/* ── Image section ─────────────────────────────────────────────────────── */}
+      {/*
+        Outer View has NO overflow:hidden so absolute overlays are not clipped and
+        touch events are not blocked. The inner View clips the image to rounded corners.
+      */}
+      <View>
+        {/* Inner image container — clips photo to rounded top corners only */}
+        <View
+          style={{
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            overflow: 'hidden',
+          }}
+        >
+          <Image
+            source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
+            style={{ width: '100%', height: imageHeight }}
+            contentFit="cover"
+            placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
+          />
+        </View>
 
-        {/* Age Group Badge — top left overlay */}
-        {primaryAgeGroup ? (
+        {/* Age Group Badge — top left overlay, asymmetric corners, web-matched pastel colors */}
+        {ageGroupText ? (
           <View
             style={{
               position: 'absolute',
               top: 12,
               left: 12,
               zIndex: 10,
-              borderRadius: 999,
-              paddingHorizontal: 10,
-              paddingVertical: 4,
-              backgroundColor: ageGroupColor ?? COLORS.primary,
+              ...BADGE_BORDER_RADIUS,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              backgroundColor: ageGroupColor,
+              shadowColor: '#000',
+              shadowOpacity: 0.15,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 4,
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>
-              {primaryAgeGroup.name}
+            <Text style={{ color: ageGroupTextColor, fontSize: 12, fontWeight: 'bold' }}>
+              {ageGroupText}
             </Text>
           </View>
         ) : null}
 
-        {/* Favorite Button — top right (Pressable avoids nested-touchable bug on Android) */}
+        {/* Favorite Button — top right overlay */}
         <Pressable
           onPress={handleFavoriteToggle}
           hitSlop={8}
           style={({ pressed }) => ({
             position: 'absolute',
-            top: 8,
-            right: 8,
+            top: 12,
+            right: 12,
             zIndex: 10,
-            width: 34,
-            height: 34,
-            borderRadius: 17,
+            width: 40,
+            height: 40,
+            borderRadius: 20,
             backgroundColor: 'rgba(255,255,255,0.9)',
             alignItems: 'center',
             justifyContent: 'center',
             opacity: pressed ? 0.7 : 1,
+            shadowColor: '#000',
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 3,
           })}
         >
           <Ionicons
             name={favorite ? 'heart' : 'heart-outline'}
-            size={18}
+            size={20}
             color={favorite ? '#EF4444' : '#6B7280'}
           />
         </Pressable>
+
+        {/* Expert Approved Badge — below the favorite button */}
+        {isExpertApproved ? (
+          <View
+            style={{
+              position: 'absolute',
+              top: 64,
+              right: 12,
+              zIndex: 10,
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: '#22C55E',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="checkmark" size={12} color="#fff" />
+          </View>
+        ) : null}
 
         {/* Prep Time Badge — bottom right */}
         {totalTime > 0 ? (
@@ -138,10 +190,10 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
               zIndex: 10,
               flexDirection: 'row',
               alignItems: 'center',
-              borderRadius: 999,
+              borderRadius: 8,
               paddingHorizontal: 10,
               paddingVertical: 5,
-              backgroundColor: 'rgba(0,0,0,0.55)',
+              backgroundColor: 'rgba(0,0,0,0.6)',
             }}
           >
             <Ionicons name="time-outline" size={12} color="#fff" />
@@ -187,27 +239,6 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
                 name={recipe.author!.name}
                 size={AVATAR_SIZE}
               />
-
-              {/* Expert checkmark badge — small blue circle on the avatar */}
-              {recipe.is_expert_approved ? (
-                <View
-                  style={{
-                    position: 'absolute',
-                    bottom: 1,
-                    right: 1,
-                    width: 18,
-                    height: 18,
-                    borderRadius: 9,
-                    backgroundColor: '#3B82F6',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                  }}
-                >
-                  <Ionicons name="checkmark" size={10} color="#fff" />
-                </View>
-              ) : null}
             </View>
           </View>
         ) : null}

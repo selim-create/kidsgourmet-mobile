@@ -88,7 +88,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         Outer View has NO overflow:hidden so absolute overlays are not clipped and
         touch events are not blocked. The inner View clips the image to rounded corners.
       */}
-      <View>
+      <View style={{ position: 'relative' }}>
         {/* Inner image container — clips photo to rounded top corners only */}
         <View
           style={{
@@ -131,34 +131,39 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         ) : null}
 
         {/* Favorite Button — top right overlay */}
-        <Pressable
-          onPress={handleFavoriteToggle}
-          hitSlop={8}
-          style={({ pressed }) => ({
+        <View
+          style={{
             position: 'absolute',
             top: 12,
             right: 12,
             zIndex: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: 'rgba(255,255,255,0.9)',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: pressed ? 0.7 : 1,
-            shadowColor: '#000',
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 3,
-          })}
+          }}
         >
-          <Ionicons
-            name={favorite ? 'heart' : 'heart-outline'}
-            size={20}
-            color={favorite ? '#EF4444' : '#6B7280'}
-          />
-        </Pressable>
+          <Pressable
+            onPress={handleFavoriteToggle}
+            hitSlop={8}
+            style={({ pressed }) => ({
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: 'rgba(255,255,255,0.9)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: pressed ? 0.7 : 1,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 3,
+            })}
+          >
+            <Ionicons
+              name={favorite ? 'heart' : 'heart-outline'}
+              size={20}
+              color={favorite ? '#EF4444' : '#6B7280'}
+            />
+          </Pressable>
+        </View>
 
         {/* Expert Approved Badge — below the favorite button */}
         {isExpertApproved ? (

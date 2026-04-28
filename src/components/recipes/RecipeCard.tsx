@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { Recipe } from '../../lib/types';
@@ -18,6 +17,11 @@ interface RecipeCardProps {
   compact?: boolean;
 }
 
+/** Size of the avatar circle (border excluded). */
+const AVATAR_SIZE = 56;
+/** Width of the white border ring around the avatar. */
+const AVATAR_BORDER = 3;
+
 export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps) {
   const { isFavorite, toggle } = useFavorites();
   const { isAuthenticated } = useAuth();
@@ -31,8 +35,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
     }
   };
 
-  const handleFavoriteToggle = async (e: { stopPropagation?: () => void }) => {
-    e?.stopPropagation?.();
+  const handleFavoriteToggle = async () => {
     if (!isAuthenticated) {
       router.push('/(auth)/login');
       return;
@@ -46,16 +49,33 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
     ? getAgeGroupColor(primaryAgeGroup.slug ?? '', primaryAgeGroup.color)
     : undefined;
   const imageHeight = compact ? 130 : 200;
+  const hasAuthor = !compact && !!recipe.author;
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
-      activeOpacity={0.8}
-      className="bg-white rounded-2xl overflow-hidden mb-4"
-      style={{ elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 }}
+      style={({ pressed }) => ({
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        marginBottom: 16,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        opacity: pressed ? 0.97 : 1,
+        // overflow must stay visible so the avatar can overlap the image bottom edge
+        overflow: 'visible',
+      })}
     >
-      {/* Image */}
-      <View style={{ position: 'relative' }}>
+      {/* ── Image container (clips the photo to rounded top corners) ───────────── */}
+      <View
+        style={{
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          overflow: 'hidden',
+        }}
+      >
         <Image
           source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
           style={{ width: '100%', height: imageHeight }}
@@ -64,15 +84,16 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         />
 
         {/* Age Group Badge — top left overlay */}
-        {primaryAgeGroup?.name ? (
+        {primaryAgeGroup ? (
           <View
             style={{
               position: 'absolute',
-              top: 8,
-              left: 8,
+              top: 12,
+              left: 12,
+              zIndex: 10,
               borderRadius: 999,
-              paddingHorizontal: 8,
-              paddingVertical: 3,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
               backgroundColor: ageGroupColor ?? COLORS.primary,
             }}
           >
@@ -82,111 +103,48 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
           </View>
         ) : null}
 
-        {/* Favorite Button — top right */}
-        <TouchableOpacity
+        {/* Favorite Button — top right (Pressable avoids nested-touchable bug on Android) */}
+        <Pressable
           onPress={handleFavoriteToggle}
-          style={{
+          hitSlop={8}
+          style={({ pressed }) => ({
             position: 'absolute',
             top: 8,
             right: 8,
-            width: 32,
-            height: 32,
-            borderRadius: 16,
+            zIndex: 10,
+            width: 34,
+            height: 34,
+            borderRadius: 17,
             backgroundColor: 'rgba(255,255,255,0.9)',
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.15,
-            shadowRadius: 3,
-          }}
-          activeOpacity={0.8}
+            opacity: pressed ? 0.7 : 1,
+          })}
         >
           <Ionicons
             name={favorite ? 'heart' : 'heart-outline'}
             size={18}
             color={favorite ? '#EF4444' : '#6B7280'}
           />
-        </TouchableOpacity>
+        </Pressable>
 
-        {/* Expert Approved Badge — below favorite button */}
-        {recipe.is_expert_approved ? (
-          <View
-            style={{
-              position: 'absolute',
-              top: compact ? 44 : 46,
-              right: 8,
-              width: 32,
-              height: 32,
-              borderRadius: 16,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(34,197,94,0.9)',
-            }}
-          >
-            <Ionicons name="shield-checkmark" size={16} color="#fff" />
-          </View>
-        ) : null}
-
-        {/* Author overlay — gradient fade at the bottom, non-compact only */}
-        {!compact && recipe.author ? (
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: imageHeight * 0.55,
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              paddingBottom: 10,
-            }}
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.42)']}
-              locations={[0, 0.4, 1]}
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: imageHeight * 0.55,
-              }}
-            />
-            <Avatar uri={recipe.author.avatar_url} name={recipe.author.name} size={32} />
-            <Text
-              style={{
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: '600',
-                marginTop: 4,
-                textShadowColor: 'rgba(0,0,0,0.7)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
-              }}
-              numberOfLines={1}
-            >
-              {recipe.author.name}
-            </Text>
-          </View>
-        ) : null}
-
-        {/* Prep Time Badge — bottom right, glassmorphism */}
+        {/* Prep Time Badge — bottom right */}
         {totalTime > 0 ? (
           <View
             style={{
               position: 'absolute',
-              bottom: 8,
-              right: 8,
+              bottom: 10,
+              right: 10,
+              zIndex: 10,
               flexDirection: 'row',
               alignItems: 'center',
               borderRadius: 999,
-              paddingHorizontal: 8,
-              paddingVertical: 4,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
               backgroundColor: 'rgba(0,0,0,0.55)',
             }}
           >
-            <Ionicons name="time-outline" size={11} color="#fff" />
+            <Ionicons name="time-outline" size={12} color="#fff" />
             <Text style={{ color: '#fff', fontWeight: '600', marginLeft: 4, fontSize: 11 }}>
               {formatDuration(totalTime)}
             </Text>
@@ -194,26 +152,114 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         ) : null}
       </View>
 
-      {/* Content */}
-      <View style={{ padding: 12 }}>
-        {/* Title */}
+      {/* ── Content area ────────────────────────────────────────────────────────── */}
+      <View
+        style={{
+          borderBottomLeftRadius: 16,
+          borderBottomRightRadius: 16,
+          backgroundColor: '#fff',
+          paddingHorizontal: 16,
+          paddingBottom: 14,
+          // No paddingTop here — the avatar's negative margin controls the spacing
+          paddingTop: hasAuthor ? 0 : 12,
+        }}
+      >
+        {/* Avatar — half overlapping the image bottom, centered */}
+        {hasAuthor ? (
+          <View style={{ alignItems: 'center', marginTop: -(AVATAR_SIZE / 2 + AVATAR_BORDER) }}>
+            <View
+              style={{
+                width: AVATAR_SIZE + AVATAR_BORDER * 2,
+                height: AVATAR_SIZE + AVATAR_BORDER * 2,
+                borderRadius: (AVATAR_SIZE + AVATAR_BORDER * 2) / 2,
+                backgroundColor: '#fff',
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.12,
+                shadowRadius: 4,
+                elevation: 4,
+              }}
+            >
+              <Avatar
+                uri={recipe.author!.avatar_url}
+                name={recipe.author!.name}
+                size={AVATAR_SIZE}
+              />
+
+              {/* Expert checkmark badge — small blue circle on the avatar */}
+              {recipe.is_expert_approved ? (
+                <View
+                  style={{
+                    position: 'absolute',
+                    bottom: 1,
+                    right: 1,
+                    width: 18,
+                    height: 18,
+                    borderRadius: 9,
+                    backgroundColor: '#3B82F6',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                  }}
+                >
+                  <Ionicons name="checkmark" size={10} color="#fff" />
+                </View>
+              ) : null}
+            </View>
+          </View>
+        ) : null}
+
+        {/* Chef / author name */}
+        {hasAuthor && recipe.author?.name ? (
+          <Text
+            style={{
+              textAlign: 'center',
+              color: '#6B7280',
+              fontSize: 12,
+              marginTop: 6,
+              fontWeight: '500',
+            }}
+            numberOfLines={1}
+          >
+            {recipe.author.name}
+          </Text>
+        ) : null}
+
+        {/* Recipe title */}
         <Text
-          style={{ color: COLORS.dark, fontWeight: '700', fontSize: 13, marginBottom: 6 }}
+          style={{
+            textAlign: hasAuthor ? 'center' : 'left',
+            color: COLORS.dark,
+            fontWeight: '700',
+            fontSize: 14,
+            marginTop: hasAuthor ? 4 : 0,
+            marginBottom: 6,
+          }}
           numberOfLines={2}
         >
           {recipe.title}
         </Text>
 
         {/* Diet type & meal type chips */}
-        {!compact && ((recipe.diet_types && recipe.diet_types.length > 0) || recipe.meal_type) ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+        {((recipe.diet_types && recipe.diet_types.length > 0) || recipe.meal_type) ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 4,
+              justifyContent: hasAuthor ? 'center' : 'flex-start',
+            }}
+          >
             {recipe.meal_type ? (
               <View
                 style={{
                   backgroundColor: '#FFF3EE',
                   borderRadius: 999,
                   paddingHorizontal: 8,
-                  paddingVertical: 2,
+                  paddingVertical: 3,
                 }}
               >
                 <Text style={{ fontSize: 10, color: COLORS.primary, fontWeight: '600' }}>
@@ -228,7 +274,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
                   backgroundColor: '#F0FDF4',
                   borderRadius: 999,
                   paddingHorizontal: 8,
-                  paddingVertical: 2,
+                  paddingVertical: 3,
                 }}
               >
                 <Text style={{ fontSize: 10, color: '#15803D', fontWeight: '600' }}>
@@ -239,7 +285,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
           </View>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

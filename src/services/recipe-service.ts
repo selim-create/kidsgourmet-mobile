@@ -24,8 +24,26 @@ function parseTimeToMinutes(value: unknown): number | undefined {
   return minutes > 0 ? minutes : undefined;
 }
 
+/**
+ * Slugify a Turkish age-group name like "6-12 Ay" → "6-12-ay".
+ */
+function slugifyAgeGroup(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/ş/g, 's')
+    .replace(/ı/g, 'i')
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
+
 function normalizeRecipe(recipe: Recipe): Recipe {
-  return {
+  const raw = recipe as unknown as Record<string, unknown>;
+
+  const normalized: Recipe = {
     ...recipe,
     // API may return `image` instead of `featured_image`
     featured_image: recipe.featured_image ?? recipe.image,
@@ -33,6 +51,53 @@ function normalizeRecipe(recipe: Recipe): Recipe {
     prep_time: parseTimeToMinutes(recipe.prep_time as unknown),
     cook_time: parseTimeToMinutes(recipe.cook_time as unknown),
   };
+
+  // ── age_groups: synthesize from age_group string if the array is absent ──────
+  if ((!normalized.age_groups || normalized.age_groups.length === 0) && normalized.age_group) {
+    normalized.age_groups = [
+      {
+        // Use a negative sentinel so it never collides with a real API id (>0)
+        id: -1,
+        name: normalized.age_group,
+        slug: slugifyAgeGroup(normalized.age_group),
+        color: normalized.age_group_color ?? undefined,
+      },
+    ];
+  }
+
+  // ── is_expert_approved: map alternative API field names ─────────────────────
+  if (!('is_expert_approved' in recipe) || normalized.is_expert_approved === undefined) {
+    if (raw.expert_approved !== undefined) {
+      normalized.is_expert_approved = Boolean(raw.expert_approved);
+    } else if (raw.expert && typeof raw.expert === 'object') {
+      const expert = raw.expert as { approved?: boolean };
+      if (expert.approved !== undefined) {
+        normalized.is_expert_approved = Boolean(expert.approved);
+      }
+    }
+  }
+
+  // ── author.avatar_url: map alternative API field names ──────────────────────
+  if (normalized.author && !normalized.author.avatar_url) {
+    const authorRaw = normalized.author as unknown as Record<string, unknown>;
+    const alt = authorRaw.avatar ?? authorRaw.profile_image ?? authorRaw.avatar_urls;
+    if (typeof alt === 'string' && alt) {
+      normalized.author = { ...normalized.author, avatar_url: alt };
+    } else if (alt && typeof alt === 'object') {
+      // WordPress avatar_urls: { "96": "https://...", "48": "...", ... }
+      const sizes = Object.keys(alt as Record<string, string>).sort(
+        (a, b) => Number(b) - Number(a),
+      );
+      if (sizes.length > 0) {
+        normalized.author = {
+          ...normalized.author,
+          avatar_url: (alt as Record<string, string>)[sizes[0]],
+        };
+      }
+    }
+  }
+
+  return normalized;
 }
 
 export async function getRecipes(

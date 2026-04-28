@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { Recipe } from '../../lib/types';
@@ -127,7 +128,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
           </View>
         ) : null}
 
-        {/* Author center overlay — only in non-compact mode */}
+        {/* Author overlay — gradient fade at the bottom, non-compact only */}
         {!compact && recipe.author ? (
           <View
             style={{
@@ -135,21 +136,21 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
               bottom: 0,
               left: 0,
               right: 0,
-              height: imageHeight * 0.45,
+              height: imageHeight * 0.55,
               justifyContent: 'flex-end',
               alignItems: 'center',
               paddingBottom: 10,
-              backgroundColor: 'transparent',
             }}
           >
-            <View
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.42)']}
+              locations={[0, 0.4, 1]}
               style={{
                 position: 'absolute',
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: imageHeight * 0.45,
-                backgroundColor: 'rgba(0,0,0,0.45)',
+                height: imageHeight * 0.55,
               }}
             />
             <Avatar uri={recipe.author.avatar_url} name={recipe.author.name} size={32} />

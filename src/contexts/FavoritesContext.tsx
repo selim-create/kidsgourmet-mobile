@@ -24,6 +24,8 @@ const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   const [favorites, setFavorites] = useState<Recipe[]>([]);
+  /** IDs optimistically added but not yet confirmed by the server reload. */
+  const [pendingAddIds, setPendingAddIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
 
   const favoriteIds = useMemo(
@@ -56,27 +58,48 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       if (!isAuthenticated) {
         return;
       }
-      const was = favoriteIds.has(recipeId);
-      // Optimistic update
+      const was = favoriteIds.has(recipeId) || pendingAddIds.has(recipeId);
+
+      // Optimistic update — immediate UI feedback
       if (was) {
         setFavorites((prev) => prev.filter((r) => r.id !== recipeId));
+        setPendingAddIds((prev) => {
+          const next = new Set(prev);
+          next.delete(recipeId);
+          return next;
+        });
+      } else {
+        setPendingAddIds((prev) => new Set([...prev, recipeId]));
       }
+
       try {
         await toggleFavorite(recipeId);
-        if (!was) {
-          await load();
-        }
-      } catch {
-        // revert on error
         await load();
+      } catch {
+        // Revert optimistic state on error
+        if (!was) {
+          setPendingAddIds((prev) => {
+            const next = new Set(prev);
+            next.delete(recipeId);
+            return next;
+          });
+        }
+        await load();
+      } finally {
+        // Always clean up pending after the server sync
+        setPendingAddIds((prev) => {
+          const next = new Set(prev);
+          next.delete(recipeId);
+          return next;
+        });
       }
     },
-    [isAuthenticated, favoriteIds, load],
+    [isAuthenticated, favoriteIds, pendingAddIds, load],
   );
 
   const isFavorite = useCallback(
-    (recipeId: number) => favoriteIds.has(recipeId),
-    [favoriteIds],
+    (recipeId: number) => favoriteIds.has(recipeId) || pendingAddIds.has(recipeId),
+    [favoriteIds, pendingAddIds],
   );
 
   return (

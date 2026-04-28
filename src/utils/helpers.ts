@@ -1,7 +1,9 @@
 /**
  * Strip HTML tags from a string (replacement for DOMPurify in React Native).
+ * Handles null, undefined, and non-string values safely.
  */
-export function stripHtml(html: string): string {
+export function stripHtml(html: string | null | undefined): string {
+  if (!html || typeof html !== 'string') return '';
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
@@ -104,4 +106,17 @@ export const DIFFICULTY_LABELS: Record<string, string> = {
 
 export function isNonEmpty(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * Extract the text content from an instruction step, checking multiple
+ * field names that different API versions may return.
+ */
+export function getInstructionContent(step: {
+  content?: string;
+  text?: string;
+  description?: string;
+  instruction?: string;
+}): string {
+  return step.content ?? step.text ?? step.description ?? step.instruction ?? '';
 }

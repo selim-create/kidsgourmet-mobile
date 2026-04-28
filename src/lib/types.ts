@@ -127,6 +127,13 @@ export interface DietType {
   description?: string;
 }
 
+export interface SpecialCondition {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
 export interface Tag {
   id: number;
   name: string;

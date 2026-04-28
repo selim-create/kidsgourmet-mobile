@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,6 @@ import useSWR from 'swr';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipes } from '../../../src/services/recipe-service';
-import { getAgeGroups } from '../../../src/services/taxonomy-service';
 import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../../src/components/ui/EmptyState';
@@ -23,8 +22,11 @@ import { AppHeader } from '../../../src/components/ui/AppHeader';
 import { useAgeGroups } from '../../../src/hooks/useAgeGroups';
 import { useMealTypes } from '../../../src/hooks/useMealTypes';
 import { useDietTypes } from '../../../src/hooks/useDietTypes';
+import { useSpecialConditions } from '../../../src/hooks/useSpecialConditions';
 import type { SearchFilters } from '../../../src/lib/types';
 import { API_ENDPOINTS, PAGINATION, COLORS } from '../../../src/lib/constants';
+import { searchIngredients } from '../../../src/services/ingredient-service';
+import { getAgeGroupColor } from '../../../src/utils/helpers';
 
 const SORT_OPTIONS: { value: NonNullable<SearchFilters['sort']>; label: string }[] = [
   { value: 'newest', label: 'En Yeni' },
@@ -57,9 +59,11 @@ interface FilterChipProps {
   label: string;
   selected: boolean;
   onPress: () => void;
+  color?: string;
 }
 
-function FilterChip({ label, selected, onPress }: FilterChipProps) {
+function FilterChip({ label, selected, onPress, color }: FilterChipProps) {
+  const bg = selected ? (color ?? COLORS.primary) : '#F3F4F6';
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -67,7 +71,7 @@ function FilterChip({ label, selected, onPress }: FilterChipProps) {
         paddingHorizontal: 14,
         paddingVertical: 7,
         borderRadius: 20,
-        backgroundColor: selected ? COLORS.primary : '#F3F4F6',
+        backgroundColor: bg,
         borderWidth: selected ? 0 : 1,
         borderColor: '#E5E7EB',
       }}
@@ -80,6 +84,15 @@ function FilterChip({ label, selected, onPress }: FilterChipProps) {
   );
 }
 
+interface TempFilters {
+  meal_type?: string;
+  diet_type?: string;
+  special_condition?: string;
+  expert_approved?: boolean;
+  sort?: SearchFilters['sort'];
+  ingredient?: string;
+}
+
 export default function RecipesScreen() {
   const insets = useSafeAreaInsets();
   const [filters, setFilters] = useState<SearchFilters>({
@@ -89,7 +102,13 @@ export default function RecipesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [tempFilters, setTempFilters] = useState<SearchFilters>({});
+  const [tempFilters, setTempFilters] = useState<TempFilters>({});
+
+  // Ingredient search state (debounced)
+  const [ingredientInput, setIngredientInput] = useState('');
+  const [ingredientResults, setIngredientResults] = useState<string[]>([]);
+  const [isSearchingIngredients, setIsSearchingIngredients] = useState(false);
+  const ingredientDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const swrKey = `${API_ENDPOINTS.RECIPES}?${JSON.stringify(filters)}`;
 
@@ -101,6 +120,7 @@ export default function RecipesScreen() {
   const { ageGroups } = useAgeGroups();
   const { mealTypes } = useMealTypes();
   const { dietTypes } = useDietTypes();
+  const { specialConditions } = useSpecialConditions();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -130,13 +150,41 @@ export default function RecipesScreen() {
     [],
   );
 
+  // Debounced ingredient search
+  useEffect(() => {
+    if (ingredientDebounceRef.current) {
+      clearTimeout(ingredientDebounceRef.current);
+    }
+    if (!ingredientInput.trim()) {
+      setIngredientResults([]);
+      return;
+    }
+    setIsSearchingIngredients(true);
+    ingredientDebounceRef.current = setTimeout(async () => {
+      try {
+        const results = await searchIngredients(ingredientInput.trim());
+        setIngredientResults(results.map((r) => r.name).slice(0, 8));
+      } catch {
+        setIngredientResults([]);
+      } finally {
+        setIsSearchingIngredients(false);
+      }
+    }, 400);
+    return () => {
+      if (ingredientDebounceRef.current) clearTimeout(ingredientDebounceRef.current);
+    };
+  }, [ingredientInput]);
+
   const openFilterModal = () => {
     setTempFilters({
       meal_type: filters.meal_type,
       diet_type: filters.diet_type,
+      special_condition: filters.special_condition,
       expert_approved: filters.expert_approved,
       sort: filters.sort,
+      ingredient: filters.ingredient,
     });
+    setIngredientInput(filters.ingredient ?? '');
     setShowFilterModal(true);
   };
 
@@ -145,8 +193,10 @@ export default function RecipesScreen() {
       ...prev,
       meal_type: tempFilters.meal_type,
       diet_type: tempFilters.diet_type,
+      special_condition: tempFilters.special_condition,
       expert_approved: tempFilters.expert_approved,
       sort: tempFilters.sort,
+      ingredient: tempFilters.ingredient,
       page: 1,
     }));
     setShowFilterModal(false);
@@ -154,6 +204,8 @@ export default function RecipesScreen() {
 
   const resetTempFilters = () => {
     setTempFilters({});
+    setIngredientInput('');
+    setIngredientResults([]);
   };
 
   const resetAllFilters = () => {
@@ -181,6 +233,13 @@ export default function RecipesScreen() {
       const dt = (dietTypes ?? []).find((d) => d.slug === filters.diet_type);
       chips.push({ label: dt?.name ?? filters.diet_type, key: 'diet_type' });
     }
+    if (filters.special_condition) {
+      const sc = (specialConditions ?? []).find((s) => s.slug === filters.special_condition);
+      chips.push({ label: sc?.name ?? filters.special_condition, key: 'special_condition' });
+    }
+    if (filters.ingredient) {
+      chips.push({ label: `Malzeme: ${filters.ingredient}`, key: 'ingredient' });
+    }
     if (filters.expert_approved) {
       chips.push({ label: 'Uzman Onaylı', key: 'expert_approved' });
     }
@@ -189,7 +248,7 @@ export default function RecipesScreen() {
       chips.push({ label: s?.label ?? filters.sort, key: 'sort' });
     }
     return chips;
-  }, [filters, ageGroups, mealTypes, dietTypes]);
+  }, [filters, ageGroups, mealTypes, dietTypes, specialConditions]);
 
   const activeFilterCount = activeFilterChips.length;
 
@@ -262,28 +321,34 @@ export default function RecipesScreen() {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={[{ id: 0, name: 'Tümü', slug: '' }, ...ageGroups]}
+            data={[{ id: 0, name: 'Tümü', slug: '', color: undefined }, ...ageGroups]}
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}
             ItemSeparatorComponent={() => <View className="w-2" />}
             renderItem={({ item }) => {
               const isSelected =
                 item.slug === '' ? !selectedAgeGroup : selectedAgeGroup === item.slug;
+              const chipColor = item.slug
+                ? getAgeGroupColor(item.slug, (item as { color?: string }).color)
+                : COLORS.primary;
               return (
                 <TouchableOpacity
                   onPress={() =>
                     handleAgeGroupSelect(item.slug === '' ? null : item.slug)
                   }
-                  className={`px-4 py-2 rounded-full ${
-                    isSelected
-                      ? 'bg-primary'
-                      : 'bg-gray-100'
-                  }`}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 999,
+                    backgroundColor: isSelected ? chipColor : '#F3F4F6',
+                  }}
                 >
                   <Text
-                    className={`text-sm font-medium ${
-                      isSelected ? 'text-white' : 'text-gray-600'
-                    }`}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: '600',
+                      color: isSelected ? '#fff' : '#6B7280',
+                    }}
                   >
                     {item.name}
                   </Text>
@@ -439,6 +504,24 @@ export default function RecipesScreen() {
 
             <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} showsVerticalScrollIndicator={false}>
               <View style={{ paddingTop: 20 }}>
+
+                {/* Yaş Grubu — top of list */}
+                {ageGroups.length > 0 && (
+                  <FilterSection title="Yaş Grubu" icon="person-outline">
+                    {ageGroups.map((ag) => (
+                      <FilterChip
+                        key={ag.slug}
+                        label={ag.name}
+                        selected={filters.age_group === ag.slug}
+                        color={getAgeGroupColor(ag.slug, ag.color)}
+                        onPress={() => handleAgeGroupSelect(
+                          filters.age_group === ag.slug ? null : ag.slug,
+                        )}
+                      />
+                    ))}
+                  </FilterSection>
+                )}
+
                 {/* Öğün Tipi */}
                 {mealTypes.length > 0 && (
                   <FilterSection title="Öğün Tipi" icon="restaurant-outline">
@@ -476,6 +559,97 @@ export default function RecipesScreen() {
                     ))}
                   </FilterSection>
                 )}
+
+                {/* Özel Durum */}
+                {specialConditions.length > 0 && (
+                  <FilterSection title="Özel Durum" icon="medical-outline">
+                    {specialConditions.map((sc) => (
+                      <FilterChip
+                        key={sc.slug}
+                        label={sc.name}
+                        selected={tempFilters.special_condition === sc.slug}
+                        onPress={() =>
+                          setTempFilters((f) => ({
+                            ...f,
+                            special_condition: f.special_condition === sc.slug ? undefined : sc.slug,
+                          }))
+                        }
+                      />
+                    ))}
+                  </FilterSection>
+                )}
+
+                {/* Malzeme Ara */}
+                <View style={{ marginBottom: 20 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                    <Ionicons name="nutrition-outline" size={18} color={COLORS.primary} />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#374151', marginLeft: 6 }}>
+                      Malzeme
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: '#F3F4F6',
+                      borderRadius: 12,
+                      paddingHorizontal: 12,
+                      paddingVertical: 10,
+                    }}
+                  >
+                    <Ionicons name="search-outline" size={16} color="#9CA3AF" />
+                    <TextInput
+                      style={{ flex: 1, marginLeft: 8, fontSize: 14, color: '#374151' }}
+                      placeholder="Malzeme ara..."
+                      placeholderTextColor="#9CA3AF"
+                      value={ingredientInput}
+                      onChangeText={(text) => {
+                        setIngredientInput(text);
+                        setTempFilters((f) => ({ ...f, ingredient: text || undefined }));
+                      }}
+                    />
+                    {ingredientInput.length > 0 ? (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setIngredientInput('');
+                          setIngredientResults([]);
+                          setTempFilters((f) => ({ ...f, ingredient: undefined }));
+                        }}
+                      >
+                        <Ionicons name="close-circle" size={16} color="#9CA3AF" />
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                  {/* Ingredient suggestions */}
+                  {isSearchingIngredients ? (
+                    <Text style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6, marginLeft: 4 }}>
+                      Aranıyor...
+                    </Text>
+                  ) : ingredientResults.length > 0 ? (
+                    <View style={{ marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {ingredientResults.map((name) => (
+                        <TouchableOpacity
+                          key={name}
+                          onPress={() => {
+                            setIngredientInput(name);
+                            setTempFilters((f) => ({ ...f, ingredient: name }));
+                            setIngredientResults([]);
+                          }}
+                          style={{
+                            paddingHorizontal: 10,
+                            paddingVertical: 5,
+                            backgroundColor: '#FFF3EE',
+                            borderRadius: 12,
+                          }}
+                        >
+                          <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>
+                            {name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  ) : null}
+                </View>
 
                 {/* Uzman Onayı */}
                 <FilterSection title="Uzman Onayı" icon="shield-checkmark-outline">

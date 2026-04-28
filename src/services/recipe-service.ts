@@ -136,3 +136,13 @@ export async function getFeaturedRecipes(): Promise<Recipe[]> {
   const recipes = await api.get<Recipe[]>(API_ENDPOINTS.FEATURED_RECIPES, { skipAuth: true });
   return recipes.map(normalizeRecipe);
 }
+
+export async function rateRecipe(
+  recipeId: number,
+  rating: number,
+): Promise<{ rating: number; rating_count: number }> {
+  return api.post<{ rating: number; rating_count: number }>(
+    API_ENDPOINTS.RECIPE_RATING(recipeId),
+    { rating },
+  );
+}

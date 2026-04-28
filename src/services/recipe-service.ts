@@ -40,6 +40,17 @@ function slugifyAgeGroup(name: string): string {
     .replace(/[^a-z0-9-]/g, '');
 }
 
+/** Extract the display name from an API object that may have name, title, or fall back to string form. */
+function extractDisplayName(a: unknown): string {
+  if (typeof a === 'string') return a;
+  if (a && typeof a === 'object') {
+    const obj = a as Record<string, unknown>;
+    if (typeof obj.name === 'string') return obj.name;
+    if (typeof obj.title === 'string') return obj.title;
+  }
+  return String(a);
+}
+
 function normalizeRecipe(recipe: Recipe): Recipe {
   const raw = recipe as unknown as Record<string, unknown>;
 
@@ -123,9 +134,7 @@ function normalizeRecipe(recipe: Recipe): Recipe {
   if (!normalized.allergens) {
     const alt = raw.allergy_warnings ?? raw.allergen_list ?? raw.allergy_list;
     if (Array.isArray(alt)) {
-      normalized.allergens = alt.map((a) =>
-        typeof a === 'string' ? a : (a as Record<string, unknown>).name ? String((a as Record<string, unknown>).name) : String(a),
-      );
+      normalized.allergens = alt.map(extractDisplayName);
     } else if (typeof alt === 'string' && alt) {
       normalized.allergens = [alt];
     }
@@ -163,9 +172,7 @@ function normalizeRecipe(recipe: Recipe): Recipe {
         if (Array.isArray(altField)) {
           return {
             ...ing,
-            alternatives: altField.map((a) =>
-              typeof a === 'string' ? a : (a as Record<string, unknown>).name ? String((a as Record<string, unknown>).name) : String(a),
-            ),
+            alternatives: altField.map(extractDisplayName),
           };
         }
       }

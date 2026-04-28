@@ -466,7 +466,7 @@ export default function RecipeDetailScreen() {
                     }}
                   >
                     <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
-                      {ag.name ?? ag.slug}
+                      {ag.name ?? ag.slug.replace(/-/g, ' ')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -765,8 +765,7 @@ export default function RecipeDetailScreen() {
               activeOpacity={0.85}
               onPress={() => {
                 if (ctaAlternative) {
-                  const altSlug = ctaAlternative.toLowerCase().replace(/\s+/g, '-');
-                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(altSlug)}` as never);
+                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaAlternative)}` as never);
                 } else {
                   router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaIngredient.name)}` as never);
                 }
@@ -905,7 +904,7 @@ export default function RecipeDetailScreen() {
                     Bu tarif ile ilgili Uzman Notu:
                   </Text>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark, marginTop: 2 }}>
-                    {recipe.expert.title ? `${recipe.expert.title} ` : ''}{recipe.expert.name}
+                    {[recipe.expert.title, recipe.expert.name].filter(Boolean).join(' ')}
                   </Text>
                 </View>
               </View>

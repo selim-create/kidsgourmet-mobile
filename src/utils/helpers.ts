@@ -47,45 +47,49 @@ export function formatDuration(minutes: number): string {
 }
 
 /**
- * Age group color map (consistent with web design).
- * Keys are matched as substrings of the age-group slug (longest key first wins).
+ * Age group color map — pastel colors matching the web RecipeCard design.
+ * Keys are substrings found in the full age group name or slug.
  */
-export const AGE_GROUP_COLORS: Record<string, string> = {
-  // 0–6 months
-  '0-6-ay': '#F8BBD0',
-  // 6–8 months
-  '6-8-ay': '#AED581',
-  // 8–12 months
-  '8-12-ay': '#81D4FA',
-  // 6–12 months (alternative slug)
-  '6-12-ay': '#81D4FA',
-  // 12 months / 1 year
-  '12-ay': '#FF8A65',
-  // 1–3 years
-  '1-3-yas': '#FFB74D',
-  // 3–6 years (before the bare '3-yas' key so longer key matches first)
-  '3-6-yas': '#B39DDB',
-  // 3 years
-  '3-yas': '#CE93D8',
-  // 4 years
-  '4-yas': '#F48FB1',
-  // 5 years
-  '5-yas': '#80DEEA',
-  // 6+ years
-  '6-yas': '#FFD54F',
+export const AGE_GROUP_COLORS: { [key: string]: string } = {
+  '0-6':   '#E1BEE7',  // Lila       – 0-6 Ay / Hazırlık
+  '6-8':   '#FFCCBC',  // Şeftali    – 6-8 Ay / Tadım
+  '9-11':  '#C8E6C9',  // Nane Yeşili – 9-11 Ay / Keşif
+  '12-24': '#B3E5FC',  // Gökyüzü Mavisi – 12-24 Ay / Aile
+  '2+':    '#FFF9C4',  // Limon Sarısı – 2+ Yaş / Gurme
 };
 
 /**
- * Return the color for a given age group slug.
- * Tries the longest matching key first to avoid short-key false positives.
- * Falls back to the API-provided color, then the given fallback.
+ * Return the background color for a given age group name or slug.
+ * Checks the full string for known substrings (web-compatible).
+ * Falls back to the API-provided color, then a default green.
  */
-export function getAgeGroupColor(slug: string, apiColor?: string | null, fallback?: string): string {
-  // Sort keys by length (descending) so longer/more-specific keys match first
-  const key = Object.keys(AGE_GROUP_COLORS)
-    .sort((a, b) => b.length - a.length)
-    .find((k) => slug.includes(k));
-  return key ? AGE_GROUP_COLORS[key] : apiColor ?? fallback ?? '#FF8A65';
+export function getAgeGroupColor(ageGroup?: string, apiColor?: string | null, fallback?: string): string {
+  if (apiColor) return apiColor;
+  if (!ageGroup) return fallback ?? '#22C55E';
+  if (ageGroup.includes('0-6')) return AGE_GROUP_COLORS['0-6'];
+  if (ageGroup.includes('6-8')) return AGE_GROUP_COLORS['6-8'];
+  if (ageGroup.includes('9-11')) return AGE_GROUP_COLORS['9-11'];
+  if (ageGroup.includes('12-24')) return AGE_GROUP_COLORS['12-24'];
+  if (ageGroup.includes('2+') || /\(24\+?\s*(Ay|yaş)/i.test(ageGroup)) return AGE_GROUP_COLORS['2+'];
+  return fallback ?? '#22C55E';
+}
+
+/**
+ * Return the text color for a given age group name (light or dark depending on background).
+ */
+export function getAgeGroupTextColor(ageGroup?: string): string {
+  if (!ageGroup) return '#FFFFFF';
+  if (
+    ageGroup.includes('2+') ||
+    /\(24\+?\s*(Ay|yaş)/i.test(ageGroup) ||
+    ageGroup.toLowerCase().includes('gurme')
+  ) {
+    return '#92400E'; // Amber-800 (on yellow background)
+  }
+  if (ageGroup.includes('9-11') || ageGroup.toLowerCase().includes('keşif')) {
+    return '#166534'; // Green-800 (on mint background)
+  }
+  return '#FFFFFF';
 }
 
 /**

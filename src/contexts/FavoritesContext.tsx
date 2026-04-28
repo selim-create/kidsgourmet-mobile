@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from 'react';
 import type { Recipe } from '../lib/types';
-import { getFavorites, toggleFavorite } from '../services/favorites-service';
+import { getFavorites, addFavorite, removeFavorite } from '../services/favorites-service';
 import { useAuth } from './AuthContext';
 
 interface FavoritesContextValue {
@@ -42,7 +42,8 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await getFavorites();
       setFavorites(Array.isArray(data) ? data : []);
-    } catch {
+    } catch (err) {
+      console.error('[Favorites] Load error:', err);
       setFavorites([]);
     } finally {
       setIsLoading(false);
@@ -73,9 +74,14 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        await toggleFavorite(recipeId);
+        if (was) {
+          await removeFavorite(recipeId);
+        } else {
+          await addFavorite(recipeId);
+        }
         await load();
-      } catch {
+      } catch (err) {
+        console.error('[Favorites] Toggle error (recipeId=%d, was=%s):', recipeId, was, err);
         // Revert optimistic state on error
         if (!was) {
           setPendingAddIds((prev) => {
@@ -84,6 +90,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
             return next;
           });
         }
+        // Reload to restore server state
         await load();
       } finally {
         // Always clean up pending after the server sync

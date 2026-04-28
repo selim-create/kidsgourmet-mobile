@@ -23,6 +23,7 @@ import { useAuth } from '../../src/contexts/AuthContext';
 import { useBlog } from '../../src/hooks/use-blog';
 import { getRecipes } from '../../src/services/recipe-service';
 import { COLORS } from '../../src/lib/constants';
+import { Footer } from '../../src/components/layout/Footer';
 import type { Recipe } from '../../src/lib/types';
 
 export default function HomeScreen() {
@@ -179,6 +180,9 @@ export default function HomeScreen() {
 
         {/* ── SECTION 10: Newsletter ─────────────────────────────────────── */}
         <NewsletterSection />
+
+        {/* ── FOOTER ─────────────────────────────────────────────────────── */}
+        <Footer />
       </ScrollView>
     </View>
   );
@@ -190,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFBE6',
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 0,
   },
   sectionTop: {
     paddingTop: 16,

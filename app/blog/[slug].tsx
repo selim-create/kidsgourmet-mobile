@@ -18,7 +18,7 @@ import { getBlogPost, getBlogPosts } from '../../src/services/blog-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { DetailHeader } from '../../src/components/ui/DetailHeader';
-import { BlogContent } from '../../src/components/blog/BlogContent';
+import { ContentWithEmbeds } from '../../src/components/embeds/ContentWithEmbeds';
 import { BlogCard } from '../../src/components/blog/BlogCard';
 import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
 import { extractImageUrl } from '../../src/utils/url';
@@ -221,7 +221,10 @@ export default function BlogDetailScreen() {
           {/* Rich HTML Content */}
           {post.content ? (
             <View style={styles.bodyContainer}>
-              <BlogContent html={post.content} />
+              <ContentWithEmbeds
+                htmlContent={post.content}
+                embeddedContent={post.embedded_content}
+              />
             </View>
           ) : post.excerpt ? (
             <Text style={styles.excerpt}>{post.excerpt}</Text>
@@ -231,9 +234,14 @@ export default function BlogDetailScreen() {
           {post.tags && post.tags.length > 0 && (
             <View style={styles.tagsRow}>
               {post.tags.map((tag) => (
-                <View key={tag.id} style={styles.tagChip}>
+                <TouchableOpacity
+                  key={tag.id}
+                  style={styles.tagChip}
+                  activeOpacity={0.7}
+                  onPress={() => router.push(`/search?q=${encodeURIComponent(tag.name)}`)}
+                >
                   <Text style={styles.tagText}>#{tag.name}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}

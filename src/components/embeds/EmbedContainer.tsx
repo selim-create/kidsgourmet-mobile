@@ -38,10 +38,10 @@ export function EmbedContainer({ embed }: EmbedContainerProps) {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={[styles.iconWrapper, { backgroundColor: info.color + '1A' }]}>
-          <Ionicons name={info.icon} size={18} color={info.color} />
+        <View style={[styles.iconWrapper, { backgroundColor: info.color + '20' }]}>
+          <Ionicons name={info.icon} size={20} color={info.color} />
         </View>
-        <Text style={styles.headerTitle}>{info.title}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>{info.title}</Text>
       </View>
 
       {/* Cards */}
@@ -60,30 +60,34 @@ const styles = StyleSheet.create({
   container: {
     marginVertical: 24,
     padding: 20,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     marginBottom: 16,
   },
   iconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     color: '#0F172A',
+    flex: 1,
   },
   cardList: {
-    gap: 12,
+    gap: 10,
   },
 });

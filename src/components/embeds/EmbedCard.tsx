@@ -11,8 +11,6 @@ import type {
   PostEmbedItem,
 } from '../../lib/types';
 
-type RouterPath = Parameters<typeof router.push>[0];
-
 // ─── Age Group Colors (ported from web) ───────────────────────────────────────
 
 const AGE_GROUP_COLORS: Record<string, { bg: string; text: string }> = {
@@ -51,7 +49,7 @@ const TOOL_URL_MAPPING: Record<string, string> = {
 function handleToolPress(item: ToolEmbedItem) {
   const internalRoute = TOOL_URL_MAPPING[item.tool_type] ?? TOOL_URL_MAPPING[item.slug];
   if (internalRoute) {
-    router.push(internalRoute as RouterPath);
+    router.push(internalRoute as Parameters<typeof router.push>[0]);
   } else {
     Linking.openURL(item.url).catch(() => {});
   }
@@ -64,7 +62,9 @@ function RecipeCard({ item }: { item: RecipeEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/recipes/${item.slug}` as RouterPath)}
+      onPress={() => router.push({ pathname: '/(tabs)/recipes/[slug]', params: { slug: item.slug } })}
+      android_ripple={{ color: '#E5E7EB' }}
+      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
         <Image
@@ -99,7 +99,9 @@ function IngredientCard({ item }: { item: IngredientEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/ingredients/${item.slug}` as RouterPath)}
+      onPress={() => router.push({ pathname: '/ingredients/[slug]', params: { slug: item.slug } })}
+      android_ripple={{ color: '#E5E7EB' }}
+      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
         <Image
@@ -132,6 +134,8 @@ function ToolCard({ item }: { item: ToolEmbedItem }) {
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       onPress={() => handleToolPress(item)}
+      android_ripple={{ color: '#E5E7EB' }}
+      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       <View style={[styles.image, styles.toolPlaceholder]}>
         <Ionicons name="sparkles" size={28} color="#fff" />
@@ -150,7 +154,9 @@ function PostCard({ item }: { item: PostEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/blog/${item.slug}` as RouterPath)}
+      onPress={() => router.push({ pathname: '/blog/[slug]', params: { slug: item.slug } })}
+      android_ripple={{ color: '#E5E7EB' }}
+      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
         <Image
@@ -201,21 +207,19 @@ export function EmbedCard({ item }: { item: EmbedItem }) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'stretch',
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#F1F5F9',
+    overflow: 'hidden',
   },
   cardPressed: {
     opacity: 0.75,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
+    width: 96,
+    height: 96,
     flexShrink: 0,
   },
   imagePlaceholder: {
@@ -230,7 +234,9 @@ const styles = StyleSheet.create({
   },
   textBlock: {
     flex: 1,
-    gap: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    justifyContent: 'space-between',
   },
   title: {
     fontSize: 14,
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   badge: {
     borderRadius: 6,

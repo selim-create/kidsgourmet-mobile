@@ -38,7 +38,7 @@ import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, sl
 import { COLORS } from '../../../src/lib/constants';
 import { ApiError } from '../../../src/lib/api';
 import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
-import type { SafetyCheck, Comment, Ingredient } from '../../../src/lib/types';
+import type { SafetyCheck, Comment, Ingredient, RecipeSubstitute } from '../../../src/lib/types';
 
 // ─── Portion multiplier options (web-style labels) ───────────────────────────
 const PORTION_OPTIONS = [
@@ -101,12 +101,13 @@ interface IngredientRowProps {
   onToggle: () => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  substitute?: RecipeSubstitute;
 }
 
-function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded, onToggleExpand }: IngredientRowProps) {
+function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded, onToggleExpand, substitute }: IngredientRowProps) {
   const [substitutesModalVisible, setSubstitutesModalVisible] = useState(false);
   const hasNotes = !!ing.notes;
-  const hasAlternatives = !!(ing.alternatives && ing.alternatives.length > 0);
+  const hasSubstitute = !!substitute;
   const hasAllergen = !!ing.allergen_warning;
   const hasExtra = hasNotes || hasAllergen;
 
@@ -170,7 +171,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
               <Ionicons name="help-circle-outline" size={18} color="#6B7280" />
             </TouchableOpacity>
           ) : null}
-          {hasAlternatives ? (
+          {hasSubstitute ? (
             <TouchableOpacity
               onPress={() => setSubstitutesModalVisible(true)}
               activeOpacity={0.7}
@@ -223,7 +224,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
       ) : null}
 
       {/* Substitutes modal */}
-      {hasAlternatives ? (
+      {hasSubstitute ? (
         <Modal
           visible={substitutesModalVisible}
           transparent
@@ -273,42 +274,49 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark }}>
-                    İkame Malzemeler
+                    {substitute?.original} yerine {substitute?.substitute}
                   </Text>
                   <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
                     {ing.name} için kullanabilirsiniz
                   </Text>
                 </View>
               </View>
-              {/* Substitutes list */}
-              {ing.alternatives!.map((alt, idx) => (
+              {/* Substitute info */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 12,
+                  borderTopWidth: 1,
+                  borderTopColor: '#F3F4F6',
+                  gap: 12,
+                }}
+              >
                 <View
-                  key={idx}
                   style={{
-                    flexDirection: 'row',
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: '#F3F4F6',
                     alignItems: 'center',
-                    paddingVertical: 12,
-                    borderBottomWidth: idx < ing.alternatives!.length - 1 ? 1 : 0,
-                    borderBottomColor: '#F3F4F6',
-                    gap: 12,
+                    justifyContent: 'center',
+                    flexShrink: 0,
                   }}
                 >
-                  <View
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      backgroundColor: '#F3F4F6',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Text style={{ fontSize: 15 }}>🔄</Text>
-                  </View>
-                  <Text style={{ fontSize: 14, color: COLORS.dark, flex: 1 }}>{alt}</Text>
+                  <Text style={{ fontSize: 15 }}>🔄</Text>
                 </View>
-              ))}
+                <Text style={{ fontSize: 14, color: COLORS.dark, flex: 1 }}>
+                  {substitute?.note ? (
+                    substitute.note
+                  ) : (
+                    <>
+                      {'Bu malzeme yerine '}
+                      <Text style={{ fontWeight: '700' }}>{substitute?.substitute}</Text>
+                      {' kullanabilirsiniz.'}
+                    </>
+                  )}
+                </Text>
+              </View>
               {/* Close button */}
               <TouchableOpacity
                 onPress={() => setSubstitutesModalVisible(false)}
@@ -356,6 +364,17 @@ export default function RecipeDetailScreen() {
     slug ? `recipe-detail-${slug}` : null,
     () => getRecipe(slug!),
   );
+
+  // Build a case-insensitive lookup map from ingredient name → RecipeSubstitute
+  const substituteMap = useMemo(() => {
+    const map = new Map<string, RecipeSubstitute>();
+    if (!recipe?.substitutes) return map;
+    for (const sub of recipe.substitutes) {
+      const key = sub.original.toLocaleLowerCase('tr-TR').trim();
+      if (key) map.set(key, sub);
+    }
+    return map;
+  }, [recipe?.substitutes]);
 
   // Related recipes
   const { data: relatedRecipes } = useSWR(
@@ -563,11 +582,10 @@ export default function RecipeDetailScreen() {
 
   const displayRating = userRating || recipe.rating || 0;
 
-  // Ingredient CTA: prefer first ingredient with alternatives, else first ingredient
-  const ctaIngredient = recipe.ingredients?.find(
-    (ing) => ing.alternatives && ing.alternatives.length > 0,
-  ) ?? recipe.ingredients?.[0];
-  const ctaAlternative = ctaIngredient?.alternatives?.[0];
+  // CTA: prefer first recipe-level substitute, else first ingredient
+  const firstSubstitute = recipe.substitutes?.[0];
+  const ctaIngredientName = firstSubstitute?.original ?? recipe.ingredients?.[0]?.name;
+  const ctaAlternative = firstSubstitute?.substitute;
 
   // Nutrition rows – filter out null, undefined, 0, and empty string
   const nutritionRows = recipe.nutrition
@@ -871,6 +889,7 @@ export default function RecipeDetailScreen() {
                     onToggle={() => toggleIngredientCheck(ingKey)}
                     isExpanded={expandedIngredientId === ingKey}
                     onToggleExpand={() => toggleIngredientExpand(ingKey)}
+                    substitute={substituteMap.get(ing.name.toLocaleLowerCase('tr-TR').trim())}
                   />
                 );
               })
@@ -923,14 +942,14 @@ export default function RecipeDetailScreen() {
           </Card>
 
           {/* ── Malzemeye Göre Tarif Öneri (CTA) ── */}
-          {ctaIngredient ? (
+          {ctaIngredientName ? (
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={() => {
                 if (ctaAlternative) {
                   router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaAlternative)}` as never);
                 } else {
-                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaIngredient.name)}` as never);
+                  router.push(`/(tabs)/recipes?ingredient=${encodeURIComponent(ctaIngredientName)}` as never);
                 }
               }}
               style={{ marginBottom: 16 }}
@@ -962,7 +981,7 @@ export default function RecipeDetailScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
-                    Evde {ctaIngredient.name} yok mu?
+                    Evde {ctaIngredientName} yok mu?
                   </Text>
                   <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
                     {ctaAlternative
@@ -1286,8 +1305,8 @@ export default function RecipeDetailScreen() {
           ══════════════════════════════════════════════════════ */}
 
           {/* ── "Bizimkiler Ne Yiyecek?" banner — recipe-specific tariften.com suggestion ── */}
-          {recipe.tariften_recipe?.url ? (
-            <RecipeTariftenBanner tariftenRecipe={recipe.tariften_recipe} style={CROSS_SELL_BANNER_STYLE} />
+          {recipe.cross_sell?.url ? (
+            <RecipeTariftenBanner crossSell={recipe.cross_sell} style={CROSS_SELL_BANNER_STYLE} />
           ) : null}
 
           {/* ── 1. Rastgele 4 Faydalı Araç ── */}

@@ -8,6 +8,7 @@ import {
   Linking,
   StyleSheet,
   TextInput,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
@@ -83,7 +84,7 @@ export default function BlogDetailScreen() {
       setCommentText('');
       await mutateComments();
     } catch {
-      // silent fail
+      Alert.alert('Hata', 'Yorum gönderilemedi. Lütfen tekrar deneyin.');
     } finally {
       setIsSubmittingComment(false);
     }

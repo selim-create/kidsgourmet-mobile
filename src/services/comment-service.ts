@@ -20,11 +20,17 @@ export async function deleteComment(commentId: number): Promise<void> {
 export async function getBlogComments(postId: number): Promise<Comment[]> {
   try {
     return await api.get<Comment[]>(`/kg/v1/posts/${postId}/comments`);
-  } catch {
+  } catch (primaryError) {
     // Fall back to WordPress native comments API
+    if (__DEV__) {
+      console.warn(`[comments] kg endpoint failed for post ${postId}, trying wp/v2:`, primaryError);
+    }
     try {
       return await api.get<Comment[]>(`/wp/v2/comments?post=${postId}`);
-    } catch {
+    } catch (fallbackError) {
+      if (__DEV__) {
+        console.warn(`[comments] wp/v2 fallback also failed for post ${postId}:`, fallbackError);
+      }
       return [];
     }
   }

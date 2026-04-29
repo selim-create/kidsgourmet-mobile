@@ -9,6 +9,9 @@ interface AuthorBoxProps {
   author: Author;
 }
 
+const AVATAR_SIZE = 64;
+const AVATAR_BORDER_WIDTH = 3;
+
 export function AuthorBox({ author }: AuthorBoxProps) {
   const handleAuthorPress = () => {
     router.push(`/authors/${author.id}`);
@@ -18,7 +21,7 @@ export function AuthorBox({ author }: AuthorBoxProps) {
     <View style={styles.card}>
       <View style={styles.row}>
         <View style={styles.avatarWrapper}>
-          <Avatar uri={author.avatar_url} name={author.name} size={64} />
+          <Avatar uri={author.avatar_url} name={author.name} size={AVATAR_SIZE} />
         </View>
         <View style={styles.info}>
           <TouchableOpacity onPress={handleAuthorPress} activeOpacity={0.7} style={styles.nameRow}>
@@ -56,8 +59,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatarWrapper: {
-    borderRadius: 35,
-    borderWidth: 3,
+    borderRadius: AVATAR_SIZE / 2 + AVATAR_BORDER_WIDTH,
+    borderWidth: AVATAR_BORDER_WIDTH,
     borderColor: '#fff',
     alignSelf: 'flex-start',
     overflow: 'hidden',

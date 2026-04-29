@@ -16,7 +16,6 @@ import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBlogPost, getBlogPosts } from '../../src/services/blog-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
-import { Badge } from '../../src/components/ui/Badge';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { DetailHeader } from '../../src/components/ui/DetailHeader';
 import { BlogContent } from '../../src/components/blog/BlogContent';
@@ -34,6 +33,12 @@ function formatDate(dateStr?: string): string {
     month: 'long',
     year: 'numeric',
   });
+}
+
+function calculateReadTime(html: string): number {
+  const text = (html ?? '').replace(/<[^>]*>/gm, '');
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 export default function BlogDetailScreen() {
@@ -87,6 +92,7 @@ export default function BlogDetailScreen() {
   const sd = post.sponsor_data;
   const isFav = isPostFavorite(post.id);
   const logoUrl = extractImageUrl(sd?.sponsor_logo) ?? extractImageUrl(sd?.sponsor_light_logo);
+  const readTime = post.reading_time || calculateReadTime(post.content ?? '');
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -113,46 +119,67 @@ export default function BlogDetailScreen() {
             colors={['transparent', 'rgba(0,0,0,0.45)']}
             style={styles.heroGradient}
           />
-          {/* Category chips on hero bottom-left */}
-          {post.categories && post.categories.length > 0 && (
-            <View style={styles.heroCategoryRow}>
-              {isSponsored ? (
-                <View style={styles.sponsoredHeroBadge}>
-                  <Text style={styles.sponsoredHeroBadgeText}>📢 Sponsorlu</Text>
-                </View>
-              ) : (
-                post.categories.map((cat) => (
-                  <Badge key={cat.id} variant="secondary" size="sm">{cat.name}</Badge>
-                ))
-              )}
-            </View>
-          )}
+          {/* Floating action buttons: share + favorite */}
+          <View style={[styles.heroActions, { top: insets.top + 12 }]}>
+            <TouchableOpacity style={styles.heroActionBtn} onPress={handleShare} activeOpacity={0.7}>
+              <Ionicons name="share-outline" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.heroActionBtn} onPress={handleFavorite} activeOpacity={0.7}>
+              <Ionicons
+                name={isFav ? 'heart' : 'heart-outline'}
+                size={20}
+                color={isFav ? '#EF4444' : '#fff'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.content}>
+          {/* Category chips (below hero, above title) */}
+          {isSponsored ? (
+            <View style={styles.categoryRow}>
+              <View style={styles.sponsoredBadge}>
+                <Text style={styles.sponsoredBadgeText}>📢 Sponsorlu</Text>
+              </View>
+            </View>
+          ) : post.categories && post.categories.length > 0 ? (
+            <View style={styles.categoryRow}>
+              {post.categories.map((cat) => (
+                <TouchableOpacity
+                  key={cat.id}
+                  style={styles.categoryChip}
+                  activeOpacity={0.7}
+                  onPress={() => router.push(`/blog?categoryId=${encodeURIComponent(cat.id)}`)}
+                >
+                  <Text style={styles.categoryChipText}>{cat.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : null}
+
           {/* Title */}
           <Text style={styles.title}>{post.title}</Text>
 
           {/* Meta row */}
           <Text style={styles.metaRow}>
             {formatDate(post.created_at)}
-            {post.reading_time ? ` · ${post.reading_time} dk okuma` : ''}
+            {` · ${readTime} dk okuma`}
             {post.comment_count ? ` · 💬 ${post.comment_count}` : ''}
           </Text>
 
-          {/* Action bar: share + favorite */}
-          <View style={styles.actionBar}>
-            <TouchableOpacity style={styles.actionBtn} onPress={handleShare} activeOpacity={0.7}>
-              <Ionicons name="share-outline" size={20} color="#6B7280" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtn} onPress={handleFavorite} activeOpacity={0.7}>
-              <Ionicons
-                name={isFav ? 'heart' : 'heart-outline'}
-                size={20}
-                color={isFav ? '#EF4444' : '#6B7280'}
-              />
-            </TouchableOpacity>
-          </View>
+          {/* Mini author row (non-sponsored only) */}
+          {!isSponsored && post.author ? (
+            <View style={styles.miniAuthorRow}>
+              <Avatar uri={post.author.avatar_url} name={post.author.name} size={24} />
+              <Text style={styles.miniAuthorLabel}>Yazar: </Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => router.push(`/authors/${encodeURIComponent(post.author.id)}`)}
+              >
+                <Text style={styles.miniAuthorName}>{post.author.name}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
 
           <View style={styles.divider} />
 
@@ -191,19 +218,6 @@ export default function BlogDetailScreen() {
             </TouchableOpacity>
           ) : null}
 
-          {/* Author block (non-sponsored only) */}
-          {!isSponsored && post.author ? (
-            <View style={styles.authorCard}>
-              <Avatar uri={post.author.avatar_url} name={post.author.name} size={56} />
-              <View style={styles.authorInfo}>
-                <Text style={styles.authorName}>{post.author.name}</Text>
-                {post.author.bio ? (
-                  <Text style={styles.authorBio} numberOfLines={3}>{post.author.bio}</Text>
-                ) : null}
-              </View>
-            </View>
-          ) : null}
-
           {/* Rich HTML Content */}
           {post.content ? (
             <View style={styles.bodyContainer}>
@@ -238,7 +252,7 @@ export default function BlogDetailScreen() {
           </View>
         )}
       </ScrollView>
-      <DetailHeader onShare={handleShare} transparent />
+      <DetailHeader transparent />
     </View>
   );
 }
@@ -263,28 +277,55 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 120,
   },
-  heroCategoryRow: {
+  heroActions: {
     position: 'absolute',
-    bottom: 12,
-    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  heroActionBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  categoryRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
+    marginBottom: 12,
   },
-  sponsoredHeroBadge: {
+  categoryChip: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  categoryChipText: {
+    color: '#2563EB',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  sponsoredBadge: {
     backgroundColor: '#F59E0B',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  sponsoredHeroBadgeText: {
+  sponsoredBadgeText: {
     color: '#fff',
     fontSize: 11,
     fontWeight: '700',
-  },
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
   },
   title: {
     fontSize: 26,
@@ -296,20 +337,22 @@ const styles = StyleSheet.create({
   metaRow: {
     fontSize: 13,
     color: '#9CA3AF',
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  actionBar: {
+  miniAuthorRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 16,
   },
-  actionBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F9FAFB',
-    alignItems: 'center',
-    justifyContent: 'center',
+  miniAuthorLabel: {
+    fontSize: 13,
+    color: '#9CA3AF',
+  },
+  miniAuthorName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0F172A',
   },
   divider: {
     height: 1,
@@ -370,29 +413,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     fontStyle: 'italic',
-  },
-  authorCard: {
-    flexDirection: 'row',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  authorInfo: {
-    flex: 1,
-  },
-  authorName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 4,
-  },
-  authorBio: {
-    fontSize: 13,
-    color: '#6B7280',
-    lineHeight: 19,
   },
   bodyContainer: {
     paddingVertical: 8,

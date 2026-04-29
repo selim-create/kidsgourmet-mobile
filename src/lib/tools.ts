@@ -91,7 +91,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     slug: 'persentil',
     title: 'Persentil Hesaplayıcı',
-    description: 'Bebeğinizin boy ve kilo persentilini WHO standartlarına göre hesaplayın.',
+    description: 'Bebeğinizin boy, kilo ve baş çevresi persentilini WHO büyüme standartlarına göre hesaplayın.',
     icon: 'analytics-outline',
     color: '#3B82F6', bg: '#DBEAFE',
     route: '/growth',

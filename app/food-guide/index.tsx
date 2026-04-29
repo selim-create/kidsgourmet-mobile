@@ -295,7 +295,7 @@ export default function FoodGuideScreen() {
                       <View
                         style={[
                           styles.progressBarFill,
-                          { width: `${stage.progress}%` as any, backgroundColor: stage.color },
+                          { width: `${stage.progress}%`, backgroundColor: stage.color },
                         ]}
                       />
                     </View>

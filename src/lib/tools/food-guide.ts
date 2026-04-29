@@ -197,7 +197,7 @@ export const AGE_RANGE_PLANS: Record<AgeRangeSlug, AgeRangePlan> = {
         examples: ['Zeytinyağı (pişirmede)', 'Avokado (püre)'],
         portion: '1 çay kaşığı',
         frequency: 'Günde 1-2 kez yemeklere ekleyerek',
-        note: 'Beyin gelişimi için omega-3 ve sağlıklı yağlar önemlidir. Tuz/baharat ekleyin.',
+        note: 'Beyin gelişimi için omega-3 ve sağlıklı yağlar önemlidir. Tuz ve baharat eklemeyin.',
       },
     ],
   },

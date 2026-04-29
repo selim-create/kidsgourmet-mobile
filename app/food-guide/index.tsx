@@ -28,7 +28,7 @@ import {
   getAgeRangeForMonths,
   type AgeRangeSlug,
   type FoodGroupSlug,
-} from '../../src/lib/tools/food-guide';
+} from '../../src/data/food-guide';
 
 // ─── Section IDs (for accordion expand/collapse) ──────────────────────────────
 type Section = 'food-groups' | 'texture' | 'allergens' | 'tips';

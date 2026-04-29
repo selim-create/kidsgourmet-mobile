@@ -642,7 +642,266 @@ export interface ChildAllergen {
   notes?: string;
 }
 
-// ─── Meal Slot Types ──────────────────────────────────────────────────────────
+// ─── Tool Types ───────────────────────────────────────────────────────────────
+
+export interface Tool {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  excerpt?: string;
+  icon?: string;
+  url?: string;
+  is_active?: boolean;
+  tool_type?: string;
+  tool_types?: string[];
+  requires_auth?: boolean;
+  is_sponsored?: boolean;
+}
+
+// ─── BLW Test Types ───────────────────────────────────────────────────────────
+
+export interface BLWTestQuestion {
+  id: string;
+  text: string;
+  category?: string;
+  description?: string;
+}
+
+export interface BLWTestConfig {
+  questions: BLWTestQuestion[];
+  thresholds?: {
+    ready: number;
+    almost_ready: number;
+  };
+}
+
+export interface BLWTestAnswer {
+  question_id: string;
+  answer: boolean;
+}
+
+export interface BLWResultBucket {
+  slug: 'not_ready' | 'almost_ready' | 'ready';
+  label: string;
+  description?: string;
+  recommendations?: string[];
+  color?: string;
+}
+
+// ─── Percentile Types ─────────────────────────────────────────────────────────
+
+export interface PercentileMeasurement {
+  child_id?: number;
+  age_months: number;
+  gender: 'male' | 'female';
+  weight_kg?: number;
+  height_cm?: number;
+  head_circumference_cm?: number;
+}
+
+// ─── Water Calculator Types ───────────────────────────────────────────────────
+
+export interface WaterNeedResult {
+  daily_ml: number;
+  min_ml?: number;
+  max_ml?: number;
+  note?: string;
+  sources?: string[];
+  disclaimer?: string;
+}
+
+// ─── Solid Food Readiness Types ───────────────────────────────────────────────
+
+export interface SolidFoodReadinessQuestion {
+  id: string;
+  text: string;
+  description?: string;
+}
+
+export interface SolidFoodReadinessConfig {
+  questions: SolidFoodReadinessQuestion[];
+}
+
+export interface SolidFoodResultBucket {
+  slug: string;
+  label: string;
+  description?: string;
+  recommendations?: string[];
+}
+
+// ─── Allergen Planner Types ───────────────────────────────────────────────────
+
+export interface AllergenPlannerConfig {
+  allergens: Array<{
+    id: string;
+    name: string;
+    icon?: string;
+    description?: string;
+  }>;
+  schedule_days?: number;
+}
+
+export interface AllergenPlannerInput {
+  allergen_ids: string[];
+  child_id?: number;
+  start_date?: string;
+}
+
+export interface AllergenTrialDay {
+  day: number;
+  allergen: string;
+  amount?: string;
+  instructions?: string;
+}
+
+export interface AllergenTrialPlan {
+  schedule: AllergenTrialDay[];
+  notes?: string;
+  emergency_signs?: string[];
+  disclaimer?: string;
+}
+
+// ─── Food Trial Types ─────────────────────────────────────────────────────────
+
+export interface FoodTrial {
+  id: number;
+  child_id?: number;
+  food_name: string;
+  start_date: string;
+  status: 'planned' | 'in_progress' | 'completed' | 'reaction';
+  notes?: string;
+  reaction_type?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FoodTrialInput {
+  child_id?: number;
+  food_name: string;
+  start_date?: string;
+  notes?: string;
+}
+
+export interface FoodTrialSummary {
+  total: number;
+  completed: number;
+  in_progress: number;
+  reactions: number;
+}
+
+// ─── Bath Planner Types ───────────────────────────────────────────────────────
+
+export interface BathPlannerAgeGroup {
+  slug: string;
+  label: string;
+  min_months: number;
+  max_months?: number;
+}
+
+export interface BathPlannerConfig {
+  seasons: string[];
+  age_groups: BathPlannerAgeGroup[];
+}
+
+export interface BathPlannerInput {
+  age_months: number;
+  season: string;
+  child_id?: number;
+}
+
+export interface BathPlannerResult {
+  frequency_per_week: number;
+  best_time?: string;
+  duration_minutes?: number;
+  water_temperature?: string;
+  tips?: string[];
+  products?: string[];
+  disclaimer?: string;
+}
+
+// ─── Hygiene Calculator Types ─────────────────────────────────────────────────
+
+export interface HygieneInput {
+  age_months: number;
+  activity_level?: 'low' | 'medium' | 'high';
+  child_id?: number;
+}
+
+export interface HygieneCalculatorResult {
+  wipes_per_day: number;
+  bath_frequency?: string;
+  products_needed?: string[];
+  tips?: string[];
+  disclaimer?: string;
+}
+
+// ─── Diaper Calculator Types ──────────────────────────────────────────────────
+
+export interface DiaperInput {
+  age_months: number;
+  weight_kg?: number;
+  child_id?: number;
+}
+
+export interface DiaperCalculatorResult {
+  diapers_per_day: number;
+  diapers_per_month: number;
+  current_size?: string;
+  next_size_at?: string;
+  tips?: string[];
+  disclaimer?: string;
+}
+
+export interface RashRiskInput {
+  age_months: number;
+  frequency_per_day?: number;
+  skin_sensitivity?: 'low' | 'medium' | 'high';
+  child_id?: number;
+}
+
+export interface RashRiskResult {
+  risk_level: 'low' | 'medium' | 'high';
+  risk_score?: number;
+  factors?: string[];
+  recommendations?: string[];
+  disclaimer?: string;
+}
+
+// ─── Air Quality Types ────────────────────────────────────────────────────────
+
+export interface AirQualityResult {
+  aqi: number;
+  category: string;
+  color?: string;
+  outdoor_recommendation: string;
+  activity_suggestions?: string[];
+  health_notes?: string[];
+  source?: string;
+  measured_at?: string;
+}
+
+// ─── Stain Encyclopedia Types ─────────────────────────────────────────────────
+
+export interface StainGuide {
+  id: number;
+  slug: string;
+  title: string;
+  stain_type?: string;
+  removal_steps?: string[];
+  products?: string[];
+  warnings?: string[];
+  tips?: string[];
+  image?: string;
+}
+
+export interface StainSearchResponse {
+  results: StainGuide[];
+  total?: number;
+  query?: string;
+}
+
+
 
 export interface MealSlot {
   id?: number;

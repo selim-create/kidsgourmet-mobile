@@ -1,9 +1,19 @@
 /**
  * src/lib/tools/safety-check.ts
  *
- * Pure TypeScript business logic for the "Bu Gıda Verilir mi?" tool.
- * No React runtime imports — fully testable in isolation.
- * (Type-only imports like `ComponentProps` are erased at compile time.)
+ * UI presentation helpers for the "Bu Gıda Verilir mi?" tool.
+ *
+ * IMPORTANT: This file contains ONLY display/presentation helpers:
+ *   - Visual configuration (colors, icons, labels) per safety level
+ *   - Derivation of a display-level enum from the API response shape
+ *   - Client-side form validation
+ *   - UI message strings
+ *
+ * The actual safety decision ("is this food safe for this child?") is made
+ * entirely by the kg-core backend endpoint:
+ *   POST /kg/v1/safety/check-ingredient
+ * called via src/services/safety-service.ts.
+ * No business logic lives here.
  */
 
 import type { ComponentProps } from 'react';

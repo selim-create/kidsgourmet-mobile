@@ -103,12 +103,60 @@ export const API_ENDPOINTS = {
 
   // Tools
   TOOLS: '/kg/v1/tools',
+  TOOL_BY_SLUG: (slug: string) => `/kg/v1/tools/${slug}`,
+
+  // BLW Test
   TOOL_BLW_TEST: '/kg/v1/tools/blw-test',
   TOOL_BLW_RESULTS: '/kg/v1/tools/blw-test/results',
+  BLW_TEST_CONFIG: '/kg/v1/tools/blw-test/config',
+  BLW_TEST_SUBMIT: '/kg/v1/tools/blw-test/submit',
+
+  // Percentile
   TOOL_PERCENTILE: '/kg/v1/tools/percentile',
   TOOL_PERCENTILE_RESULTS: '/kg/v1/tools/percentile/results',
+  PERCENTILE_CALCULATE: '/kg/v1/tools/percentile/calculate',
+  PERCENTILE_SAVE: '/kg/v1/tools/percentile/save',
+
+  // Solid Food Readiness
   TOOL_SOLID_FOOD: '/kg/v1/tools/solid-food-readiness',
   TOOL_SOLID_FOOD_RESULTS: '/kg/v1/tools/solid-food-readiness/results',
+  SOLID_FOOD_READINESS_CONFIG: '/kg/v1/tools/solid-food-readiness/config',
+  SOLID_FOOD_READINESS_SUBMIT: '/kg/v1/tools/solid-food-readiness/submit',
+
+  // Water Calculator
+  WATER_CALCULATOR: '/kg/v1/tools/water-calculator',
+
+  // Allergen Planner
+  ALLERGEN_PLANNER_CONFIG: '/kg/v1/tools/allergen-planner/config',
+  ALLERGEN_PLANNER_GENERATE: '/kg/v1/tools/allergen-planner/generate',
+
+  // Food Trials (auth required)
+  FOOD_TRIALS: '/kg/v1/tools/food-trials',
+  FOOD_TRIAL: (id: number) => `/kg/v1/tools/food-trials/${id}`,
+  FOOD_TRIAL_SUMMARY: '/kg/v1/tools/food-trials/summary',
+
+  // Bath Planner
+  BATH_PLANNER_CONFIG: '/kg/v1/tools/bath-planner/config',
+  BATH_PLANNER_GENERATE: '/kg/v1/tools/bath-planner/generate',
+
+  // Hygiene Calculator
+  HYGIENE_CALCULATOR: '/kg/v1/tools/hygiene-calculator',
+
+  // Diaper Calculator
+  DIAPER_CALCULATOR: '/kg/v1/tools/diaper-calculator',
+  DIAPER_RASH_RISK: '/kg/v1/tools/diaper-calculator/rash-risk',
+
+  // Air Quality
+  AIR_QUALITY_ANALYZE: '/kg/v1/tools/air-quality/analyze',
+
+  // Stain Encyclopedia
+  STAIN_ENCYCLOPEDIA_SEARCH: '/kg/v1/tools/stain-encyclopedia/search',
+  STAIN_ENCYCLOPEDIA_POPULAR: '/kg/v1/tools/stain-encyclopedia/popular',
+  STAIN_ENCYCLOPEDIA_BY_SLUG: (slug: string) => `/kg/v1/tools/stain-encyclopedia/${slug}`,
+
+  // Sponsored Tools
+  SPONSORED_TOOLS: '/kg/v1/tools/sponsored',
+  TOOL_SPONSOR_BY_SLUG: (slug: string) => `/kg/v1/tools/${slug}/sponsor`,
 
   // Growth
   GROWTH_DATA: '/kg/v1/health/growth',

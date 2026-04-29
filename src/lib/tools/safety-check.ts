@@ -2,7 +2,8 @@
  * src/lib/tools/safety-check.ts
  *
  * Pure TypeScript business logic for the "Bu Gıda Verilir mi?" tool.
- * No React / RN imports — fully testable in isolation.
+ * No React runtime imports — fully testable in isolation.
+ * (Type-only imports like `ComponentProps` are erased at compile time.)
  */
 
 import type { ComponentProps } from 'react';

@@ -177,7 +177,7 @@ export default function SafetyCheckScreen() {
                 }}
                 onSubmitEditing={handleCheck}
                 returnKeyType="search"
-                autoCapitalize="none"
+                autoCapitalize="sentences"
                 autoCorrect={false}
               />
               <TouchableOpacity

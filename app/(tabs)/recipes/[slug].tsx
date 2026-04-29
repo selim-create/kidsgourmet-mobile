@@ -45,6 +45,9 @@ const PORTION_OPTIONS = [
   { label: '4 Öğün', value: 4 },
 ];
 
+// ─── Cross-sell banner style: negative horizontal margin offsets the parent's padding ──
+const CROSS_SELL_BANNER_STYLE = { marginHorizontal: -16 as const, marginBottom: 16 as const };
+
 function calculatePortion(amount: string | undefined, multiplier: number): string {
   if (!amount) return '';
   const num = parseFloat(amount);
@@ -230,6 +233,8 @@ export default function RecipeDetailScreen() {
   const { isAuthenticated } = useAuth();
   const [portionMultiplier, setPortionMultiplier] = useState(1);
   const [userRating, setUserRating] = useState<number>(0);
+  const userRatingRef = React.useRef(userRating);
+  React.useEffect(() => { userRatingRef.current = userRating; }, [userRating]);
   const [isRating, setIsRating] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -308,7 +313,7 @@ export default function RecipeDetailScreen() {
       return;
     }
     if (isRating) return;
-    const prevRating = userRating;
+    const prevRating = userRatingRef.current;
     setIsRating(true);
     setUserRating(star);
     try {
@@ -332,7 +337,7 @@ export default function RecipeDetailScreen() {
     } finally {
       setIsRating(false);
     }
-  }, [recipe, isAuthenticated, isRating, mutate, userRating]);
+  }, [recipe, isAuthenticated, isRating, mutate]);
 
   const handleAddComment = useCallback(async () => {
     if (!recipe || !isAuthenticated) {
@@ -1069,7 +1074,7 @@ export default function RecipeDetailScreen() {
 
           {/* ── "Bizimkiler Ne Yiyecek?" banner — shown only when API config is available ── */}
           {showCrossSellBanner ? (
-            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={{ marginHorizontal: -16, marginBottom: 16 }} />
+            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={CROSS_SELL_BANNER_STYLE} />
           ) : null}
 
           {/* ── Comments ── */}

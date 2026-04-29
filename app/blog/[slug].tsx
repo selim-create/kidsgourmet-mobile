@@ -83,7 +83,10 @@ export default function BlogDetailScreen() {
       await addBlogComment(post.id, text);
       setCommentText('');
       await mutateComments();
-    } catch {
+    } catch (err) {
+      if (__DEV__) {
+        console.warn('[blog] Comment submission failed:', err);
+      }
       Alert.alert('Hata', 'Yorum gönderilemedi. Lütfen tekrar deneyin.');
     } finally {
       setIsSubmittingComment(false);
@@ -124,6 +127,7 @@ export default function BlogDetailScreen() {
   const isFav = isPostFavorite(post.id);
   const logoUrl = extractImageUrl(sd?.sponsor_logo) ?? extractImageUrl(sd?.sponsor_light_logo);
   const readTime = post.reading_time || calculateReadTime(post.content ?? '');
+  const isCommentSubmitDisabled = !commentText.trim() || isSubmittingComment;
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -305,10 +309,10 @@ export default function BlogDetailScreen() {
               }}
             />
             <TouchableOpacity
-              style={[styles.commentSubmitBtn, (!commentText.trim() || isSubmittingComment) && styles.commentSubmitBtnDisabled]}
+              style={[styles.commentSubmitBtn, isCommentSubmitDisabled && styles.commentSubmitBtnDisabled]}
               onPress={handleAddComment}
               activeOpacity={0.8}
-              disabled={!commentText.trim() || isSubmittingComment}
+              disabled={isCommentSubmitDisabled}
             >
               <Text style={styles.commentSubmitText}>
                 {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}

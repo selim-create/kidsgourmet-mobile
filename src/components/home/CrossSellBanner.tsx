@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Linking, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface CrossSellBannerProps {
   variant: 'tariften' | 'rejimde';
+  /** Optional style override for the card container (e.g. margins). */
+  style?: ViewStyle;
 }
 
 const TARIFTEN_CONFIG = {
@@ -30,7 +32,7 @@ const REJIMDE_CONFIG = {
   icon: 'leaf-outline' as const,
 };
 
-export function CrossSellBanner({ variant }: CrossSellBannerProps) {
+export function CrossSellBanner({ variant, style }: CrossSellBannerProps) {
   const config = variant === 'tariften' ? TARIFTEN_CONFIG : REJIMDE_CONFIG;
 
   return (
@@ -38,6 +40,7 @@ export function CrossSellBanner({ variant }: CrossSellBannerProps) {
       style={[
         styles.card,
         { backgroundColor: config.gradient1 },
+        style,
       ]}
     >
       {/* Decorative circle */}

@@ -19,6 +19,8 @@ import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
 import { getRecipeComments, addComment } from '../../../src/services/comment-service';
+import { getCrossSellBannerConfig } from '../../../src/services/featured-service';
+import { CrossSellBanner } from '../../../src/components/home/CrossSellBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Button } from '../../../src/components/ui/Button';
@@ -256,6 +258,14 @@ export default function RecipeDetailScreen() {
     () => getRecipeComments(recipe!.id),
   );
 
+  // Cross-sell banner config — fetched from API; banner is hidden when null/disabled
+  const { data: crossSellConfig } = useSWR(
+    'cross-sell-banner-config',
+    getCrossSellBannerConfig,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const showCrossSellBanner = !!(crossSellConfig && crossSellConfig.enabled !== false);
+
   const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
 
@@ -298,17 +308,31 @@ export default function RecipeDetailScreen() {
       return;
     }
     if (isRating) return;
+    const prevRating = userRating;
     setIsRating(true);
     setUserRating(star);
     try {
-      await rateRecipe(recipe.id, star);
-      await mutate();
-    } catch {
-      setUserRating(0);
+      const result = await rateRecipe(recipe.id, star);
+      // Update local recipe state with returned rating values (no full refetch needed)
+      await mutate(
+        (current) =>
+          current
+            ? { ...current, rating: result.rating, rating_count: result.rating_count, user_rating: star }
+            : current,
+        { revalidate: false },
+      );
+    } catch (err) {
+      setUserRating(prevRating);
+      Alert.alert(
+        'Puan Verilemedi',
+        err instanceof Error
+          ? err.message
+          : 'Puan verilirken bir hata oluştu. Lütfen tekrar deneyin.',
+      );
     } finally {
       setIsRating(false);
     }
-  }, [recipe, isAuthenticated, isRating, mutate]);
+  }, [recipe, isAuthenticated, isRating, mutate, userRating]);
 
   const handleAddComment = useCallback(async () => {
     if (!recipe || !isAuthenticated) {
@@ -1043,48 +1067,10 @@ export default function RecipeDetailScreen() {
             </View>
           ) : null}
 
-          {/* ── Add to Meal Plan → tariften.com banner ── */}
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => Linking.openURL('https://www.tariften.com')}
-            style={{ marginBottom: 16 }}
-          >
-            <View
-              style={{
-                backgroundColor: '#FF8A65',
-                borderRadius: 20,
-                padding: 20,
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <View
-                style={{
-                  position: 'absolute',
-                  width: 160,
-                  height: 160,
-                  borderRadius: 80,
-                  backgroundColor: '#E64A19',
-                  top: -50,
-                  right: -30,
-                  opacity: 0.35,
-                }}
-              />
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
-                <Text style={{ fontSize: 11, fontWeight: '800', color: '#FF8A65' }}>✨ YENİ</Text>
-              </View>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
-                Bizimkiler Ne Yiyecek?
-              </Text>
-              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 18, marginBottom: 16 }}>
-                Haftalık yemek planınızı kolayca oluşturun. Tariften.com'da binlerce tarif, alışveriş listesi ve haftalık plan sizi bekliyor!
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF8A65' }}>tariften.com'a git</Text>
-                <Ionicons name="arrow-forward" size={15} color="#FF8A65" />
-              </View>
-            </View>
-          </TouchableOpacity>
+          {/* ── "Bizimkiler Ne Yiyecek?" banner — shown only when API config is available ── */}
+          {showCrossSellBanner ? (
+            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={{ marginHorizontal: -16, marginBottom: 16 }} />
+          ) : null}
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>

@@ -50,6 +50,19 @@ const classesStyles: Record<string, MixedStyleDeclaration> = {
   },
 };
 
+const renderersProps = {
+  a: {
+    onPress: (_e: unknown, href: string) => {
+      Linking.openURL(href).catch(() => {});
+    },
+  },
+  img: { enableExperimentalPercentWidth: true },
+};
+
+const defaultTextProps = { selectable: true };
+
+const ignoredDomTags = ['script', 'style', 'noscript'];
+
 /** WordPress'ten gelen HTML'de boş paragrafları ve fazla boşlukları temizler. */
 function normalizeHtml(html: string): string {
   return html
@@ -71,16 +84,9 @@ export function BlogContent({ html }: BlogContentProps) {
       classesStyles={classesStyles}
       systemFonts={defaultSystemFonts}
       enableExperimentalMarginCollapsing
-      defaultTextProps={{ selectable: true }}
-      renderersProps={{
-        a: {
-          onPress: (_e: unknown, href: string) => {
-            Linking.openURL(href).catch(() => {});
-          },
-        },
-        img: { enableExperimentalPercentWidth: true },
-      }}
-      ignoredDomTags={['script', 'style', 'noscript']}
+      defaultTextProps={defaultTextProps}
+      renderersProps={renderersProps}
+      ignoredDomTags={ignoredDomTags}
     />
   );
 }

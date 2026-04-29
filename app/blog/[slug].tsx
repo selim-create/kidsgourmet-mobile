@@ -22,7 +22,7 @@ import { DetailHeader } from '../../src/components/ui/DetailHeader';
 import { BlogContent } from '../../src/components/blog/BlogContent';
 import { BlogCard } from '../../src/components/blog/BlogCard';
 import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
-import { toAbsoluteUrl } from '../../src/utils/url';
+import { extractImageUrl } from '../../src/utils/url';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { router } from 'expo-router';
@@ -86,7 +86,7 @@ export default function BlogDetailScreen() {
   const isSponsored = post.sponsor_data?.is_sponsored;
   const sd = post.sponsor_data;
   const isFav = isPostFavorite(post.id);
-  const logoUrl = toAbsoluteUrl(typeof sd?.sponsor_logo === 'string' ? sd.sponsor_logo : (typeof sd?.sponsor_light_logo === 'string' ? sd.sponsor_light_logo : undefined));
+  const logoUrl = extractImageUrl(sd?.sponsor_logo) ?? extractImageUrl(sd?.sponsor_light_logo);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>

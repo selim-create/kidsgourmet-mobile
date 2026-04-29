@@ -8,7 +8,7 @@ import { Linking } from 'react-native';
 import type { BlogPost } from '../../lib/types';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { toAbsoluteUrl } from '../../utils/url';
+import { extractImageUrl } from '../../utils/url';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -145,8 +145,7 @@ function SponsoredCard({ post }: { post: BlogPost }) {
     await togglePost(post.id);
   };
 
-  const logoRaw = sd?.sponsor_logo ?? sd?.sponsor_light_logo;
-  const logoUrl = toAbsoluteUrl(typeof logoRaw === 'string' ? logoRaw : undefined);
+  const logoUrl = extractImageUrl(sd?.sponsor_logo) ?? extractImageUrl(sd?.sponsor_light_logo);
 
   return (
     <TouchableOpacity

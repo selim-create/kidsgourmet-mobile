@@ -1,4 +1,5 @@
 import { API_URL } from '../lib/constants';
+import type { SponsorImage } from '../lib/types';
 
 /**
  * Converts WordPress relative paths (e.g. /wp-content/uploads/...)
@@ -16,4 +17,20 @@ export function toAbsoluteUrl(path?: string | null): string | undefined {
     return `${host}${path}`;
   }
   return path;
+}
+
+/**
+ * WP ACF image alanlarından URL string'i ayıklar.
+ * - string ise olduğu gibi
+ * - { url } object ise .url
+ * - aksi halde undefined
+ * Çıkan URL `toAbsoluteUrl` ile prefix'lenir.
+ */
+export function extractImageUrl(value: SponsorImage | undefined | null): string | undefined {
+  if (!value) return undefined;
+  if (typeof value === 'string') return toAbsoluteUrl(value);
+  if (typeof value === 'object' && typeof value.url === 'string') {
+    return toAbsoluteUrl(value.url);
+  }
+  return undefined;
 }

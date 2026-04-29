@@ -26,11 +26,9 @@ export interface SponsoredToolData {
  */
 export async function getSponsoredTool(slug: string): Promise<SponsoredToolData | null> {
   try {
-    const tool = await api.get<SponsoredToolData>(
-      `${API_ENDPOINTS.TOOL_BY_SLUG(slug)}/sponsor`,
-      { skipAuth: true },
-    );
-    return tool;
+    return await api.get<SponsoredToolData>(API_ENDPOINTS.TOOL_SPONSOR_BY_SLUG(slug), {
+      skipAuth: true,
+    });
   } catch {
     return null;
   }
@@ -41,7 +39,7 @@ export async function getSponsoredTool(slug: string): Promise<SponsoredToolData 
  */
 export async function getSponsoredTools(): Promise<SponsoredToolData[]> {
   try {
-    return await api.get<SponsoredToolData[]>(`${API_ENDPOINTS.TOOLS}/sponsored`, {
+    return await api.get<SponsoredToolData[]>(API_ENDPOINTS.SPONSORED_TOOLS, {
       skipAuth: true,
     });
   } catch {

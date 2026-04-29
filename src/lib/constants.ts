@@ -154,6 +154,10 @@ export const API_ENDPOINTS = {
   STAIN_ENCYCLOPEDIA_POPULAR: '/kg/v1/tools/stain-encyclopedia/popular',
   STAIN_ENCYCLOPEDIA_BY_SLUG: (slug: string) => `/kg/v1/tools/stain-encyclopedia/${slug}`,
 
+  // Sponsored Tools
+  SPONSORED_TOOLS: '/kg/v1/tools/sponsored',
+  TOOL_SPONSOR_BY_SLUG: (slug: string) => `/kg/v1/tools/${slug}/sponsor`,
+
   // Growth
   GROWTH_DATA: '/kg/v1/health/growth',
   GROWTH_RECORD: (childId: number) => `/kg/v1/health/growth?child_id=${childId}`,

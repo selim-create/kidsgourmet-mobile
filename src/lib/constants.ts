@@ -47,7 +47,7 @@ export const API_ENDPOINTS = {
   SPECIAL_CONDITIONS: '/wp/v2/special-condition',
 
   // Recipe Rating
-  RECIPE_RATING: (recipeId: number) => `/kg/v1/recipes/${recipeId}/rating`,
+  RECIPE_RATING: (recipeId: number) => `/kg/v1/recipes/${recipeId}/rate`,
 
   // Search
   SEARCH: '/kg/v1/search',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   StyleSheet,
+  TextInput,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
@@ -15,10 +16,12 @@ import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBlogPost, getBlogPosts } from '../../src/services/blog-service';
+import { getBlogComments, addBlogComment } from '../../src/services/comment-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { DetailHeader } from '../../src/components/ui/DetailHeader';
 import { ContentWithEmbeds } from '../../src/components/embeds/ContentWithEmbeds';
+import { AuthorBox } from '../../src/components/blog/AuthorBox';
 import { BlogCard } from '../../src/components/blog/BlogCard';
 import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
 import { extractImageUrl } from '../../src/utils/url';
@@ -58,6 +61,33 @@ export default function BlogDetailScreen() {
     () => getBlogPosts(1, 5, String(categoryId)),
   );
   const relatedPosts = relatedData?.items?.filter((p) => p.slug !== post?.slug).slice(0, 4) ?? [];
+
+  const { data: comments, mutate: mutateComments } = useSWR(
+    post ? `blog-comments-${post.id}` : null,
+    () => getBlogComments(post!.id),
+  );
+
+  const [commentText, setCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  const handleAddComment = useCallback(async () => {
+    if (!post || !isAuthenticated) {
+      router.push('/(auth)/login');
+      return;
+    }
+    const text = commentText.trim();
+    if (!text) return;
+    setIsSubmittingComment(true);
+    try {
+      await addBlogComment(post.id, text);
+      setCommentText('');
+      await mutateComments();
+    } catch {
+      // silent fail
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  }, [post, isAuthenticated, commentText, mutateComments]);
 
   const handleShare = async () => {
     if (!post) return;
@@ -244,6 +274,67 @@ export default function BlogDetailScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+          )}
+
+          {/* Detailed author box (non-sponsored only) */}
+          {!isSponsored && post.author ? (
+            <AuthorBox author={post.author} />
+          ) : null}
+        </View>
+
+        {/* Comments section */}
+        <View style={styles.commentsSection}>
+          <Text style={styles.commentsTitle}>
+            Yorumlar{comments && comments.length > 0 ? ` (${comments.length})` : ''}
+          </Text>
+
+          {/* Comment form */}
+          <View style={styles.commentForm}>
+            <TextInput
+              multiline
+              numberOfLines={3}
+              style={styles.commentInput}
+              placeholder={isAuthenticated ? 'Yorum yazın...' : 'Yorum yazmak için giriş yapın'}
+              placeholderTextColor="#9CA3AF"
+              value={commentText}
+              onChangeText={setCommentText}
+              editable={isAuthenticated}
+              onFocus={() => {
+                if (!isAuthenticated) router.push('/(auth)/login');
+              }}
+            />
+            <TouchableOpacity
+              style={[styles.commentSubmitBtn, (!commentText.trim() || isSubmittingComment) && styles.commentSubmitBtnDisabled]}
+              onPress={handleAddComment}
+              activeOpacity={0.8}
+              disabled={!commentText.trim() || isSubmittingComment}
+            >
+              <Text style={styles.commentSubmitText}>
+                {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Comment list */}
+          {comments && comments.length > 0 ? (
+            comments.map((comment) => (
+              <View key={comment.id} style={styles.commentCard}>
+                <View style={styles.commentHeader}>
+                  <Avatar uri={comment.author.avatar_url} name={comment.author.name} size={32} />
+                  <View style={styles.commentMeta}>
+                    <Text style={styles.commentAuthor}>{comment.author.name}</Text>
+                    <Text style={styles.commentDate}>
+                      {new Date(comment.created_at).toLocaleDateString('tr-TR')}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.commentContent}>{comment.content}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noCommentsText}>
+              Henüz yorum yapılmamış. İlk yorumu siz yapın!
+            </Text>
           )}
         </View>
 
@@ -457,6 +548,89 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#0F172A',
     marginBottom: 12,
+  },
+  commentsSection: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  commentsTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginBottom: 16,
+  },
+  commentForm: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  commentInput: {
+    fontSize: 14,
+    color: '#0F172A',
+    minHeight: 72,
+    textAlignVertical: 'top',
+  },
+  commentSubmitBtn: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+    backgroundColor: '#F97316',
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  commentSubmitBtnDisabled: {
+    backgroundColor: '#FED7AA',
+  },
+  commentSubmitText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  commentCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  commentMeta: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  commentAuthor: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  commentDate: {
+    fontSize: 11,
+    color: '#9CA3AF',
+  },
+  commentContent: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 22,
+  },
+  noCommentsText: {
+    color: '#9CA3AF',
+    textAlign: 'center',
+    paddingVertical: 12,
   },
 });
 

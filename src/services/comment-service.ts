@@ -16,3 +16,23 @@ export async function addComment(
 export async function deleteComment(commentId: number): Promise<void> {
   return api.delete(`${API_ENDPOINTS.COMMENTS}/${commentId}`);
 }
+
+export async function getBlogComments(postId: number): Promise<Comment[]> {
+  try {
+    return await api.get<Comment[]>(`/kg/v1/posts/${postId}/comments`);
+  } catch {
+    // Fall back to WordPress native comments API
+    try {
+      return await api.get<Comment[]>(`/wp/v2/comments?post=${postId}`);
+    } catch {
+      return [];
+    }
+  }
+}
+
+export async function addBlogComment(
+  postId: number,
+  content: string,
+): Promise<Comment> {
+  return api.post<Comment>(`/kg/v1/posts/${postId}/comments`, { content });
+}

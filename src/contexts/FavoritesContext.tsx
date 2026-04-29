@@ -169,6 +169,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
             return next;
           });
         }
+        throw err;
       } finally {
         setPendingPostIds((prev) => {
           const next = new Set(prev);

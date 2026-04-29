@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, Linking, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -60,10 +60,13 @@ function handleToolPress(item: ToolEmbedItem) {
 function RecipeCard({ item }: { item: RecipeEmbedItem }) {
   const colors = getAgeGroupColors(item.age_group);
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push({ pathname: '/(tabs)/recipes/[slug]', params: { slug: item.slug } })}
-      android_ripple={{ color: '#E5E7EB' }}
+    <TouchableOpacity
+      activeOpacity={0.75}
+      style={styles.card}
+      onPress={() => {
+        if (__DEV__) console.log('[embed] recipe card press', item.slug);
+        router.push({ pathname: '/(tabs)/recipes/[slug]', params: { slug: item.slug } });
+      }}
       hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
@@ -91,16 +94,19 @@ function RecipeCard({ item }: { item: RecipeEmbedItem }) {
           ) : null}
         </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 function IngredientCard({ item }: { item: IngredientEmbedItem }) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push({ pathname: '/ingredients/[slug]', params: { slug: item.slug } })}
-      android_ripple={{ color: '#E5E7EB' }}
+    <TouchableOpacity
+      activeOpacity={0.75}
+      style={styles.card}
+      onPress={() => {
+        if (__DEV__) console.log('[embed] ingredient card press', item.slug);
+        router.push({ pathname: '/ingredients/[slug]', params: { slug: item.slug } });
+      }}
       hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
@@ -125,16 +131,19 @@ function IngredientCard({ item }: { item: IngredientEmbedItem }) {
           </View>
         ) : null}
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 function ToolCard({ item }: { item: ToolEmbedItem }) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => handleToolPress(item)}
-      android_ripple={{ color: '#E5E7EB' }}
+    <TouchableOpacity
+      activeOpacity={0.75}
+      style={styles.card}
+      onPress={() => {
+        if (__DEV__) console.log('[embed] tool card press', item.slug);
+        handleToolPress(item);
+      }}
       hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       <View style={[styles.image, styles.toolPlaceholder]}>
@@ -146,16 +155,19 @@ function ToolCard({ item }: { item: ToolEmbedItem }) {
           <Text style={styles.subInfo} numberOfLines={2}>{item.excerpt}</Text>
         ) : null}
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 function PostCard({ item }: { item: PostEmbedItem }) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push({ pathname: '/blog/[slug]', params: { slug: item.slug } })}
-      android_ripple={{ color: '#E5E7EB' }}
+    <TouchableOpacity
+      activeOpacity={0.75}
+      style={styles.card}
+      onPress={() => {
+        if (__DEV__) console.log('[embed] post card press', item.slug);
+        router.push({ pathname: '/blog/[slug]', params: { slug: item.slug } });
+      }}
       hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       {item.image ? (
@@ -183,7 +195,7 @@ function PostCard({ item }: { item: PostEmbedItem }) {
           ) : null}
         </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
@@ -213,9 +225,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F1F5F9',
     overflow: 'hidden',
-  },
-  cardPressed: {
-    opacity: 0.75,
   },
   image: {
     width: 96,

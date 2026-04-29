@@ -38,7 +38,7 @@ import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, slugify, formatCommentDate } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
 import { ApiError } from '../../../src/lib/api';
-import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
+import { TOOLS, pickRandom } from '../../../src/lib/tools';
 import type { SafetyCheck, Comment, Ingredient, RecipeSubstitute } from '../../../src/lib/types';
 
 // ─── Portion multiplier options (web-style labels) ───────────────────────────
@@ -53,9 +53,9 @@ const CONTENT_HORIZONTAL_PADDING = 16;
 
 // ─── Cross-sell banner style: negative horizontal margin offsets the parent's padding ──
 const CROSS_SELL_BANNER_STYLE = {
-  marginHorizontal: -CONTENT_HORIZONTAL_PADDING as const,
-  marginBottom: 16 as const,
-};
+  marginHorizontal: -CONTENT_HORIZONTAL_PADDING,
+  marginBottom: 16,
+} as const;
 
 function calculatePortion(amount: string | undefined, multiplier: number): string {
   if (!amount) return '';
@@ -361,7 +361,7 @@ export default function RecipeDetailScreen() {
   const insets = useSafeAreaInsets();
 
   // Pick 4 random tools once per render (stable across re-renders)
-  const randomTools = useMemo(() => pickRandom(ALL_TOOLS, 4), []);
+  const randomTools = useMemo(() => pickRandom(TOOLS, 4), []);
 
   const { data: recipe, isLoading, error, mutate } = useSWR(
     slug ? `recipe-detail-${slug}` : null,
@@ -1397,9 +1397,9 @@ export default function RecipeDetailScreen() {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {randomTools.map((tool) => (
                 <TouchableOpacity
-                  key={tool.id}
+                  key={tool.slug}
                   activeOpacity={0.85}
-                  onPress={() => router.push(tool.route as never)}
+                  onPress={() => tool.route ? router.push(tool.route as never) : Linking.openURL(tool.webUrl)}
                   style={{
                     width: '47%',
                     backgroundColor: '#fff',
@@ -1426,7 +1426,7 @@ export default function RecipeDetailScreen() {
                     <Ionicons name={tool.icon} size={22} color={tool.color} />
                   </View>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }} numberOfLines={2}>
-                    {tool.name}
+                    {tool.title}
                   </Text>
                   <Text style={{ fontSize: 11, color: '#6B7280', lineHeight: 15 }} numberOfLines={3}>
                     {tool.description}

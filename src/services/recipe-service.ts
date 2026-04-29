@@ -1,6 +1,6 @@
 import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
-import type { Recipe, PaginatedResponse, RecipePaginatedResponse, SearchFilters } from '../lib/types';
+import type { Recipe, PaginatedResponse, RecipePaginatedResponse, SearchFilters, TariftenRecipe } from '../lib/types';
 
 // ─── Normalize recipe fields ───────────────────────────────────────────────────
 
@@ -174,12 +174,19 @@ function normalizeRecipe(recipe: Recipe): Recipe {
       }
 
       // Map alternative field names → alternatives (array or single string)
+      // Use .find() to skip empty arrays ([] is truthy but not useful), unlike ??
       if (!updated.alternatives || updated.alternatives.length === 0) {
-        const altField =
-          ingRaw.alternative_ingredients ??
-          ingRaw.substitutes ??
-          ingRaw.alternates ??
-          ingRaw.substitute; // singular form used by web API
+        const altCandidates: unknown[] = [
+          ingRaw.alternative_ingredients,
+          ingRaw.substitutes,
+          ingRaw.alternates,
+          ingRaw.substitute, // singular form used by some API versions
+          ingRaw.ingredient_substitutes,
+          ingRaw.swap_ingredients,
+        ];
+        const altField = altCandidates.find(
+          (v) => (Array.isArray(v) && v.length > 0) || (typeof v === 'string' && v),
+        );
         if (Array.isArray(altField)) {
           updated = { ...updated, alternatives: altField.map(extractDisplayName) };
         } else if (typeof altField === 'string' && altField) {
@@ -189,6 +196,38 @@ function normalizeRecipe(recipe: Recipe): Recipe {
 
       return updated;
     });
+  }
+
+  // ── tariften_recipe: map from alternative field names ──────────────────────
+  if (!normalized.tariften_recipe) {
+    const tariftenRaw =
+      raw.tariften_recipe ??
+      raw.parent_recipe ??
+      raw.cross_sell_recipe ??
+      raw.tariften ??
+      raw.suggested_recipe ??
+      raw.tariften_suggestion;
+
+    if (tariftenRaw && typeof tariftenRaw === 'object') {
+      const t = tariftenRaw as Record<string, unknown>;
+      const title = typeof t.title === 'string' ? t.title : undefined;
+      const urlStr = typeof t.url === 'string' ? t.url : undefined;
+      const linkStr = typeof t.link === 'string' ? t.link : undefined;
+      const url = urlStr ?? linkStr;
+      if (title && url) {
+        const imageStr = typeof t.image === 'string' ? t.image : undefined;
+        const featuredImageStr = typeof t.featured_image === 'string' ? t.featured_image : undefined;
+        const tariften: TariftenRecipe = {
+          title,
+          url,
+          image: imageStr ?? featuredImageStr,
+          prep_time: typeof t.prep_time === 'string' ? t.prep_time : undefined,
+          difficulty: typeof t.difficulty === 'string' ? t.difficulty : undefined,
+          trigger_ingredient: typeof t.trigger_ingredient === 'string' ? t.trigger_ingredient : undefined,
+        };
+        normalized.tariften_recipe = tariften;
+      }
+    }
   }
 
   return normalized;

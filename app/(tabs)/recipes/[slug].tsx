@@ -21,8 +21,7 @@ import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
 import { getRecipeComments, addComment } from '../../../src/services/comment-service';
-import { getCrossSellBannerConfig } from '../../../src/services/featured-service';
-import { CrossSellBanner } from '../../../src/components/home/CrossSellBanner';
+import { RecipeTariftenBanner } from '../../../src/components/recipe/RecipeTariftenBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Button } from '../../../src/components/ui/Button';
@@ -56,9 +55,6 @@ const CROSS_SELL_BANNER_STYLE = {
   marginHorizontal: -CONTENT_HORIZONTAL_PADDING as const,
   marginBottom: 16 as const,
 };
-
-/** SWR options for the cross-sell banner config (no retry, no focus revalidation). */
-const CROSS_SELL_BANNER_SWR_OPTIONS = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
 function calculatePortion(amount: string | undefined, multiplier: number): string {
   if (!amount) return '';
@@ -372,14 +368,6 @@ export default function RecipeDetailScreen() {
     recipe ? `comments-${recipe.id}` : null,
     () => getRecipeComments(recipe!.id),
   );
-
-  // Cross-sell banner config — fetched from API; banner is hidden when null/disabled
-  const { data: crossSellConfig } = useSWR(
-    'cross-sell-banner-config',
-    getCrossSellBannerConfig,
-    CROSS_SELL_BANNER_SWR_OPTIONS,
-  );
-  const showCrossSellBanner = crossSellConfig?.enabled !== false;
 
   const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
@@ -1297,9 +1285,9 @@ export default function RecipeDetailScreen() {
               SIDEBAR BLOCKS — displayed vertically at the bottom
           ══════════════════════════════════════════════════════ */}
 
-          {/* ── "Bizimkiler Ne Yiyecek?" banner — right above Faydalı Araçlar, shown unless explicitly disabled ── */}
-          {showCrossSellBanner ? (
-            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={CROSS_SELL_BANNER_STYLE} />
+          {/* ── "Bizimkiler Ne Yiyecek?" banner — recipe-specific tariften.com suggestion ── */}
+          {recipe.tariften_recipe?.url ? (
+            <RecipeTariftenBanner tariftenRecipe={recipe.tariften_recipe} style={CROSS_SELL_BANNER_STYLE} />
           ) : null}
 
           {/* ── 1. Rastgele 4 Faydalı Araç ── */}

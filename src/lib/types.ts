@@ -30,6 +30,15 @@ export interface RecipeExpert {
   note?: string;
 }
 
+export interface TariftenRecipe {
+  title: string;
+  image?: string;
+  url: string;
+  prep_time?: string;
+  difficulty?: string;
+  trigger_ingredient?: string;
+}
+
 export interface Recipe {
   id: number;
   slug: string;
@@ -71,6 +80,7 @@ export interface Recipe {
   tags?: Tag[];
   created_at?: string;
   updated_at?: string;
+  tariften_recipe?: TariftenRecipe;
 }
 
 export interface Ingredient {

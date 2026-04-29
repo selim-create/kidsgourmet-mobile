@@ -51,3 +51,20 @@ export async function getAllFeatured(limit = 5): Promise<FeaturedItem[]> {
     return [];
   }
 }
+
+export interface CrossSellBannerConfig {
+  enabled: boolean;
+  variant?: 'tariften' | 'rejimde';
+  title?: string;
+  description?: string;
+  cta_text?: string;
+  cta_url?: string;
+}
+
+export async function getCrossSellBannerConfig(): Promise<CrossSellBannerConfig | null> {
+  try {
+    return await api.get<CrossSellBannerConfig>(API_ENDPOINTS.CROSS_SELL_BANNER, { skipAuth: true });
+  } catch {
+    return null;
+  }
+}

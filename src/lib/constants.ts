@@ -120,6 +120,9 @@ export const API_ENDPOINTS = {
 
   // Newsletter
   NEWSLETTER: '/kg/v1/newsletter',
+
+  // Cross-sell / Promo banners
+  CROSS_SELL_BANNER: '/kg/v1/cross-sell/banner',
 } as const;
 
 export const APP_NAME = 'KidsGourmet';

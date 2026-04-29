@@ -162,21 +162,32 @@ function normalizeRecipe(recipe: Recipe): Recipe {
     });
   }
 
-  // ── ingredient alternatives: map from alternative field names ─────────────────
+  // ── ingredient notes + alternatives: map from alternative field names ──────────
   if (normalized.ingredients && normalized.ingredients.length > 0) {
     normalized.ingredients = normalized.ingredients.map((ing) => {
-      if (!ing.alternatives || ing.alternatives.length === 0) {
-        const ingRaw = ing as unknown as Record<string, unknown>;
+      const ingRaw = ing as unknown as Record<string, unknown>;
+      let updated = { ...ing };
+
+      // Map note (singular) → notes
+      if (!updated.notes && typeof ingRaw.note === 'string' && ingRaw.note) {
+        updated = { ...updated, notes: ingRaw.note };
+      }
+
+      // Map alternative field names → alternatives (array or single string)
+      if (!updated.alternatives || updated.alternatives.length === 0) {
         const altField =
-          ingRaw.alternative_ingredients ?? ingRaw.substitutes ?? ingRaw.alternates;
+          ingRaw.alternative_ingredients ??
+          ingRaw.substitutes ??
+          ingRaw.alternates ??
+          ingRaw.substitute; // singular form used by web API
         if (Array.isArray(altField)) {
-          return {
-            ...ing,
-            alternatives: altField.map(extractDisplayName),
-          };
+          updated = { ...updated, alternatives: altField.map(extractDisplayName) };
+        } else if (typeof altField === 'string' && altField) {
+          updated = { ...updated, alternatives: [altField] };
         }
       }
-      return ing;
+
+      return updated;
     });
   }
 

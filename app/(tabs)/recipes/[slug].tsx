@@ -19,6 +19,8 @@ import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
 import { getRecipeComments, addComment } from '../../../src/services/comment-service';
+import { getCrossSellBannerConfig } from '../../../src/services/featured-service';
+import { CrossSellBanner } from '../../../src/components/home/CrossSellBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Button } from '../../../src/components/ui/Button';
@@ -42,6 +44,18 @@ const PORTION_OPTIONS = [
   { label: '2 Öğün', value: 2 },
   { label: '4 Öğün', value: 4 },
 ];
+
+/** Horizontal padding of the main content view — used to cancel it for full-bleed banners. */
+const CONTENT_HORIZONTAL_PADDING = 16;
+
+// ─── Cross-sell banner style: negative horizontal margin offsets the parent's padding ──
+const CROSS_SELL_BANNER_STYLE = {
+  marginHorizontal: -CONTENT_HORIZONTAL_PADDING as const,
+  marginBottom: 16 as const,
+};
+
+/** SWR options for the cross-sell banner config (no retry, no focus revalidation). */
+const CROSS_SELL_BANNER_SWR_OPTIONS = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
 function calculatePortion(amount: string | undefined, multiplier: number): string {
   if (!amount) return '';
@@ -228,6 +242,8 @@ export default function RecipeDetailScreen() {
   const { isAuthenticated } = useAuth();
   const [portionMultiplier, setPortionMultiplier] = useState(1);
   const [userRating, setUserRating] = useState<number>(0);
+  // Ref so handleRate can read the latest rating without a stale closure
+  const userRatingRef = React.useRef(0);
   const [isRating, setIsRating] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -256,6 +272,14 @@ export default function RecipeDetailScreen() {
     () => getRecipeComments(recipe!.id),
   );
 
+  // Cross-sell banner config — fetched from API; banner is hidden when null/disabled
+  const { data: crossSellConfig } = useSWR(
+    'cross-sell-banner-config',
+    getCrossSellBannerConfig,
+    CROSS_SELL_BANNER_SWR_OPTIONS,
+  );
+  const showCrossSellBanner = !!(crossSellConfig && crossSellConfig.enabled !== false);
+
   const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
 
@@ -263,6 +287,7 @@ export default function RecipeDetailScreen() {
   React.useEffect(() => {
     if (recipe?.user_rating) {
       setUserRating(recipe.user_rating);
+      userRatingRef.current = recipe.user_rating;
     }
   }, [recipe?.user_rating]);
 
@@ -298,13 +323,29 @@ export default function RecipeDetailScreen() {
       return;
     }
     if (isRating) return;
+    const prevRating = userRatingRef.current;
     setIsRating(true);
     setUserRating(star);
+    userRatingRef.current = star;
     try {
-      await rateRecipe(recipe.id, star);
-      await mutate();
-    } catch {
-      setUserRating(0);
+      const result = await rateRecipe(recipe.id, star);
+      // Update local recipe state with returned rating values (no full refetch needed)
+      await mutate(
+        (current) =>
+          current
+            ? { ...current, rating: result.rating, rating_count: result.rating_count, user_rating: star }
+            : current,
+        { revalidate: false },
+      );
+    } catch (err) {
+      setUserRating(prevRating);
+      userRatingRef.current = prevRating;
+      Alert.alert(
+        'Puan Verilemedi',
+        err instanceof Error
+          ? err.message
+          : 'Puan verilirken bir hata oluştu. Lütfen tekrar deneyin.',
+      );
     } finally {
       setIsRating(false);
     }
@@ -1043,48 +1084,10 @@ export default function RecipeDetailScreen() {
             </View>
           ) : null}
 
-          {/* ── Add to Meal Plan → tariften.com banner ── */}
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => Linking.openURL('https://www.tariften.com')}
-            style={{ marginBottom: 16 }}
-          >
-            <View
-              style={{
-                backgroundColor: '#FF8A65',
-                borderRadius: 20,
-                padding: 20,
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <View
-                style={{
-                  position: 'absolute',
-                  width: 160,
-                  height: 160,
-                  borderRadius: 80,
-                  backgroundColor: '#E64A19',
-                  top: -50,
-                  right: -30,
-                  opacity: 0.35,
-                }}
-              />
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
-                <Text style={{ fontSize: 11, fontWeight: '800', color: '#FF8A65' }}>✨ YENİ</Text>
-              </View>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
-                Bizimkiler Ne Yiyecek?
-              </Text>
-              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 18, marginBottom: 16 }}>
-                Haftalık yemek planınızı kolayca oluşturun. Tariften.com'da binlerce tarif, alışveriş listesi ve haftalık plan sizi bekliyor!
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF8A65' }}>tariften.com'a git</Text>
-                <Ionicons name="arrow-forward" size={15} color="#FF8A65" />
-              </View>
-            </View>
-          </TouchableOpacity>
+          {/* ── "Bizimkiler Ne Yiyecek?" banner — shown only when API config is available ── */}
+          {showCrossSellBanner ? (
+            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={CROSS_SELL_BANNER_STYLE} />
+          ) : null}
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>

@@ -197,16 +197,22 @@ export interface Tag {
 
 // ─── Blog Types ────────────────────────────────────────────────────────────────
 
+export type SponsorImage = string | { id?: number | null; url?: string | null } | null;
+
 export interface SponsorData {
   is_sponsored: boolean;
   sponsor_name?: string;
   sponsor_url?: string;
-  sponsor_logo?: string;
-  sponsor_light_logo?: string;
+  /** WordPress ACF/meta image — can be either a string URL or an { id, url } object */
+  sponsor_logo?: SponsorImage;
+  sponsor_light_logo?: SponsorImage;
+  sponsor_tagline?: string;
   discount_text?: string;
+  has_discount?: boolean;
   direct_redirect?: boolean;
   gam_click_url?: string;
   gam_impression_url?: string;
+  sponsor_cta?: { text?: string; url?: string };
 }
 
 export interface BlogPost {

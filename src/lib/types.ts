@@ -67,6 +67,7 @@ export interface Recipe {
   view_count?: number;
   rating?: number;
   rating_count?: number;
+  user_rating?: number;
   tags?: Tag[];
   created_at?: string;
   updated_at?: string;
@@ -74,6 +75,7 @@ export interface Recipe {
 
 export interface Ingredient {
   id?: number;
+  slug?: string;
   name: string;
   amount?: string;
   unit?: string;
@@ -81,6 +83,21 @@ export interface Ingredient {
   is_optional?: boolean;
   alternatives?: string[];
   allergen_warning?: string;
+}
+
+export interface IngredientDetail {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string;
+  image?: string;
+  category?: string;
+  nutrition?: NutritionInfo;
+  allergens?: string[];
+  age_suitability?: string;
+  min_age_months?: number;
+  alternatives?: string[];
+  recipes?: { id: number; slug: string; title: string; featured_image?: string }[];
 }
 
 export interface Instruction {
@@ -112,6 +129,9 @@ export interface Author {
   name: string;
   avatar_url?: string;
   bio?: string;
+  slug?: string;
+  title?: string;
+  is_expert?: boolean;
 }
 
 // ─── Taxonomy Types ────────────────────────────────────────────────────────────

@@ -153,7 +153,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="document-text-outline" size={18} color="#6B7280" />
+              <Ionicons name="help-circle-outline" size={18} color="#6B7280" />
             </TouchableOpacity>
           ) : null}
           {hasAlternatives ? (
@@ -227,7 +227,7 @@ export default function RecipeDetailScreen() {
   const { isFavorite, toggle } = useFavorites();
   const { isAuthenticated } = useAuth();
   const [portionMultiplier, setPortionMultiplier] = useState(1);
-  const [userRating, setUserRating] = useState(0);
+  const [userRating, setUserRating] = useState<number>(0);
   const [isRating, setIsRating] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -258,6 +258,13 @@ export default function RecipeDetailScreen() {
 
   const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
+
+  // Initialize user rating from server when recipe loads
+  React.useEffect(() => {
+    if (recipe?.user_rating) {
+      setUserRating(recipe.user_rating);
+    }
+  }, [recipe?.user_rating]);
 
   const favorite = recipe ? isFavorite(recipe.id) : false;
 
@@ -528,7 +535,7 @@ export default function RecipeDetailScreen() {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => {
-                    if (recipe.author?.id) router.push(`/(tabs)/recipes?author=${recipe.author.id}` as never);
+                    if (recipe.author?.id) router.push(`/authors/${recipe.author.id}` as never);
                   }}
                 >
                   <Text style={{ fontSize: 12, color: COLORS.primary, marginTop: 2 }}>
@@ -973,9 +980,32 @@ export default function RecipeDetailScreen() {
                   Alerjen Uyarısı
                 </Text>
               </View>
-              <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 20 }}>
-                {recipe.allergens.join(', ')}
+              <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 20, marginBottom: 10 }}>
+                Bu tarif aşağıdaki alerjenleri içermektedir:
               </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+                {recipe.allergens.map((allergen, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      backgroundColor: '#FDE68A',
+                      borderRadius: 999,
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: '#92400E', fontWeight: '700' }}>{allergen}</Text>
+                  </View>
+                ))}
+              </View>
+              <View style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 10, padding: 12 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#92400E', marginBottom: 6 }}>
+                  3 gün kuralı nedir?
+                </Text>
+                <Text style={{ fontSize: 12, color: '#92400E', lineHeight: 19 }}>
+                  Bebeğinize yeni bir besin tanıtırken, her yeni besini 3 gün arayla verin. Bu süre boyunca alerji belirtilerini (kızarıklık, kaşıntı, sindirim sorunları) gözlemleyin. Herhangi bir belirtide doktorunuza başvurun.
+                </Text>
+              </View>
             </Card>
           ) : null}
 
@@ -1013,16 +1043,48 @@ export default function RecipeDetailScreen() {
             </View>
           ) : null}
 
-          {/* ── Add to Meal Plan ── */}
-          <Button
-            variant="outline"
-            style={{ marginBottom: 24 }}
-            onPress={() => {
-              // TODO: Open meal plan picker modal
-            }}
+          {/* ── Add to Meal Plan → tariften.com banner ── */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => Linking.openURL('https://www.tariften.com')}
+            style={{ marginBottom: 16 }}
           >
-            Haftalık Plana Ekle
-          </Button>
+            <View
+              style={{
+                backgroundColor: '#FF8A65',
+                borderRadius: 20,
+                padding: 20,
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <View
+                style={{
+                  position: 'absolute',
+                  width: 160,
+                  height: 160,
+                  borderRadius: 80,
+                  backgroundColor: '#E64A19',
+                  top: -50,
+                  right: -30,
+                  opacity: 0.35,
+                }}
+              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#FF8A65' }}>✨ YENİ</Text>
+              </View>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
+                Bizimkiler Ne Yiyecek?
+              </Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 18, marginBottom: 16 }}>
+                Haftalık yemek planınızı kolayca oluşturun. Tariften.com'da binlerce tarif, alışveriş listesi ve haftalık plan sizi bekliyor!
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF8A65' }}>tariften.com'a git</Text>
+                <Ionicons name="arrow-forward" size={15} color="#FF8A65" />
+              </View>
+            </View>
+          </TouchableOpacity>
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>
@@ -1167,92 +1229,53 @@ export default function RecipeDetailScreen() {
             </View>
           </View>
 
-          {/* ── 2. "Bizimkiler Ne Yiyecek?" Banner ── */}
+          {/* ── 2. "Aklınıza Takılan mı Var?" Banner ── */}
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push('/(tabs)/meal-plan' as never)}
+            onPress={() => Linking.openURL('https://www.kidsgourmet.com/topluluk')}
             style={{ marginBottom: 16 }}
           >
             <View
               style={{
-                backgroundColor: '#7E57C2',
+                backgroundColor: '#fff',
                 borderRadius: 20,
                 padding: 20,
                 overflow: 'hidden',
-                position: 'relative',
+                borderWidth: 1,
+                borderColor: '#E5E7EB',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.06,
+                shadowRadius: 8,
+                elevation: 3,
               }}
             >
-              <View
-                style={{
-                  position: 'absolute',
-                  width: 140,
-                  height: 140,
-                  borderRadius: 70,
-                  backgroundColor: '#5E35B1',
-                  top: -40,
-                  right: -20,
-                  opacity: 0.5,
-                }}
-              />
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
-                <Ionicons name="star" size={10} color="#7E57C2" />
-                <Text style={{ fontSize: 11, fontWeight: '800', color: '#7E57C2', marginLeft: 4 }}>HAFTALIK PLAN</Text>
-              </View>
-              <Ionicons name="calendar-outline" size={32} color="#fff" style={{ marginBottom: 8 }} />
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
-                Bizimkiler Ne Yiyecek?
-              </Text>
-              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)', lineHeight: 18, marginBottom: 14 }}>
-                Haftanın her günü için sağlıklı ve lezzetli tarifler planla.
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#7E57C2' }}>Planla</Text>
-                <Ionicons name="arrow-forward" size={15} color="#7E57C2" />
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          {/* ── 3. "Aklınıza Takılan mı Var?" Banner ── */}
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => router.push('/(tabs)/profile' as never)}
-            style={{ marginBottom: 16 }}
-          >
-            <View
-              style={{
-                backgroundColor: '#2E7D32',
-                borderRadius: 20,
-                padding: 20,
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <View
-                style={{
-                  position: 'absolute',
-                  width: 140,
-                  height: 140,
-                  borderRadius: 70,
-                  backgroundColor: '#1B5E20',
-                  top: -40,
-                  right: -20,
-                  opacity: 0.5,
-                }}
-              />
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.9)', alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 12 }}>
-                <Ionicons name="star" size={10} color="#2E7D32" />
-                <Text style={{ fontSize: 11, fontWeight: '800', color: '#2E7D32', marginLeft: 4 }}>UZMAN DANIŞMA</Text>
-              </View>
-              <Ionicons name="chatbubble-ellipses-outline" size={32} color="#fff" style={{ marginBottom: 8 }} />
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 6 }}>
-                Aklınıza Takılan mı Var?
-              </Text>
-              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.88)', lineHeight: 18, marginBottom: 14 }}>
-                Uzmanlarımıza soru sorun, çocuğunuz için en doğru yanıtı alın.
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#2E7D32' }}>Soru Sor</Text>
-                <Ionicons name="arrow-forward" size={15} color="#2E7D32" />
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14 }}>
+                <View
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 16,
+                    backgroundColor: '#FFF3EE',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Ionicons name="chatbubble-ellipses-outline" size={26} color={COLORS.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark, marginBottom: 6 }}>
+                    Aklınıza Takılan mı Var?
+                  </Text>
+                  <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 20, marginBottom: 14 }}>
+                    Uzman diyetisyen ve çocuk beslenmesi uzmanlarına sorularınızı sorun.
+                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.primary, alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Soru Sor</Text>
+                    <Ionicons name="arrow-forward" size={15} color="#fff" />
+                  </View>
+                </View>
               </View>
             </View>
           </TouchableOpacity>
@@ -1264,29 +1287,44 @@ export default function RecipeDetailScreen() {
                 Tarifin Malzemeleri
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                {recipe.ingredients.map((ing, idx) => (
-                  <View
-                    key={ing.id ?? `chip-${idx}`}
-                    style={{
-                      backgroundColor: '#F3F4F6',
-                      borderRadius: 999,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                    }}
-                  >
-                    <Text style={{ fontSize: 12, color: COLORS.dark }}>
-                      {ing.amount ? `${ing.amount}${ing.unit ? ' ' + ing.unit : ''} ` : ''}{ing.name}
-                    </Text>
-                  </View>
-                ))}
+                {recipe.ingredients.map((ing, idx) => {
+                  const ingSlug = ing.slug
+                    ?? ing.name
+                      .toLowerCase()
+                      .replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ğ/g, 'g')
+                      .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                  return (
+                    <TouchableOpacity
+                      key={ing.id ?? `chip-${idx}`}
+                      activeOpacity={0.7}
+                      onPress={() => router.push(`/ingredients/${ingSlug}` as never)}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: '#F3F4F6',
+                          borderRadius: 999,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <Text style={{ fontSize: 12, color: COLORS.dark }}>{ing.name}</Text>
+                        <Ionicons name="chevron-forward" size={10} color="#9CA3AF" />
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </Card>
           ) : null}
 
           {/* ── 5. Alt Alta Benzer Tarifler ── */}
           {relatedRecipes && relatedRecipes.length > 0 ? (
-            <View style={{ marginBottom: 24 }}>
-              <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
+            <View style={{ marginBottom: 24, gap: 12 }}>
+              <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 4 }}>
                 Benzer Tarifler
               </Text>
               {relatedRecipes.map((item) => (

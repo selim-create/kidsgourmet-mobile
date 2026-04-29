@@ -75,6 +75,10 @@ export const API_ENDPOINTS = {
   INGREDIENT_BY_SLUG: (slug: string) => `/kg/v1/ingredients/${slug}`,
   INGREDIENT_SEARCH: '/kg/v1/ingredients/search',
 
+  // Authors
+  AUTHOR: (id: number) => `/wp/v2/users/${id}`,
+  AUTHOR_RECIPES: (authorId: number) => `/kg/v1/recipes?author=${authorId}`,
+
   // Comments
   COMMENTS: '/kg/v1/comments',
   RECIPE_COMMENTS: (recipeId: number) => `/kg/v1/recipes/${recipeId}/comments`,

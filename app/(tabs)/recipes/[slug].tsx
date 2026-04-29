@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
 import { getRecipeComments, addComment } from '../../../src/services/comment-service';
+import { tariftenService, type TariftenSuggestion } from '../../../src/services/tariften-service';
 import { RecipeTariftenBanner } from '../../../src/components/recipe/RecipeTariftenBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
@@ -355,6 +356,8 @@ export default function RecipeDetailScreen() {
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
   const [expandedIngredientId, setExpandedIngredientId] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [autoSuggestion, setAutoSuggestion] = useState<TariftenSuggestion | null>(null);
+  const [autoSuggestionUsedIngredient, setAutoSuggestionUsedIngredient] = useState<string>('');
   const insets = useSafeAreaInsets();
 
   // Pick 4 random tools once per render (stable across re-renders)
@@ -398,6 +401,37 @@ export default function RecipeDetailScreen() {
       userRatingRef.current = recipe.user_rating;
     }
   }, [recipe?.user_rating]);
+
+  // Auto-fetch tariften.com suggestion when manual cross_sell is absent
+  useEffect(() => {
+    if (!recipe) return;
+    if (recipe.cross_sell?.url) {
+      setAutoSuggestion(null);
+      setAutoSuggestionUsedIngredient('');
+      return;
+    }
+    const ingredients = recipe.ingredients ?? [];
+    if (ingredients.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      for (const ing of ingredients.slice(0, 3)) {
+        const name = (ing.name || '').trim();
+        if (!name) continue;
+        const results = await tariftenService.getByIngredient(name, 1);
+        if (cancelled) return;
+        if (results.length > 0) {
+          setAutoSuggestion(results[0]);
+          setAutoSuggestionUsedIngredient(name);
+          return;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [recipe?.id, recipe?.cross_sell?.url]);
 
   const favorite = recipe ? isFavorite(recipe.id) : false;
 
@@ -1307,6 +1341,18 @@ export default function RecipeDetailScreen() {
           {/* ── "Bizimkiler Ne Yiyecek?" banner — recipe-specific tariften.com suggestion ── */}
           {recipe.cross_sell?.url ? (
             <RecipeTariftenBanner crossSell={recipe.cross_sell} style={CROSS_SELL_BANNER_STYLE} />
+          ) : autoSuggestion ? (
+            <RecipeTariftenBanner
+              crossSell={{
+                url: `https://www.tariften.com/recipe/${autoSuggestion.slug}`,
+                title: autoSuggestion.title,
+                image: autoSuggestion.image,
+                prep_time: autoSuggestion.prep_time,
+                difficulty: autoSuggestion.difficulty,
+                ingredient: autoSuggestionUsedIngredient,
+              }}
+              style={CROSS_SELL_BANNER_STYLE}
+            />
           ) : null}
 
           {/* ── 1. Rastgele 4 Faydalı Araç ── */}

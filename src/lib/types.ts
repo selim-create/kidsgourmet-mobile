@@ -215,6 +215,62 @@ export interface SponsorData {
   sponsor_cta?: { text?: string; url?: string };
 }
 
+// ─── Embed Types ──────────────────────────────────────────────────────────────
+
+export interface BaseEmbedItem {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  image: string | null;
+  url: string;
+  embed_type: 'recipe' | 'ingredient' | 'tool' | 'post';
+}
+
+export interface RecipeEmbedItem extends BaseEmbedItem {
+  embed_type: 'recipe';
+  prep_time: string;
+  age_group: string | null;
+  age_group_color: string;
+  diet_types: string[];
+  allergens: string[];
+  is_featured: boolean;
+}
+
+export interface IngredientEmbedItem extends BaseEmbedItem {
+  embed_type: 'ingredient';
+  start_age: string;
+  benefits: string;
+  allergy_risk: string;
+  allergens: string[];
+  season: string;
+}
+
+export interface ToolEmbedItem extends BaseEmbedItem {
+  embed_type: 'tool';
+  tool_type: string;
+  tool_icon: string;
+  tool_types: string[];
+  is_active: boolean;
+}
+
+export interface PostEmbedItem extends BaseEmbedItem {
+  embed_type: 'post';
+  category: { name: string; slug: string } | null;
+  author: { name: string; avatar: string };
+  date: string;
+  read_time: string;
+}
+
+export type EmbedItem = RecipeEmbedItem | IngredientEmbedItem | ToolEmbedItem | PostEmbedItem;
+
+export interface EmbedData {
+  type: 'recipe' | 'ingredient' | 'tool' | 'post';
+  position: number;
+  placeholder_id: string;
+  items: EmbedItem[];
+}
+
 export interface BlogPost {
   id: number;
   slug: string;
@@ -231,6 +287,7 @@ export interface BlogPost {
   reading_time?: number;
   sponsor_data?: SponsorData;
   comment_count?: number;
+  embedded_content?: EmbedData[];
 }
 
 export interface BlogCategory {

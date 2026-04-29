@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { BlogPost, BlogCategory, PaginatedResponse, SponsorData } from '../lib/types';
+import type { BlogPost, BlogCategory, PaginatedResponse, SponsorData, EmbedData, Tag } from '../lib/types';
 
 // ─── WP REST API Response Types ────────────────────────────────────────────────
 
@@ -15,6 +15,7 @@ interface WPPost {
   sponsor_data?: SponsorData;
   acf?: { sponsor_data?: SponsorData };
   meta?: { sponsor_data?: SponsorData };
+  embedded_content?: EmbedData[];
   _embedded?: {
     author?: Array<{ id: number; name: string; avatar_urls?: Record<string, string>; description?: string }>;
     'wp:featuredmedia'?: Array<{ source_url: string; media_details?: { sizes?: { medium?: { source_url: string } } } }>;
@@ -39,6 +40,7 @@ function transformWPPost(post: WPPost): BlogPost {
   const authorRaw = post._embedded?.author?.[0];
   const mediaRaw = post._embedded?.['wp:featuredmedia']?.[0];
   const termsRaw = post._embedded?.['wp:term']?.[0];
+  const tagsRaw = post._embedded?.['wp:term']?.[1];
 
   const featuredImage =
     mediaRaw?.source_url ??
@@ -60,6 +62,12 @@ function transformWPPost(post: WPPost): BlogPost {
     description: term.description,
   }));
 
+  const tags: Tag[] | undefined = tagsRaw?.map((t) => ({
+    id: t.id,
+    name: t.name,
+    slug: t.slug,
+  }));
+
   const sponsor_data = post.sponsor_data ?? post.acf?.sponsor_data ?? post.meta?.sponsor_data;
 
   return {
@@ -72,10 +80,12 @@ function transformWPPost(post: WPPost): BlogPost {
     thumbnail: featuredImage,
     author,
     categories,
+    tags,
     created_at: post.date,
     updated_at: post.modified,
     sponsor_data,
     comment_count: post.comment_count ?? 0,
+    embedded_content: post.embedded_content,
   };
 }
 

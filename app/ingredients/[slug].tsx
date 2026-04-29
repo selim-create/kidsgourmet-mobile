@@ -9,11 +9,12 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { DetailHeader } from '../../src/components/ui/DetailHeader';
 import { COLORS } from '../../src/lib/constants';
+import type { IngredientDetail } from '../../src/lib/types';
 
 export default function IngredientBySlugScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
 
-  const { data: ingredient, isLoading, error } = useSWR(
+  const { data: ingredient, isLoading, error } = useSWR<IngredientDetail>(
     slug ? `ingredient-slug-${slug}` : null,
     () => getIngredientBySlug(slug!),
   );
@@ -36,32 +37,13 @@ export default function IngredientBySlugScreen() {
     );
   }
 
-  // Safely access ingredient fields (API may return extra fields)
-  const ing = ingredient as typeof ingredient & {
-    description?: string;
-    image?: string;
-    category?: string;
-    allergens?: string[];
-    age_suitability?: string;
-    min_age_months?: number;
-    alternatives?: string[];
-    nutrition?: {
-      calories?: number;
-      protein?: number;
-      carbs?: number;
-      fat?: number;
-      fiber?: number;
-    };
-    recipes?: { id: number; slug: string; title: string; featured_image?: string }[];
-  };
-
-  const nutritionRows = ing.nutrition
+  const nutritionRows = ingredient.nutrition
     ? [
-        { label: 'Kalori', value: ing.nutrition.calories, unit: 'kcal' },
-        { label: 'Protein', value: ing.nutrition.protein, unit: 'g' },
-        { label: 'Karbonhidrat', value: ing.nutrition.carbs, unit: 'g' },
-        { label: 'Yağ', value: ing.nutrition.fat, unit: 'g' },
-        { label: 'Lif', value: ing.nutrition.fiber, unit: 'g' },
+        { label: 'Kalori', value: ingredient.nutrition.calories, unit: 'kcal' },
+        { label: 'Protein', value: ingredient.nutrition.protein, unit: 'g' },
+        { label: 'Karbonhidrat', value: ingredient.nutrition.carbs, unit: 'g' },
+        { label: 'Yağ', value: ingredient.nutrition.fat, unit: 'g' },
+        { label: 'Lif', value: ingredient.nutrition.fiber, unit: 'g' },
       ].filter((n) => n.value !== undefined && n.value !== null && n.value !== 0)
     : [];
 
@@ -69,9 +51,9 @@ export default function IngredientBySlugScreen() {
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Hero image */}
-        {ing.image ? (
+        {ingredient.image ? (
           <Image
-            source={{ uri: ing.image }}
+            source={{ uri: ingredient.image }}
             style={{ width: '100%', height: 240 }}
             contentFit="cover"
             placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
@@ -84,46 +66,46 @@ export default function IngredientBySlugScreen() {
 
         <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
           {/* Category badge */}
-          {ing.category ? (
+          {ingredient.category ? (
             <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start', marginBottom: 10 }}>
-              <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>{ing.category}</Text>
+              <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>{ingredient.category}</Text>
             </View>
           ) : null}
 
           {/* Name */}
           <Text style={{ fontSize: 24, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
-            {ing.name}
+            {ingredient.name}
           </Text>
 
           {/* Description */}
-          {ing.description ? (
+          {ingredient.description ? (
             <Text style={{ fontSize: 14, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>
-              {ing.description}
+              {ingredient.description}
             </Text>
           ) : null}
 
           {/* Age suitability */}
-          {(ing.age_suitability ?? ing.min_age_months) ? (
+          {(ingredient.age_suitability ?? ingredient.min_age_months) ? (
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <Ionicons name="calendar-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark }}>Yaş Uygunluğu</Text>
               </View>
               <Text style={{ fontSize: 14, color: '#6B7280' }}>
-                {ing.age_suitability ?? `${ing.min_age_months}. aydan itibaren`}
+                {ingredient.age_suitability ?? `${ingredient.min_age_months}. aydan itibaren`}
               </Text>
             </Card>
           ) : null}
 
           {/* Allergens */}
-          {ing.allergens && ing.allergens.length > 0 ? (
+          {ingredient.allergens && ingredient.allergens.length > 0 ? (
             <Card style={{ marginBottom: 16, backgroundColor: '#FFFBE6', borderWidth: 1, borderColor: '#FDE68A' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <Ionicons name="warning-outline" size={18} color="#D97706" style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: '#D97706' }}>Alerjen Bilgisi</Text>
               </View>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                {ing.allergens.map((a, idx) => (
+                {ingredient.allergens.map((a, idx) => (
                   <View key={idx} style={{ backgroundColor: '#FDE68A', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
                     <Text style={{ fontSize: 12, color: '#92400E', fontWeight: '600' }}>{a}</Text>
                   </View>
@@ -133,14 +115,14 @@ export default function IngredientBySlugScreen() {
           ) : null}
 
           {/* Alternatives */}
-          {ing.alternatives && ing.alternatives.length > 0 ? (
+          {ingredient.alternatives && ingredient.alternatives.length > 0 ? (
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <Ionicons name="swap-horizontal-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark }}>Alternatifler</Text>
               </View>
               <Text style={{ fontSize: 14, color: '#6B7280', lineHeight: 22 }}>
-                {ing.alternatives.join(', ')}
+                {ingredient.alternatives.join(', ')}
               </Text>
             </Card>
           ) : null}
@@ -172,12 +154,12 @@ export default function IngredientBySlugScreen() {
           ) : null}
 
           {/* Recipes using this ingredient */}
-          {ing.recipes && ing.recipes.length > 0 ? (
+          {ingredient.recipes && ingredient.recipes.length > 0 ? (
             <View style={{ marginBottom: 16 }}>
               <Text style={{ fontSize: 17, fontWeight: '800', color: COLORS.dark, marginBottom: 12 }}>
                 Bu Malzemeyi İçeren Tarifler
               </Text>
-              {ing.recipes.map((r) => (
+              {ingredient.recipes.map((r) => (
                 <TouchableOpacity
                   key={r.id}
                   activeOpacity={0.8}

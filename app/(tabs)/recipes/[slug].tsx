@@ -31,7 +31,7 @@ import { NewsletterSection } from '../../../src/components/home/NewsletterSectio
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
-import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS } from '../../../src/utils/helpers';
+import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, slugify } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
 import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
 import type { SafetyCheck, Comment, Ingredient } from '../../../src/lib/types';
@@ -1288,12 +1288,7 @@ export default function RecipeDetailScreen() {
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {recipe.ingredients.map((ing, idx) => {
-                  const ingSlug = ing.slug
-                    ?? ing.name
-                      .toLowerCase()
-                      .replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ğ/g, 'g')
-                      .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
-                      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                  const ingSlug = ing.slug ?? slugify(ing.name);
                   return (
                     <TouchableOpacity
                       key={ing.id ?? `chip-${idx}`}

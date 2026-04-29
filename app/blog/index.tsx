@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  FlatList,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
@@ -12,30 +11,26 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useBlog } from '../../src/hooks/use-blog';
+import { useBlogCategories } from '../../src/hooks/use-blog-categories';
 import { BlogCard } from '../../src/components/blog/BlogCard';
+import { CategoryChips } from '../../src/components/blog/CategoryChips';
+import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { COLORS } from '../../src/lib/constants';
 import { useSWRConfig } from 'swr';
 
-const CATEGORIES = [
-  { key: undefined, label: 'Tümü' },
-  { key: 'beslenme', label: 'Beslenme' },
-  { key: 'gelisim', label: 'Gelişim' },
-  { key: 'saglik', label: 'Sağlık' },
-  { key: 'tarifler', label: 'Tarifler' },
-  { key: 'rehber', label: 'Rehber' },
-];
-
 export default function BlogListScreen() {
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
   const { mutate } = useSWRConfig();
 
-  const { posts, totalPages, isLoading } = useBlog(page, 10, selectedCategory);
+  const { categories } = useBlogCategories();
+  const categoryParam = activeCategory === 'all' ? undefined : String(activeCategory);
+  const { posts, totalPages, isLoading } = useBlog(page, 10, categoryParam);
 
-  const handleCategoryChange = (cat?: string) => {
-    setSelectedCategory(cat);
+  const handleCategoryChange = (id: number | 'all') => {
+    setActiveCategory(id);
     setPage(1);
   };
 
@@ -60,35 +55,15 @@ export default function BlogListScreen() {
             <Ionicons name="search-outline" size={22} color={COLORS.dark} />
           </TouchableOpacity>
         </View>
+      </View>
 
-        {/* Category Filter */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="mt-3"
-          contentContainerStyle={{ paddingRight: 8 }}
-        >
-          {CATEGORIES.map((cat) => (
-            <TouchableOpacity
-              key={cat.label}
-              onPress={() => handleCategoryChange(cat.key)}
-              activeOpacity={0.8}
-              className={`mr-2 px-4 py-1.5 rounded-full border ${
-                selectedCategory === cat.key
-                  ? 'bg-primary border-primary'
-                  : 'bg-white border-gray-200'
-              }`}
-            >
-              <Text
-                className={`text-sm font-medium ${
-                  selectedCategory === cat.key ? 'text-white' : 'text-gray-500'
-                }`}
-              >
-                {cat.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+      {/* Category chips */}
+      <View className="bg-white border-b border-gray-100">
+        <CategoryChips
+          categories={categories}
+          activeId={activeCategory}
+          onSelect={handleCategoryChange}
+        />
       </View>
 
       <ScrollView
@@ -113,7 +88,10 @@ export default function BlogListScreen() {
         ) : (
           <>
             {/* Hero card for first post */}
-            <BlogCard post={posts[0]} hero />
+            <BlogCard
+              post={posts[0]}
+              variant={posts[0].sponsor_data?.is_sponsored ? 'sponsored' : 'hero'}
+            />
 
             {/* Rest of posts */}
             {posts.slice(1).map((post) => (
@@ -158,6 +136,9 @@ export default function BlogListScreen() {
                 </TouchableOpacity>
               </View>
             )}
+
+            {/* Newsletter banner */}
+            <NewsletterBanner source="mobile_blog" />
           </>
         )}
       </ScrollView>

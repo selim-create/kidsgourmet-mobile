@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,43 +10,44 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../../src/components/ui/AppHeader';
 import { BlogCard } from '../../src/components/blog/BlogCard';
+import { CategoryChips } from '../../src/components/blog/CategoryChips';
+import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { useBlog } from '../../src/hooks/use-blog';
+import { useBlogCategories } from '../../src/hooks/use-blog-categories';
 import { COLORS } from '../../src/lib/constants';
 
-const CATEGORY_SHORTCUTS = [
-  { label: 'Beslenme', icon: 'nutrition-outline' as const, color: '#FF8A65' },
-  { label: 'Gelişim', icon: 'trending-up-outline' as const, color: '#AED581' },
-  { label: 'Sağlık', icon: 'medkit-outline' as const, color: '#81D4FA' },
-  { label: 'Tarifler', icon: 'restaurant-outline' as const, color: '#B39DDB' },
-];
-
 export default function DiscoverScreen() {
-  const { posts, isLoading } = useBlog(1, 5);
+  const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
+  const { categories } = useBlogCategories();
+
+  const categoryParam = activeCategory === 'all' ? undefined : String(activeCategory);
+  const { posts, isLoading } = useBlog(1, 10, categoryParam);
 
   return (
     <View style={styles.container}>
       <AppHeader />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        {/* Quick category shortcuts */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Kategoriler</Text>
-          <View style={styles.categoryRow}>
-            {CATEGORY_SHORTCUTS.map((cat) => (
-              <TouchableOpacity
-                key={cat.label}
-                style={[styles.categoryButton, { backgroundColor: cat.color + '22' }]}
-                activeOpacity={0.8}
-                onPress={() => router.push('/blog')}
-              >
-                <Ionicons name={cat.icon} size={22} color={cat.color} />
-                <Text style={[styles.categoryLabel, { color: cat.color }]}>{cat.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+        {/* Hero header */}
+        <View style={styles.heroHeader}>
+          <Text style={styles.heroSuperTitle}>Ebeveyn Kütüphanesi</Text>
+          <Text style={styles.heroTitle}>
+            {'Bilgili Ebeveynler\n'}
+            <Text style={styles.heroTitleOrange}>Mutlu Çocuklar</Text>
+          </Text>
+          <Text style={styles.heroDescription}>
+            Uzmanlardan bilgiler, güncel rehberler, beslenme ipuçları ve gelişim notları.
+          </Text>
         </View>
 
-        {/* Latest blog posts */}
+        {/* Category chips */}
+        <CategoryChips
+          categories={categories}
+          activeId={activeCategory}
+          onSelect={setActiveCategory}
+        />
+
+        {/* Blog posts */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Son Yazılar</Text>
@@ -92,6 +93,9 @@ export default function DiscoverScreen() {
           </View>
           <Ionicons name="chevron-forward" size={20} color={COLORS.gray[300]} />
         </TouchableOpacity>
+
+        {/* Newsletter banner */}
+        <NewsletterBanner source="mobile_discover" />
       </ScrollView>
     </View>
   );
@@ -103,11 +107,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFBE6',
   },
   content: {
-    padding: 16,
     paddingBottom: 100,
   },
+  heroHeader: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    alignItems: 'center',
+  },
+  heroSuperTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#16A34A',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  heroTitle: {
+    fontSize: 27,
+    fontWeight: '800',
+    color: '#1F2937',
+    textAlign: 'center',
+    lineHeight: 33,
+    marginBottom: 10,
+  },
+  heroTitleOrange: {
+    color: '#F97316',
+  },
+  heroDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
+    textAlign: 'center',
+  },
   section: {
-    marginBottom: 24,
+    marginTop: 16,
+    paddingHorizontal: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -119,27 +157,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 12,
   },
   seeAll: {
     fontSize: 13,
     color: COLORS.primary,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  categoryButton: {
-    flex: 1,
-    borderRadius: 14,
-    paddingVertical: 12,
-    alignItems: 'center',
-    gap: 6,
-  },
-  categoryLabel: {
-    fontSize: 11,
     fontWeight: '600',
   },
   bigCard: {
@@ -149,6 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
+    marginHorizontal: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
@@ -177,3 +199,4 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 });
+

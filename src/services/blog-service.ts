@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { BlogPost, BlogCategory, PaginatedResponse } from '../lib/types';
+import type { BlogPost, BlogCategory, PaginatedResponse, SponsorData } from '../lib/types';
 
 // ─── WP REST API Response Types ────────────────────────────────────────────────
 
@@ -11,6 +11,10 @@ interface WPPost {
   title: { rendered: string };
   excerpt: { rendered: string };
   content: { rendered: string };
+  comment_count?: number;
+  sponsor_data?: SponsorData;
+  acf?: { sponsor_data?: SponsorData };
+  meta?: { sponsor_data?: SponsorData };
   _embedded?: {
     author?: Array<{ id: number; name: string; avatar_urls?: Record<string, string>; description?: string }>;
     'wp:featuredmedia'?: Array<{ source_url: string; media_details?: { sizes?: { medium?: { source_url: string } } } }>;
@@ -56,6 +60,8 @@ function transformWPPost(post: WPPost): BlogPost {
     description: term.description,
   }));
 
+  const sponsor_data = post.sponsor_data ?? post.acf?.sponsor_data ?? post.meta?.sponsor_data;
+
   return {
     id: post.id,
     slug: post.slug,
@@ -68,6 +74,8 @@ function transformWPPost(post: WPPost): BlogPost {
     categories,
     created_at: post.date,
     updated_at: post.modified,
+    sponsor_data,
+    comment_count: post.comment_count ?? 0,
   };
 }
 

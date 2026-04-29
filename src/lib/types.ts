@@ -197,6 +197,18 @@ export interface Tag {
 
 // ─── Blog Types ────────────────────────────────────────────────────────────────
 
+export interface SponsorData {
+  is_sponsored: boolean;
+  sponsor_name?: string;
+  sponsor_url?: string;
+  sponsor_logo?: string;
+  sponsor_light_logo?: string;
+  discount_text?: string;
+  direct_redirect?: boolean;
+  gam_click_url?: string;
+  gam_impression_url?: string;
+}
+
 export interface BlogPost {
   id: number;
   slug: string;
@@ -211,6 +223,8 @@ export interface BlogPost {
   created_at?: string;
   updated_at?: string;
   reading_time?: number;
+  sponsor_data?: SponsorData;
+  comment_count?: number;
 }
 
 export interface BlogCategory {

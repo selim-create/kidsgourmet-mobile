@@ -392,11 +392,24 @@ export interface BatchSafetyResult {
 
 // ─── Comment Types ────────────────────────────────────────────────────────────
 
+export interface CommentAuthor {
+  id: number;
+  name: string;
+  /** Backend `format_comment` field (primary) */
+  avatar?: string | null;
+  /** Legacy field — kept for backward compatibility */
+  avatar_url?: string | null;
+}
+
 export interface Comment {
   id: number;
   content: string;
-  author: Author;
-  created_at: string;
+  author: CommentAuthor;
+  /** Backend `format_comment` field (WP `comment_date`, ISO-like) */
+  date?: string;
+  /** Legacy field — kept for backward compatibility */
+  created_at?: string;
+  parent_id?: number;
   likes?: number;
   is_liked?: boolean;
   replies?: Comment[];

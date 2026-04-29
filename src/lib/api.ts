@@ -1,6 +1,18 @@
 import * as SecureStore from 'expo-secure-store';
 import { API_URL } from './constants';
 
+// ─── Custom API Error ──────────────────────────────────────────────────────────
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 const TOKEN_KEY = 'kg_auth_token';
 
 // ─── Token Management ──────────────────────────────────────────────────────────
@@ -68,7 +80,7 @@ export async function apiRequest<T>(
     } catch {
       // ignore parse errors
     }
-    throw new Error(errorMessage);
+    throw new ApiError(errorMessage, response.status);
   }
 
   const contentType = response.headers.get('content-type');
@@ -76,7 +88,7 @@ export async function apiRequest<T>(
     return response.json() as Promise<T>;
   }
 
-  throw new Error('Unexpected non-JSON response from server');
+  throw new ApiError('Unexpected non-JSON response from server', 0);
 }
 
 export async function apiRequestWithHeaders<T>(
@@ -104,7 +116,7 @@ export async function apiRequestWithHeaders<T>(
     } catch {
       // ignore parse errors
     }
-    throw new Error(errorMessage);
+    throw new ApiError(errorMessage, response.status);
   }
 
   const contentType = response.headers.get('content-type');
@@ -117,7 +129,7 @@ export async function apiRequestWithHeaders<T>(
     return { data, headers };
   }
 
-  throw new Error('Unexpected non-JSON response from server');
+  throw new ApiError('Unexpected non-JSON response from server', 0);
 }
 
 export const api = {

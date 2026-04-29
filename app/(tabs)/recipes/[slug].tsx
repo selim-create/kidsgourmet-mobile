@@ -10,12 +10,14 @@ import {
   Platform,
   Linking,
   Alert,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import useSWR from 'swr';
+import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipe, getRelatedRecipes, rateRecipe } from '../../../src/services/recipe-service';
 import { getRecipeComments, addComment } from '../../../src/services/comment-service';
@@ -35,6 +37,7 @@ import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
 import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, slugify } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
+import { ApiError } from '../../../src/lib/api';
 import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
 import type { SafetyCheck, Comment, Ingredient } from '../../../src/lib/types';
 
@@ -105,10 +108,11 @@ interface IngredientRowProps {
 }
 
 function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded, onToggleExpand }: IngredientRowProps) {
+  const [substitutesModalVisible, setSubstitutesModalVisible] = useState(false);
   const hasNotes = !!ing.notes;
   const hasAlternatives = !!(ing.alternatives && ing.alternatives.length > 0);
   const hasAllergen = !!ing.allergen_warning;
-  const hasExtra = hasNotes || hasAlternatives || hasAllergen;
+  const hasExtra = hasNotes || hasAllergen;
 
   return (
     <View>
@@ -172,7 +176,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
           ) : null}
           {hasAlternatives ? (
             <TouchableOpacity
-              onPress={onToggleExpand}
+              onPress={() => setSubstitutesModalVisible(true)}
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
@@ -191,7 +195,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
         </View>
       </TouchableOpacity>
 
-      {/* Inline expand panel */}
+      {/* Inline expand panel (notes + allergen) */}
       {isExpanded && hasExtra ? (
         <View
           style={{
@@ -203,16 +207,6 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
             borderColor: '#FDE68A',
           }}
         >
-          {hasAlternatives ? (
-            <View style={{ marginBottom: hasNotes || hasAllergen ? 8 : 0 }}>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
-                🔄 Alternatifler:
-              </Text>
-              <Text style={{ fontSize: 13, color: '#374151' }}>
-                {ing.alternatives!.join(', ')}
-              </Text>
-            </View>
-          ) : null}
           {hasNotes ? (
             <View style={{ marginBottom: hasAllergen ? 8 : 0 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }}>
@@ -231,9 +225,116 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
           ) : null}
         </View>
       ) : null}
+
+      {/* Substitutes modal */}
+      {hasAlternatives ? (
+        <Modal
+          visible={substitutesModalVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setSubstitutesModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' }}
+            activeOpacity={1}
+            onPress={() => setSubstitutesModalVisible(false)}
+          >
+            <View
+              style={{
+                backgroundColor: '#fff',
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                paddingHorizontal: 24,
+                paddingTop: 20,
+                paddingBottom: 36,
+              }}
+              onStartShouldSetResponder={() => true}
+            >
+              {/* Handle bar */}
+              <View
+                style={{
+                  width: 40,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: '#D1D5DB',
+                  alignSelf: 'center',
+                  marginBottom: 20,
+                }}
+              />
+              {/* Header */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 10 }}>
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: '#FFF3EE',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons name="swap-horizontal-outline" size={20} color={COLORS.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark }}>
+                    İkame Malzemeler
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                    {ing.name} için kullanabilirsiniz
+                  </Text>
+                </View>
+              </View>
+              {/* Substitutes list */}
+              {ing.alternatives!.map((alt, idx) => (
+                <View
+                  key={idx}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 12,
+                    borderBottomWidth: idx < ing.alternatives!.length - 1 ? 1 : 0,
+                    borderBottomColor: '#F3F4F6',
+                    gap: 12,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      backgroundColor: '#F3F4F6',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Text style={{ fontSize: 15 }}>🔄</Text>
+                  </View>
+                  <Text style={{ fontSize: 14, color: COLORS.dark, flex: 1 }}>{alt}</Text>
+                </View>
+              ))}
+              {/* Close button */}
+              <TouchableOpacity
+                onPress={() => setSubstitutesModalVisible(false)}
+                activeOpacity={0.8}
+                style={{
+                  marginTop: 20,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 14,
+                  paddingVertical: 14,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>Kapat</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      ) : null}
     </View>
   );
 }
+
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RecipeDetailScreen() {
@@ -278,7 +379,7 @@ export default function RecipeDetailScreen() {
     getCrossSellBannerConfig,
     CROSS_SELL_BANNER_SWR_OPTIONS,
   );
-  const showCrossSellBanner = !!(crossSellConfig && crossSellConfig.enabled !== false);
+  const showCrossSellBanner = crossSellConfig?.enabled !== false;
 
   const { safetyChecks, ageGroupSafe, isLoading: safetyLoading, hasActiveChild, ageMonths: childAgeMonths } =
     useRecipeSafetyCheck(recipe);
@@ -337,15 +438,32 @@ export default function RecipeDetailScreen() {
             : current,
         { revalidate: false },
       );
+      Toast.show({
+        type: 'success',
+        text1: 'Puan verildi!',
+        text2: `${star} yıldız verdiniz. Teşekkürler!`,
+        visibilityTime: 2500,
+      });
     } catch (err) {
       setUserRating(prevRating);
       userRatingRef.current = prevRating;
-      Alert.alert(
-        'Puan Verilemedi',
-        err instanceof Error
-          ? err.message
-          : 'Puan verilirken bir hata oluştu. Lütfen tekrar deneyin.',
-      );
+      const isAuthError = err instanceof ApiError && (err.status === 401 || err.status === 403);
+      if (isAuthError) {
+        Toast.show({
+          type: 'error',
+          text1: 'Giriş gerekli',
+          text2: 'Puan verebilmek için lütfen giriş yapın.',
+          visibilityTime: 3000,
+        });
+        router.push('/(auth)/login');
+      } else {
+        Alert.alert(
+          'Puan Verilemedi',
+          err instanceof Error
+            ? err.message
+            : 'Puan verilirken bir hata oluştu. Lütfen tekrar deneyin.',
+        );
+      }
     } finally {
       setIsRating(false);
     }
@@ -1084,10 +1202,7 @@ export default function RecipeDetailScreen() {
             </View>
           ) : null}
 
-          {/* ── "Bizimkiler Ne Yiyecek?" banner — shown only when API config is available ── */}
-          {showCrossSellBanner ? (
-            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={CROSS_SELL_BANNER_STYLE} />
-          ) : null}
+          {/* ── "Bizimkiler Ne Yiyecek?" banner — shown above Faydalı Araçlar unless API explicitly disables it ── */}
 
           {/* ── Comments ── */}
           <View style={{ marginBottom: 24 }}>
@@ -1181,6 +1296,11 @@ export default function RecipeDetailScreen() {
           {/* ══════════════════════════════════════════════════════
               SIDEBAR BLOCKS — displayed vertically at the bottom
           ══════════════════════════════════════════════════════ */}
+
+          {/* ── "Bizimkiler Ne Yiyecek?" banner — right above Faydalı Araçlar, shown unless explicitly disabled ── */}
+          {showCrossSellBanner ? (
+            <CrossSellBanner variant={crossSellConfig?.variant ?? 'tariften'} style={CROSS_SELL_BANNER_STYLE} />
+          ) : null}
 
           {/* ── 1. Rastgele 4 Faydalı Araç ── */}
           <View style={{ marginBottom: 16 }}>

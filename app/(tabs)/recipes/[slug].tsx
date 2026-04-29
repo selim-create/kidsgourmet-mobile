@@ -35,7 +35,7 @@ import { NewsletterSection } from '../../../src/components/home/NewsletterSectio
 import { useFavorites } from '../../../src/contexts/FavoritesContext';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { useRecipeSafetyCheck } from '../../../src/hooks/useSafetyCheck';
-import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, slugify } from '../../../src/utils/helpers';
+import { formatDuration, stripHtml, getInstructionContent, DIFFICULTY_LABELS, slugify, formatCommentDate } from '../../../src/utils/helpers';
 import { COLORS } from '../../../src/lib/constants';
 import { ApiError } from '../../../src/lib/api';
 import { ALL_TOOLS, pickRandom } from '../../../src/lib/tools';
@@ -1252,47 +1252,81 @@ export default function RecipeDetailScreen() {
             </Text>
 
             {/* Comment form */}
-            <View
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: 16,
-                padding: 12,
-                marginBottom: 16,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.05,
-                shadowRadius: 4,
-                elevation: 1,
-              }}
-            >
-              <TextInput
-                multiline
-                numberOfLines={3}
+            {isAuthenticated ? (
+              <View
                 style={{
-                  fontSize: 14,
-                  color: COLORS.dark,
-                  minHeight: 72,
-                  textAlignVertical: 'top',
+                  backgroundColor: '#fff',
+                  borderRadius: 16,
+                  padding: 12,
+                  marginBottom: 16,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 4,
+                  elevation: 1,
                 }}
-                placeholder={isAuthenticated ? 'Yorum yazın...' : 'Yorum yazmak için giriş yapın'}
-                placeholderTextColor="#9CA3AF"
-                value={commentText}
-                onChangeText={setCommentText}
-                editable={isAuthenticated}
-                onFocus={() => {
-                  if (!isAuthenticated) router.push('/(auth)/login');
-                }}
-              />
-              <View style={{ alignItems: 'flex-end', marginTop: 8 }}>
-                <Button
-                  variant="primary"
-                  onPress={handleAddComment}
-                  style={{ paddingHorizontal: 20 }}
-                >
-                  {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}
-                </Button>
+              >
+                <TextInput
+                  multiline
+                  numberOfLines={3}
+                  style={{
+                    fontSize: 14,
+                    color: COLORS.dark,
+                    minHeight: 72,
+                    textAlignVertical: 'top',
+                  }}
+                  placeholder="Yorum yazın..."
+                  placeholderTextColor="#9CA3AF"
+                  value={commentText}
+                  onChangeText={setCommentText}
+                />
+                <View style={{ alignItems: 'flex-end', marginTop: 8 }}>
+                  <Button
+                    variant="primary"
+                    onPress={handleAddComment}
+                    style={{ paddingHorizontal: 20 }}
+                  >
+                    {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}
+                  </Button>
+                </View>
               </View>
-            </View>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: '#FFF7F0',
+                  borderRadius: 16,
+                  padding: 20,
+                  alignItems: 'center',
+                  marginBottom: 16,
+                  borderWidth: 1,
+                  borderColor: '#FFE4D2',
+                }}
+              >
+                <Ionicons name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#0F172A', marginTop: 12, textAlign: 'center' }}>
+                  Yorum yapmak için giriş yapın
+                </Text>
+                <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 6, lineHeight: 19, marginBottom: 16 }}>
+                  Yorumunu paylaşmak ve başka anne-babalarla sohbet etmek için hesabına giriş yap veya yeni bir hesap oluştur.
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FF8A65' }}
+                    onPress={() => router.push('/(auth)/login')}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Giriş Yap</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#FF8A65' }}
+                    onPress={() => router.push('/(auth)/register')}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={{ color: '#FF8A65', fontWeight: '700', fontSize: 14 }}>Kayıt Ol</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
 
             {/* Comment list */}
             {comments && comments.length > 0 ? (
@@ -1312,13 +1346,13 @@ export default function RecipeDetailScreen() {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Avatar uri={comment.author.avatar_url} name={comment.author.name} size={32} />
+                    <Avatar uri={comment.author.avatar ?? comment.author.avatar_url} name={comment.author.name} size={32} />
                     <View style={{ marginLeft: 8, flex: 1 }}>
                       <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
                         {comment.author.name}
                       </Text>
                       <Text style={{ fontSize: 11, color: '#9CA3AF' }}>
-                        {new Date(comment.created_at).toLocaleDateString('tr-TR')}
+                        {formatCommentDate(comment.date ?? comment.created_at)}
                       </Text>
                     </View>
                   </View>

@@ -113,6 +113,26 @@ export const DIFFICULTY_LABELS: Record<string, string> = {
 };
 
 
+/**
+ * Formats a comment date into a Turkish-readable string.
+ * Returns empty string if invalid/missing.
+ * Accepts both ISO strings and WP "YYYY-MM-DD HH:MM:SS" format.
+ */
+export function formatCommentDate(input?: string | null): string {
+  if (!input) return '';
+  // WP returns "2026-04-29 10:15:00" — convert space to 'T' and append 'Z' if needed
+  const normalized = /^\d{4}-\d{2}-\d{2} /.test(input)
+    ? input.replace(' ', 'T') + 'Z'
+    : input;
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('tr-TR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 export function isNonEmpty(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }

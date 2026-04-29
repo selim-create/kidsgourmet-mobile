@@ -26,6 +26,7 @@ import { AuthorBox } from '../../src/components/blog/AuthorBox';
 import { BlogCard } from '../../src/components/blog/BlogCard';
 import { NewsletterBanner } from '../../src/components/blog/NewsletterBanner';
 import { extractImageUrl } from '../../src/utils/url';
+import { formatCommentDate } from '../../src/utils/helpers';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { router } from 'expo-router';
@@ -305,42 +306,64 @@ export default function BlogDetailScreen() {
           </Text>
 
           {/* Comment form */}
-          <View style={styles.commentForm}>
-            <TextInput
-              multiline
-              numberOfLines={3}
-              style={styles.commentInput}
-              placeholder={isAuthenticated ? 'Yorum yazın...' : 'Yorum yazmak için giriş yapın'}
-              placeholderTextColor="#9CA3AF"
-              value={commentText}
-              onChangeText={setCommentText}
-              editable={isAuthenticated}
-              onFocus={() => {
-                if (!isAuthenticated) router.push('/(auth)/login');
-              }}
-            />
-            <TouchableOpacity
-              style={[styles.commentSubmitBtn, isCommentSubmitDisabled && styles.commentSubmitBtnDisabled]}
-              onPress={handleAddComment}
-              activeOpacity={0.8}
-              disabled={isCommentSubmitDisabled}
-            >
-              <Text style={styles.commentSubmitText}>
-                {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}
+          {isAuthenticated ? (
+            <View style={styles.commentForm}>
+              <TextInput
+                multiline
+                numberOfLines={3}
+                style={styles.commentInput}
+                placeholder="Yorum yazın..."
+                placeholderTextColor="#9CA3AF"
+                value={commentText}
+                onChangeText={setCommentText}
+              />
+              <TouchableOpacity
+                style={[styles.commentSubmitBtn, isCommentSubmitDisabled && styles.commentSubmitBtnDisabled]}
+                onPress={handleAddComment}
+                activeOpacity={0.8}
+                disabled={isCommentSubmitDisabled}
+              >
+                <Text style={styles.commentSubmitText}>
+                  {isSubmittingComment ? 'Gönderiliyor...' : 'Gönder'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.authPromptCard}>
+              <Ionicons name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
+              <Text style={styles.authPromptTitle}>Yorum yapmak için giriş yapın</Text>
+              <Text style={styles.authPromptDesc}>
+                Yorumunu paylaşmak ve başka anne-babalarla sohbet etmek için hesabına giriş yap veya yeni bir hesap oluştur.
               </Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.authPromptActions}>
+                <TouchableOpacity
+                  style={[styles.authPromptBtn, styles.authPromptBtnPrimary]}
+                  onPress={() => router.push('/(auth)/login')}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.authPromptBtnPrimaryText}>Giriş Yap</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.authPromptBtn, styles.authPromptBtnSecondary]}
+                  onPress={() => router.push('/(auth)/register')}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.authPromptBtnSecondaryText}>Kayıt Ol</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* Comment list */}
           {comments && comments.length > 0 ? (
             comments.map((comment) => (
               <View key={comment.id} style={styles.commentCard}>
                 <View style={styles.commentHeader}>
-                  <Avatar uri={comment.author.avatar_url} name={comment.author.name} size={32} />
+                  <Avatar uri={comment.author.avatar ?? comment.author.avatar_url} name={comment.author.name} size={32} />
                   <View style={styles.commentMeta}>
                     <Text style={styles.commentAuthor}>{comment.author.name}</Text>
                     <Text style={styles.commentDate}>
-                      {new Date(comment.created_at).toLocaleDateString('tr-TR')}
+                      {formatCommentDate(comment.date ?? comment.created_at)}
                     </Text>
                   </View>
                 </View>
@@ -648,6 +671,60 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
     paddingVertical: 12,
+  },
+  authPromptCard: {
+    backgroundColor: '#FFF7F0',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FFE4D2',
+  },
+  authPromptTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  authPromptDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 19,
+    marginBottom: 16,
+  },
+  authPromptActions: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+  },
+  authPromptBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  authPromptBtnPrimary: {
+    backgroundColor: '#FF8A65',
+  },
+  authPromptBtnPrimaryText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  authPromptBtnSecondary: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#FF8A65',
+  },
+  authPromptBtnSecondaryText: {
+    color: '#FF8A65',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });
 

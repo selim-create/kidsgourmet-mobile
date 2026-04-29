@@ -2,17 +2,17 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking, ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import type { TariftenRecipe } from '../../lib/types';
+import type { RecipeCrossSell } from '../../lib/types';
 
 interface RecipeTariftenBannerProps {
-  tariftenRecipe: TariftenRecipe;
+  crossSell: RecipeCrossSell;
   /** Optional style override for the card container (e.g. margins). */
   style?: ViewStyle;
 }
 
-export function RecipeTariftenBanner({ tariftenRecipe, style }: RecipeTariftenBannerProps) {
+export function RecipeTariftenBanner({ crossSell, style }: RecipeTariftenBannerProps) {
   const handlePress = () => {
-    Linking.openURL(tariftenRecipe.url).catch((err) => {
+    Linking.openURL(crossSell.url).catch((err) => {
       console.warn('[RecipeTariftenBanner] Could not open URL:', err);
     });
   };
@@ -34,9 +34,9 @@ export function RecipeTariftenBanner({ tariftenRecipe, style }: RecipeTariftenBa
 
         {/* Recipe image + description row */}
         <View style={styles.row}>
-          {tariftenRecipe.image ? (
+          {crossSell.image ? (
             <Image
-              source={{ uri: tariftenRecipe.image }}
+              source={{ uri: crossSell.image }}
               style={styles.recipeImage}
               contentFit="cover"
             />
@@ -45,36 +45,38 @@ export function RecipeTariftenBanner({ tariftenRecipe, style }: RecipeTariftenBa
           <View style={styles.textBlock}>
             {/* Description */}
             <Text style={styles.description}>
-              {tariftenRecipe.trigger_ingredient ? (
+              {crossSell.ingredient && crossSell.title ? (
                 <>
                   {'Artan '}
-                  <Text style={styles.bold}>{tariftenRecipe.trigger_ingredient}</Text>
+                  <Text style={styles.bold}>{crossSell.ingredient}</Text>
                   {' ile kendinize harika bir '}
-                  <Text style={styles.bold}>{tariftenRecipe.title} Tarifi</Text>
+                  <Text style={styles.bold}>{crossSell.title} Tarifi</Text>
+                  {' yapabilirsiniz.'}
+                </>
+              ) : crossSell.title ? (
+                <>
+                  {'Kendinize harika bir '}
+                  <Text style={styles.bold}>{crossSell.title} Tarifi</Text>
                   {' yapabilirsiniz.'}
                 </>
               ) : (
-                <>
-                  {'Kendinize harika bir '}
-                  <Text style={styles.bold}>{tariftenRecipe.title} Tarifi</Text>
-                  {' yapabilirsiniz.'}
-                </>
+                "Tariften.com'da daha fazla tarif keşfedin"
               )}
             </Text>
 
             {/* Meta row */}
-            {(tariftenRecipe.prep_time || tariftenRecipe.difficulty) ? (
+            {(crossSell.prep_time || crossSell.difficulty) ? (
               <View style={styles.meta}>
-                {tariftenRecipe.prep_time ? (
+                {crossSell.prep_time ? (
                   <View style={styles.metaItem}>
                     <Ionicons name="time-outline" size={13} color="rgba(255,255,255,0.75)" />
-                    <Text style={styles.metaText}>{tariftenRecipe.prep_time}</Text>
+                    <Text style={styles.metaText}>{crossSell.prep_time}</Text>
                   </View>
                 ) : null}
-                {tariftenRecipe.difficulty ? (
+                {crossSell.difficulty ? (
                   <View style={styles.metaItem}>
                     <Ionicons name="bar-chart-outline" size={13} color="rgba(255,255,255,0.75)" />
-                    <Text style={styles.metaText}>{tariftenRecipe.difficulty}</Text>
+                    <Text style={styles.metaText}>{crossSell.difficulty}</Text>
                   </View>
                 ) : null}
               </View>

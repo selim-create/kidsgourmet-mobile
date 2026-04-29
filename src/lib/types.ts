@@ -30,14 +30,24 @@ export interface RecipeExpert {
   note?: string;
 }
 
-export interface TariftenRecipe {
+export interface RecipeSubstitute {
+  original: string;
+  substitute: string;
+  note?: string;
+}
+
+export interface RecipeCrossSell {
+  url: string;
   title: string;
   image?: string;
-  url: string;
   prep_time?: string;
   difficulty?: string;
-  trigger_ingredient?: string;
+  /** Trigger ingredient name used in the banner description (e.g. "Artan Makarna ile…") */
+  ingredient?: string;
 }
+
+/** @deprecated Use RecipeCrossSell instead */
+export type TariftenRecipe = RecipeCrossSell;
 
 export interface Recipe {
   id: number;
@@ -80,7 +90,8 @@ export interface Recipe {
   tags?: Tag[];
   created_at?: string;
   updated_at?: string;
-  tariften_recipe?: TariftenRecipe;
+  substitutes?: RecipeSubstitute[];
+  cross_sell?: RecipeCrossSell;
 }
 
 export interface Ingredient {

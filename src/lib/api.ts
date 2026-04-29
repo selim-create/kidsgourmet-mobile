@@ -132,6 +132,24 @@ export async function apiRequestWithHeaders<T>(
   throw new ApiError('Unexpected non-JSON response from server', 0);
 }
 
+// ─── Web-parallel named helpers ───────────────────────────────────────────────
+
+/** Public (no auth) call — mirrors web's `fetchAPI`. */
+export async function fetchAPI<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return apiRequest<T>(endpoint, { ...options, skipAuth: true });
+}
+
+/** Authenticated call (Bearer token) — mirrors web's `fetchAuthAPI`. */
+export async function fetchAuthAPI<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return apiRequest<T>(endpoint, options);
+}
+
 export const api = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
     apiRequest<T>(endpoint, { method: 'GET', ...options }),

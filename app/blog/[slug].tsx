@@ -71,6 +71,10 @@ export default function BlogDetailScreen() {
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
+  if (__DEV__) {
+    console.log('[blog] isAuthenticated:', isAuthenticated);
+  }
+
   const handleAddComment = useCallback(async () => {
     if (!post || !isAuthenticated) {
       router.push('/(auth)/login');
@@ -84,10 +88,11 @@ export default function BlogDetailScreen() {
       setCommentText('');
       await mutateComments();
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Bilinmeyen hata';
       if (__DEV__) {
         console.warn('[blog] Comment submission failed:', err);
       }
-      Alert.alert('Hata', 'Yorum gönderilemedi. Lütfen tekrar deneyin.');
+      Alert.alert('Yorum gönderilemedi', msg);
     } finally {
       setIsSubmittingComment(false);
     }
@@ -107,7 +112,13 @@ export default function BlogDetailScreen() {
       router.push('/(auth)/login');
       return;
     }
-    await togglePost(post.id);
+    try {
+      await togglePost(post.id);
+    } catch (err) {
+      if (__DEV__) console.warn('[blog] Favorite toggle failed:', err);
+      const msg = err instanceof Error ? err.message : 'Favori eklenemedi';
+      Alert.alert('Hata', msg);
+    }
   };
 
   if (isLoading) {
@@ -579,7 +590,8 @@ const styles = StyleSheet.create({
   commentInput: {
     fontSize: 14,
     color: '#0F172A',
-    minHeight: 72,
+    minHeight: 88,
+    padding: 12,
     textAlignVertical: 'top',
   },
   commentSubmitBtn: {

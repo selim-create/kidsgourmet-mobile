@@ -25,9 +25,13 @@ export async function addBlogComment(
   postId: number,
   content: string,
 ): Promise<Comment> {
-  const response = await api.post<{ success: boolean; message: string; comment: Comment }>(
+  const response = await api.post<{ success: boolean; message: string; comment: Comment } | Comment>(
     API_ENDPOINTS.COMMENTS,
     { post_id: postId, content },
   );
-  return response.comment;
+  // Backend wraps in { success, message, comment } — but be defensive
+  if (response && typeof response === 'object' && 'comment' in response) {
+    return (response as { comment: Comment }).comment;
+  }
+  return response as Comment;
 }

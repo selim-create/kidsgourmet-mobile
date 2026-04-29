@@ -34,6 +34,7 @@ export function DetailHeader({
 
   return (
     <View
+      pointerEvents="box-none"
       style={[
         styles.container,
         { top: insets.top + 8 },
@@ -50,7 +51,7 @@ export function DetailHeader({
 
       {/* Right buttons */}
       {(onShare || onFavorite) && (
-        <View style={styles.rightGroup}>
+        <View pointerEvents="box-none" style={styles.rightGroup}>
           {onFavorite && (
             <TouchableOpacity
               onPress={onFavorite}

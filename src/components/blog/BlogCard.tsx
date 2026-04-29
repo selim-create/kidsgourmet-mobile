@@ -6,6 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Linking } from 'react-native';
 import type { BlogPost } from '../../lib/types';
+import { useFavorites } from '../../contexts/FavoritesContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { toAbsoluteUrl } from '../../utils/url';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -52,6 +55,18 @@ export function BlogCard({ post, variant: variantProp }: BlogCardProps) {
 // ─── Default Card ──────────────────────────────────────────────────────────────
 
 function DefaultCard({ post }: { post: BlogPost }) {
+  const { isPostFavorite, togglePost } = useFavorites();
+  const { isAuthenticated } = useAuth();
+  const isFav = isPostFavorite(post.id);
+
+  const handleFavorite = async () => {
+    if (!isAuthenticated) {
+      router.push('/(auth)/login');
+      return;
+    }
+    await togglePost(post.id);
+  };
+
   return (
     <TouchableOpacity
       onPress={() => handleCardPress(post)}
@@ -80,9 +95,9 @@ function DefaultCard({ post }: { post: BlogPost }) {
         <TouchableOpacity
           style={styles.favoriteBtn}
           activeOpacity={0.8}
-          onPress={() => console.log('favorite', post.id)}
+          onPress={handleFavorite}
         >
-          <Ionicons name="heart-outline" size={16} color="#1F2937" />
+          <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
         </TouchableOpacity>
       </View>
 
@@ -118,6 +133,20 @@ function DefaultCard({ post }: { post: BlogPost }) {
 
 function SponsoredCard({ post }: { post: BlogPost }) {
   const sd = post.sponsor_data;
+  const { isPostFavorite, togglePost } = useFavorites();
+  const { isAuthenticated } = useAuth();
+  const isFav = isPostFavorite(post.id);
+
+  const handleFavorite = async () => {
+    if (!isAuthenticated) {
+      router.push('/(auth)/login');
+      return;
+    }
+    await togglePost(post.id);
+  };
+
+  const logoRaw = sd?.sponsor_logo ?? sd?.sponsor_light_logo;
+  const logoUrl = toAbsoluteUrl(typeof logoRaw === 'string' ? logoRaw : undefined);
 
   return (
     <TouchableOpacity
@@ -144,12 +173,13 @@ function SponsoredCard({ post }: { post: BlogPost }) {
           <Text style={styles.sponsoredBadgeText}>Sponsorlu</Text>
         </View>
         {/* Sponsor logo bottom-left */}
-        {(sd?.sponsor_logo || sd?.sponsor_light_logo) ? (
+        {logoUrl ? (
           <View style={styles.sponsorLogoContainer}>
             <Image
-              source={{ uri: sd.sponsor_logo ?? sd.sponsor_light_logo }}
+              source={{ uri: logoUrl }}
               style={styles.sponsorLogo}
               contentFit="contain"
+              onError={() => {}}
             />
           </View>
         ) : null}
@@ -157,9 +187,9 @@ function SponsoredCard({ post }: { post: BlogPost }) {
         <TouchableOpacity
           style={styles.favoriteBtn}
           activeOpacity={0.8}
-          onPress={() => console.log('favorite', post.id)}
+          onPress={handleFavorite}
         >
-          <Ionicons name="heart-outline" size={16} color="#1F2937" />
+          <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
         </TouchableOpacity>
       </View>
 
@@ -202,6 +232,17 @@ function SponsoredCard({ post }: { post: BlogPost }) {
 
 function HeroCard({ post }: { post: BlogPost }) {
   const isSponsored = post.sponsor_data?.is_sponsored;
+  const { isPostFavorite, togglePost } = useFavorites();
+  const { isAuthenticated } = useAuth();
+  const isFav = isPostFavorite(post.id);
+
+  const handleFavorite = async () => {
+    if (!isAuthenticated) {
+      router.push('/(auth)/login');
+      return;
+    }
+    await togglePost(post.id);
+  };
 
   return (
     <TouchableOpacity
@@ -240,9 +281,9 @@ function HeroCard({ post }: { post: BlogPost }) {
       <TouchableOpacity
         style={styles.favoriteBtn}
         activeOpacity={0.8}
-        onPress={() => console.log('favorite', post.id)}
+        onPress={handleFavorite}
       >
-        <Ionicons name="heart-outline" size={16} color="#fff" />
+        <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#fff'} />
       </TouchableOpacity>
 
       {/* Bottom content */}

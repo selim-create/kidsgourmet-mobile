@@ -2,6 +2,8 @@ import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type { Recipe, FavoriteCollection } from '../lib/types';
 
+export type FavoriteItemType = 'recipe' | 'post' | 'ingredient';
+
 export async function getFavorites(): Promise<Recipe[]> {
   const data = await api.get<
     Recipe[] | { items?: Recipe[]; recipes?: Recipe[]; data?: Recipe[] }
@@ -17,14 +19,30 @@ export async function getFavorites(): Promise<Recipe[]> {
 }
 
 /**
+ * Generic: add any item to the user's favorites.
+ * POST /kg/v1/user/favorites  { item_id, item_type }
+ */
+export async function addFavoriteItem(itemId: number, itemType: FavoriteItemType): Promise<void> {
+  await api.post<unknown>(API_ENDPOINTS.USER_FAVORITES, {
+    item_id: itemId,
+    item_type: itemType,
+  });
+}
+
+/**
+ * Generic: remove any item from the user's favorites.
+ * DELETE /kg/v1/user/favorites/{id}?type={itemType}
+ */
+export async function removeFavoriteItem(itemId: number, itemType: FavoriteItemType): Promise<void> {
+  await api.delete<unknown>(`${API_ENDPOINTS.USER_FAVORITES}/${itemId}?type=${itemType}`);
+}
+
+/**
  * Add a recipe to the user's favorites.
  * POST /kg/v1/user/favorites  { item_id, item_type: 'recipe' }
  */
 export async function addFavorite(recipeId: number): Promise<void> {
-  await api.post<unknown>(API_ENDPOINTS.USER_FAVORITES, {
-    item_id: recipeId,
-    item_type: 'recipe',
-  });
+  return addFavoriteItem(recipeId, 'recipe');
 }
 
 /**
@@ -32,7 +50,7 @@ export async function addFavorite(recipeId: number): Promise<void> {
  * DELETE /kg/v1/user/favorites/{id}?type=recipe
  */
 export async function removeFavorite(recipeId: number): Promise<void> {
-  await api.delete<unknown>(`${API_ENDPOINTS.USER_FAVORITES}/${recipeId}?type=recipe`);
+  return removeFavoriteItem(recipeId, 'recipe');
 }
 
 export async function toggleIngredientFavorite(

@@ -6,8 +6,15 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
+import { router } from 'expo-router';
 import type { Recipe } from '../lib/types';
-import { getFavorites, addFavorite, removeFavorite } from '../services/favorites-service';
+import {
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+  addFavoriteItem,
+  removeFavoriteItem,
+} from '../services/favorites-service';
 import { useAuth } from './AuthContext';
 
 interface FavoritesContextValue {
@@ -17,6 +24,9 @@ interface FavoritesContextValue {
   toggle: (recipeId: number) => Promise<void>;
   isFavorite: (recipeId: number) => boolean;
   reload: () => Promise<void>;
+  postFavoriteIds: Set<number>;
+  togglePost: (postId: number) => Promise<void>;
+  isPostFavorite: (postId: number) => boolean;
 }
 
 const FavoritesContext = createContext<FavoritesContextValue | null>(null);
@@ -27,6 +37,8 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   /** IDs optimistically added but not yet confirmed by the server reload. */
   const [pendingAddIds, setPendingAddIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
+  const [postFavoriteIds, setPostFavoriteIds] = useState<Set<number>>(new Set());
+  const [pendingPostIds, setPendingPostIds] = useState<Set<number>>(new Set());
 
   const favoriteIds = useMemo(
     () => new Set((favorites ?? []).map((r) => r.id)),
@@ -109,6 +121,70 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     [favoriteIds, pendingAddIds],
   );
 
+  const togglePost = useCallback(
+    async (postId: number) => {
+      if (!isAuthenticated) {
+        router.push('/(auth)/login');
+        return;
+      }
+      const was = postFavoriteIds.has(postId) || pendingPostIds.has(postId);
+
+      // Optimistic update
+      if (was) {
+        setPostFavoriteIds((prev) => {
+          const next = new Set(prev);
+          next.delete(postId);
+          return next;
+        });
+        setPendingPostIds((prev) => {
+          const next = new Set(prev);
+          next.delete(postId);
+          return next;
+        });
+      } else {
+        setPendingPostIds((prev) => new Set([...prev, postId]));
+      }
+
+      try {
+        if (was) {
+          await removeFavoriteItem(postId, 'post');
+          setPostFavoriteIds((prev) => {
+            const next = new Set(prev);
+            next.delete(postId);
+            return next;
+          });
+        } else {
+          await addFavoriteItem(postId, 'post');
+          setPostFavoriteIds((prev) => new Set([...prev, postId]));
+        }
+      } catch (err) {
+        console.error('[Favorites] togglePost error (postId=%d, was=%s):', postId, was, err);
+        // Revert on error
+        if (was) {
+          setPostFavoriteIds((prev) => new Set([...prev, postId]));
+        } else {
+          setPostFavoriteIds((prev) => {
+            const next = new Set(prev);
+            next.delete(postId);
+            return next;
+          });
+        }
+      } finally {
+        setPendingPostIds((prev) => {
+          const next = new Set(prev);
+          next.delete(postId);
+          return next;
+        });
+      }
+    },
+    [isAuthenticated, postFavoriteIds, pendingPostIds],
+  );
+
+  const isPostFavorite = useCallback(
+    (postId: number) => postFavoriteIds.has(postId) || pendingPostIds.has(postId),
+    [postFavoriteIds, pendingPostIds],
+  );
+
   return (
     <FavoritesContext.Provider
       value={{
@@ -118,6 +194,9 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         toggle,
         isFavorite,
         reload: load,
+        postFavoriteIds,
+        togglePost,
+        isPostFavorite,
       }}
     >
       {children}

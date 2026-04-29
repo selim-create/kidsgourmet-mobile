@@ -451,26 +451,33 @@ export default function RecipeDetailScreen() {
           {/* ── Age Group Badges (tıklanabilir) ── */}
           {recipe.age_groups && recipe.age_groups.length > 0 ? (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-              {recipe.age_groups.map((ag) => (
-                <TouchableOpacity
-                  key={ag.slug ?? String(ag.id)}
-                  activeOpacity={0.7}
-                  onPress={() => router.push(`/(tabs)/recipes?age_group=${ag.slug}` as never)}
-                >
-                  <View
-                    style={{
-                      backgroundColor: ag.color ?? COLORS.primary,
-                      borderRadius: 999,
-                      paddingHorizontal: 12,
-                      paddingVertical: 5,
-                    }}
-                  >
-                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
-                      {ag.name ?? ag.slug.replace(/-/g, ' ')}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {recipe.age_groups
+                .filter((ag) => ag && (ag.name || ag.slug))
+                .map((ag) => {
+                  const label = ag.name ?? (ag.slug ? ag.slug.replace(/-/g, ' ') : '');
+                  return (
+                    <TouchableOpacity
+                      key={ag.slug ?? String(ag.id)}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        if (ag.slug) router.push(`/(tabs)/recipes?age_group=${ag.slug}` as never);
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: ag.color ?? COLORS.primary,
+                          borderRadius: 999,
+                          paddingHorizontal: 12,
+                          paddingVertical: 5,
+                        }}
+                      >
+                        <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
+                          {label}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
             </View>
           ) : null}
 
@@ -520,7 +527,9 @@ export default function RecipeDetailScreen() {
                 </Text>
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/(tabs)/recipes?author=${recipe.author!.id}` as never)}
+                  onPress={() => {
+                    if (recipe.author?.id) router.push(`/(tabs)/recipes?author=${recipe.author.id}` as never);
+                  }}
                 >
                   <Text style={{ fontSize: 12, color: COLORS.primary, marginTop: 2 }}>
                     Tüm yazılarını görüntüle →
@@ -621,7 +630,7 @@ export default function RecipeDetailScreen() {
                 {recipe.meal_type ? (
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type!)}` as never)}
+                    onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type as string)}` as never)}
                   >
                     <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <Ionicons name="restaurant-outline" size={11} color={COLORS.primary} />

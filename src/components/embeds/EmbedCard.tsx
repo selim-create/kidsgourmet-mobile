@@ -11,6 +11,8 @@ import type {
   PostEmbedItem,
 } from '../../lib/types';
 
+type RouterPath = Parameters<typeof router.push>[0];
+
 // ─── Age Group Colors (ported from web) ───────────────────────────────────────
 
 const AGE_GROUP_COLORS: Record<string, { bg: string; text: string }> = {
@@ -49,7 +51,7 @@ const TOOL_URL_MAPPING: Record<string, string> = {
 function handleToolPress(item: ToolEmbedItem) {
   const internalRoute = TOOL_URL_MAPPING[item.tool_type] ?? TOOL_URL_MAPPING[item.slug];
   if (internalRoute) {
-    router.push(internalRoute as Parameters<typeof router.push>[0]);
+    router.push(internalRoute as RouterPath);
   } else {
     Linking.openURL(item.url).catch(() => {});
   }
@@ -62,7 +64,7 @@ function RecipeCard({ item }: { item: RecipeEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/recipes/${item.slug}` as Parameters<typeof router.push>[0])}
+      onPress={() => router.push(`/recipes/${item.slug}` as RouterPath)}
     >
       {item.image ? (
         <Image
@@ -97,7 +99,7 @@ function IngredientCard({ item }: { item: IngredientEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/ingredients/${item.slug}` as Parameters<typeof router.push>[0])}
+      onPress={() => router.push(`/ingredients/${item.slug}` as RouterPath)}
     >
       {item.image ? (
         <Image
@@ -148,7 +150,7 @@ function PostCard({ item }: { item: PostEmbedItem }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push(`/blog/${item.slug}` as Parameters<typeof router.push>[0])}
+      onPress={() => router.push(`/blog/${item.slug}` as RouterPath)}
     >
       {item.image ? (
         <Image

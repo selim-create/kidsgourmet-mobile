@@ -45,8 +45,17 @@ const PORTION_OPTIONS = [
   { label: '4 Öğün', value: 4 },
 ];
 
+/** Horizontal padding of the main content view — used to cancel it for full-bleed banners. */
+const CONTENT_HORIZONTAL_PADDING = 16;
+
 // ─── Cross-sell banner style: negative horizontal margin offsets the parent's padding ──
-const CROSS_SELL_BANNER_STYLE = { marginHorizontal: -16 as const, marginBottom: 16 as const };
+const CROSS_SELL_BANNER_STYLE = {
+  marginHorizontal: -CONTENT_HORIZONTAL_PADDING as const,
+  marginBottom: 16 as const,
+};
+
+/** SWR options for the cross-sell banner config (no retry, no focus revalidation). */
+const CROSS_SELL_BANNER_SWR_OPTIONS = { revalidateOnFocus: false, shouldRetryOnError: false } as const;
 
 function calculatePortion(amount: string | undefined, multiplier: number): string {
   if (!amount) return '';
@@ -233,8 +242,8 @@ export default function RecipeDetailScreen() {
   const { isAuthenticated } = useAuth();
   const [portionMultiplier, setPortionMultiplier] = useState(1);
   const [userRating, setUserRating] = useState<number>(0);
-  const userRatingRef = React.useRef(userRating);
-  React.useEffect(() => { userRatingRef.current = userRating; }, [userRating]);
+  // Ref so handleRate can read the latest rating without a stale closure
+  const userRatingRef = React.useRef(0);
   const [isRating, setIsRating] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -267,7 +276,7 @@ export default function RecipeDetailScreen() {
   const { data: crossSellConfig } = useSWR(
     'cross-sell-banner-config',
     getCrossSellBannerConfig,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
+    CROSS_SELL_BANNER_SWR_OPTIONS,
   );
   const showCrossSellBanner = !!(crossSellConfig && crossSellConfig.enabled !== false);
 
@@ -278,6 +287,7 @@ export default function RecipeDetailScreen() {
   React.useEffect(() => {
     if (recipe?.user_rating) {
       setUserRating(recipe.user_rating);
+      userRatingRef.current = recipe.user_rating;
     }
   }, [recipe?.user_rating]);
 
@@ -316,6 +326,7 @@ export default function RecipeDetailScreen() {
     const prevRating = userRatingRef.current;
     setIsRating(true);
     setUserRating(star);
+    userRatingRef.current = star;
     try {
       const result = await rateRecipe(recipe.id, star);
       // Update local recipe state with returned rating values (no full refetch needed)
@@ -328,6 +339,7 @@ export default function RecipeDetailScreen() {
       );
     } catch (err) {
       setUserRating(prevRating);
+      userRatingRef.current = prevRating;
       Alert.alert(
         'Puan Verilemedi',
         err instanceof Error

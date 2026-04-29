@@ -81,6 +81,7 @@ export const API_ENDPOINTS = {
 
   // Comments
   COMMENTS: '/kg/v1/comments',
+  COMMENTS_BY_POST: (postId: number) => `/kg/v1/comments?post_id=${postId}`,
   RECIPE_COMMENTS: (recipeId: number) => `/kg/v1/recipes/${recipeId}/comments`,
 
   // Contact

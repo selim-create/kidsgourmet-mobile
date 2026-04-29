@@ -36,7 +36,7 @@ function formatDate(dateStr?: string): string {
 }
 
 function calculateReadTime(html: string): number {
-  const text = (html ?? '').replace(/<[^>]*>?/gm, '');
+  const text = (html ?? '').replace(/<[^>]*>/gm, '');
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 }
@@ -149,7 +149,7 @@ export default function BlogDetailScreen() {
                   key={cat.id}
                   style={styles.categoryChip}
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/blog?categoryId=${cat.id}`)}
+                  onPress={() => router.push(`/blog?categoryId=${encodeURIComponent(cat.id)}`)}
                 >
                   <Text style={styles.categoryChipText}>{cat.name}</Text>
                 </TouchableOpacity>
@@ -174,7 +174,7 @@ export default function BlogDetailScreen() {
               <Text style={styles.miniAuthorLabel}>Yazar: </Text>
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => router.push(`/authors/${post.author?.id}`)}
+                onPress={() => router.push(`/authors/${encodeURIComponent(post.author.id)}`)}
               >
                 <Text style={styles.miniAuthorName}>{post.author.name}</Text>
               </TouchableOpacity>

@@ -13,7 +13,7 @@ import { ErrorBoundary } from '../src/components/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
-// react-native-render-html v6 + React 18.3 uyumsuzluğu (zararsız defaultProps deprecation warning'leri)
+// react-native-render-html v6 + React 18.3 incompatibility (harmless defaultProps deprecation warnings)
 LogBox.ignoreLogs([
   'Support for defaultProps will be removed from function components',
   'Support for defaultProps will be removed from memo components',

@@ -20,11 +20,11 @@ export function toAbsoluteUrl(path?: string | null): string | undefined {
 }
 
 /**
- * WP ACF image alanlarından URL string'i ayıklar.
- * - string ise olduğu gibi
- * - { url } object ise .url
- * - aksi halde undefined
- * Çıkan URL `toAbsoluteUrl` ile prefix'lenir.
+ * Extracts a URL string from WP ACF image fields.
+ * - If a string, returns it as-is
+ * - If a { url } object, returns .url
+ * - Otherwise returns undefined
+ * The resulting URL is prefixed with `toAbsoluteUrl`.
  */
 export function extractImageUrl(value: SponsorImage | undefined | null): string | undefined {
   if (!value) return undefined;

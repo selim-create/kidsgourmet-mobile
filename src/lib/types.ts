@@ -203,7 +203,7 @@ export interface SponsorData {
   is_sponsored: boolean;
   sponsor_name?: string;
   sponsor_url?: string;
-  /** WordPress ACF/meta image — string URL VEYA { id, url } object olabilir */
+  /** WordPress ACF/meta image — can be either a string URL or an { id, url } object */
   sponsor_logo?: SponsorImage;
   sponsor_light_logo?: SponsorImage;
   sponsor_tagline?: string;

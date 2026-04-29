@@ -211,12 +211,16 @@ function normalizeRecipe(recipe: Recipe): Recipe {
     if (tariftenRaw && typeof tariftenRaw === 'object') {
       const t = tariftenRaw as Record<string, unknown>;
       const title = typeof t.title === 'string' ? t.title : undefined;
-      const url = typeof t.url === 'string' ? t.url : (typeof t.link === 'string' ? t.link : undefined);
+      const urlStr = typeof t.url === 'string' ? t.url : undefined;
+      const linkStr = typeof t.link === 'string' ? t.link : undefined;
+      const url = urlStr ?? linkStr;
       if (title && url) {
+        const imageStr = typeof t.image === 'string' ? t.image : undefined;
+        const featuredImageStr = typeof t.featured_image === 'string' ? t.featured_image : undefined;
         const tariften: TariftenRecipe = {
           title,
           url,
-          image: typeof t.image === 'string' ? t.image : (typeof t.featured_image === 'string' ? t.featured_image : undefined),
+          image: imageStr ?? featuredImageStr,
           prep_time: typeof t.prep_time === 'string' ? t.prep_time : undefined,
           difficulty: typeof t.difficulty === 'string' ? t.difficulty : undefined,
           trigger_ingredient: typeof t.trigger_ingredient === 'string' ? t.trigger_ingredient : undefined,

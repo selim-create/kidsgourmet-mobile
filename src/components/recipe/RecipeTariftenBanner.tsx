@@ -12,7 +12,9 @@ interface RecipeTariftenBannerProps {
 
 export function RecipeTariftenBanner({ tariftenRecipe, style }: RecipeTariftenBannerProps) {
   const handlePress = () => {
-    Linking.openURL(tariftenRecipe.url).catch(() => {});
+    Linking.openURL(tariftenRecipe.url).catch((err) => {
+      console.warn('[RecipeTariftenBanner] Could not open URL:', err);
+    });
   };
 
   return (

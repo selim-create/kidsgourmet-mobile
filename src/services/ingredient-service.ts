@@ -1,6 +1,6 @@
 import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
-import type { Ingredient } from '../lib/types';
+import type { Ingredient, IngredientDetail } from '../lib/types';
 
 export async function searchIngredients(query: string): Promise<Ingredient[]> {
   return api.get<Ingredient[]>(
@@ -19,6 +19,6 @@ export async function getIngredients(filters?: { search?: string }): Promise<Ing
   );
 }
 
-export async function getIngredientBySlug(slug: string): Promise<Ingredient> {
-  return api.get<Ingredient>(API_ENDPOINTS.INGREDIENT_BY_SLUG(slug), { skipAuth: true });
+export async function getIngredientBySlug(slug: string): Promise<IngredientDetail> {
+  return api.get<IngredientDetail>(API_ENDPOINTS.INGREDIENT_BY_SLUG(slug), { skipAuth: true });
 }

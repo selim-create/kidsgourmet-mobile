@@ -1,3 +1,12 @@
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
+
 /**
  * Strip HTML tags from a string (replacement for DOMPurify in React Native).
  * Handles null, undefined, and non-string values safely.

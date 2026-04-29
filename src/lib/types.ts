@@ -588,10 +588,22 @@ export interface PercentileResult {
   child_id?: number;
   weight_percentile?: number;
   height_percentile?: number;
+  head_circumference_percentile?: number;
   bmi_percentile?: number;
   age_months?: number;
+  age_days?: number;
+  gender?: 'male' | 'female';
+  birth_date?: string;
+  measurement_date?: string;
+  weight_kg?: number;
+  height_cm?: number;
+  head_circumference_cm?: number;
   calculated_at?: string;
   interpretation?: string;
+  weight_status?: string;
+  height_status?: string;
+  head_circumference_status?: string;
+  bmi?: number;
 }
 
 // ─── BLW / Solid Food Types ───────────────────────────────────────────────────
@@ -693,8 +705,9 @@ export interface BLWResultBucket {
 
 export interface PercentileMeasurement {
   child_id?: number;
-  age_months: number;
   gender: 'male' | 'female';
+  birth_date: string;
+  measurement_date: string;
   weight_kg?: number;
   height_cm?: number;
   head_circumference_cm?: number;

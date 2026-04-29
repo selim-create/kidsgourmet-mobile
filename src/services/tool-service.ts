@@ -76,6 +76,54 @@ export async function calculatePercentile(
   });
 }
 
+export async function savePercentileResult(
+  result: PercentileResult,
+  childId?: number,
+): Promise<PercentileResult> {
+  return api.post<PercentileResult>(API_ENDPOINTS.PERCENTILE_SAVE, {
+    ...result,
+    child_id: childId ?? result.child_id,
+  });
+}
+
+export async function savePercentileWithRegistration(data: {
+  measurement: PercentileMeasurement;
+  registration: {
+    email: string;
+    password: string;
+    name: string;
+    child_name: string;
+    child_birth_date: string;
+    consents: {
+      terms_accepted: boolean;
+      sensitive_data_consent: boolean;
+      guardian_declaration: boolean;
+    };
+  };
+}): Promise<{ result: PercentileResult; token: string }> {
+  return api.post<{ result: PercentileResult; token: string }>(
+    `${API_ENDPOINTS.PERCENTILE_SAVE}?register=true`,
+    data,
+    { skipAuth: true },
+  );
+}
+
+export async function getUserPercentileResults(): Promise<PercentileResult[]> {
+  try {
+    return await api.get<PercentileResult[]>(API_ENDPOINTS.TOOL_PERCENTILE_RESULTS);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * @deprecated Use `savePercentileResult(result, childId?)` instead.
+ * This function accepts a `PercentileMeasurement` but `savePercentileResult`
+ * accepts the full `PercentileResult` returned by `calculatePercentile`.
+ * Migration: replace `savePercentile(measurement)` with
+ * `calculatePercentile(measurement).then(r => savePercentileResult(r))`.
+ * Will be removed in a future release.
+ */
 export async function savePercentile(
   measurement: PercentileMeasurement,
 ): Promise<PercentileResult> {

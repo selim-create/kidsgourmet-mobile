@@ -73,7 +73,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     slug: 'ek-gida-rehberi',
     title: 'Ek Gıda Rehberi',
-    description: 'Ek gıdaya geçiş sürecinde adım adım rehberlik.',
+    description: 'Bebeğiniz için yaşa özel besin grupları, porsiyon önerileri ve doku/kıvam rehberliği ile ek gıdaya güvenli geçiş.',
     icon: 'book-outline',
     color: '#0EA5E9', bg: '#E0F2FE',
     route: '/food-guide',

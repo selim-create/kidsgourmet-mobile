@@ -5,15 +5,24 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
-import { ALL_TOOLS, pickRandom } from '../../lib/tools';
+import { TOOLS, pickRandom, type ToolDefinition } from '../../lib/tools';
 
 export function ToolsSection() {
   // Pick 4 random tools once per render (useMemo so it's stable during a session)
-  const tools = useMemo(() => pickRandom(ALL_TOOLS, 4), []);
+  const tools = useMemo<ToolDefinition[]>(() => pickRandom(TOOLS, 4), []);
+
+  const handlePress = (tool: ToolDefinition) => {
+    if (tool.route) {
+      router.push(tool.route as never);
+    } else if (tool.webUrl) {
+      Linking.openURL(tool.webUrl);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -38,9 +47,9 @@ export function ToolsSection() {
       >
         {tools.map((tool) => (
           <TouchableOpacity
-            key={tool.id}
+            key={tool.slug}
             activeOpacity={0.85}
-            onPress={() => router.push(tool.route as never)}
+            onPress={() => handlePress(tool)}
             style={styles.toolCard}
           >
             {/* Icon */}
@@ -49,7 +58,7 @@ export function ToolsSection() {
             </View>
             {/* Name */}
             <Text style={styles.toolName} numberOfLines={2}>
-              {tool.name}
+              {tool.title}
             </Text>
             {/* Description */}
             <Text style={styles.toolDesc} numberOfLines={3}>

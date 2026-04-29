@@ -145,6 +145,15 @@ JWT token'ı şifreli şekilde cihazda saklanır.
 WordPress Headless CMS ile `/kg/v1/` endpoint'leri üzerinden haberleşir.
 `EXPO_PUBLIC_API_URL` ortam değişkeni ile API URL'si yapılandırılır.
 
+## Akıllı Asistan Araçları
+
+14 tool'un tek doğruluk kaynağı `src/lib/tools.ts`.
+Her tool web sürümüyle birebir aynı slug, başlık ve açıklamaya sahip.
+Henüz mobil ekranı olmayan tool'lar `app/akilli-asistan/[slug].tsx` placeholder'ına düşer.
+Yeni bir tool'u tam port etmek için:
+1. Mobil ekranı `app/...` altında oluştur
+2. `src/lib/tools.ts` içindeki ilgili kayıtta `route` alanını yeni mobil rotaya bağla
+
 ## 📱 Özellikler
 
 - ✅ JWT Authentication (Giriş/Kayıt)

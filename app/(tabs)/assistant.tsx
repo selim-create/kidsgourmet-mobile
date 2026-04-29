@@ -10,73 +10,55 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../../src/components/ui/AppHeader';
 import { COLORS } from '../../src/lib/constants';
-
-interface AssistantCard {
-  title: string;
-  description: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  color: string;
-  bg: string;
-  route: string;
-}
-
-const CARDS: AssistantCard[] = [
-  {
-    title: 'Bu Gıda Verilir Mi?',
-    description: 'Bir besini bebeğinize vermek güvenli mi öğrenin',
-    icon: 'shield-checkmark-outline',
-    color: '#16A34A',
-    bg: '#DCFCE7',
-    route: '/safety-check',
-  },
-  {
-    title: 'BLW Hazırlık Testi',
-    description: 'Bebeğiniz parmak maması için hazır mı?',
-    icon: 'checkmark-circle-outline',
-    color: '#7C3AED',
-    bg: '#EDE9FE',
-    route: '/blw-test',
-  },
-  {
-    title: 'Ne Pişirsem?',
-    description: 'Yaşa ve beslenme ihtiyacına göre tarif önerileri',
-    icon: 'restaurant-outline',
-    color: '#FF8A65',
-    bg: '#FFF3EE',
-    route: '/(tabs)/recipes',
-  },
-  {
-    title: 'Haftalık Plan Oluştur',
-    description: 'Çocuğunuz için haftalık beslenme planı yap',
-    icon: 'calendar-outline',
-    color: '#0EA5E9',
-    bg: '#E0F2FE',
-    route: '/(tabs)/meal-plan',
-  },
-];
+import { TOOLS } from '../../src/lib/tools';
+import type { ToolSlug } from '../../src/lib/tools';
 
 export default function AssistantScreen() {
+  const handlePress = (route: string | null, slug: ToolSlug) => {
+    if (route) {
+      router.push(route as never);
+    } else {
+      router.push({ pathname: '/akilli-asistan/[slug]', params: { slug } });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <AppHeader />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Akıllı Asistan</Text>
         <Text style={styles.intro}>
-          Bebeğinizin beslenmesi için akıllı araçlar
+          Bebek beslenmesi yolculuğunu interaktif araçlarımız ile kolaylaştırıyoruz.
         </Text>
 
-        {CARDS.map((card) => (
+        {TOOLS.map((tool) => (
           <TouchableOpacity
-            key={card.title}
+            key={tool.slug}
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push(card.route as never)}
+            onPress={() => handlePress(tool.route, tool.slug)}
           >
-            <View style={[styles.cardIcon, { backgroundColor: card.bg }]}>
-              <Ionicons name={card.icon} size={30} color={card.color} />
+            <View style={[styles.cardIcon, { backgroundColor: tool.bg }]}>
+              <Ionicons name={tool.icon} size={30} color={tool.color} />
             </View>
             <View style={styles.cardText}>
-              <Text style={styles.cardTitle}>{card.title}</Text>
-              <Text style={styles.cardDesc}>{card.description}</Text>
+              <View style={styles.cardTitleRow}>
+                <Text style={styles.cardTitle} numberOfLines={2}>{tool.title}</Text>
+                {tool.requiresAuth && (
+                  <View style={styles.authBadge}>
+                    <Text style={styles.authBadgeText}>Üyelik Gerekli</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardDesc} numberOfLines={2}>{tool.description}</Text>
+              <View style={styles.cardFooter}>
+                {tool.route === null && (
+                  <View style={styles.soonBadge}>
+                    <Text style={styles.soonBadgeText}>Yakında</Text>
+                  </View>
+                )}
+                <Text style={[styles.ctaText, { color: tool.color }]}>Başla →</Text>
+              </View>
             </View>
             <Ionicons name="chevron-forward" size={20} color={COLORS.gray[300]} />
           </TouchableOpacity>
@@ -94,6 +76,12 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 32,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#1F2937',
+    marginBottom: 6,
   },
   intro: {
     fontSize: 14,
@@ -125,15 +113,56 @@ const styles = StyleSheet.create({
   cardText: {
     flex: 1,
   },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 4,
+  },
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 4,
+    flexShrink: 1,
+  },
+  authBadge: {
+    backgroundColor: '#FEF3C7',
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    alignSelf: 'flex-start',
+  },
+  authBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#92400E',
   },
   cardDesc: {
     fontSize: 12,
     color: '#6B7280',
     lineHeight: 18,
+    marginBottom: 6,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  soonBadge: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  soonBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  ctaText: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginLeft: 'auto',
   },
 });

@@ -1,160 +1,164 @@
 import type { ComponentProps } from 'react';
 import type { Ionicons } from '@expo/vector-icons';
 
-export interface Tool {
-  id: string;
-  name: string;
+export type ToolSlug =
+  | 'besin-takvimi'
+  | 'alerjen-planlayici'
+  | 'bu-gida-verilir-mi'
+  | 'ek-gidaya-baslama'
+  | 'ek-gida-rehberi'
+  | 'su-ihtiyaci'
+  | 'persentil'
+  | 'blw-testi'
+  | 'leke-rehberi'
+  | 'hava-kalitesi'
+  | 'bez-hesaplayici'
+  | 'hijyen-hesaplayici'
+  | 'banyo-planlayici'
+  | 'asi-takvimi';
+
+export interface ToolDefinition {
+  slug: ToolSlug;
+  title: string;
   description: string;
   icon: ComponentProps<typeof Ionicons>['name'];
+  /** Renk (ikon arka planı) — pastel + canlı eşleştirme */
   color: string;
   bg: string;
-  route: string;
+  /** Mobil rotası — yoksa null (placeholder'a düşer) */
+  route: string | null;
+  /** Web URL — placeholder ekranında "Web'de aç" butonu için */
+  webUrl: string;
+  requiresAuth?: boolean;
 }
 
-export const ALL_TOOLS: Tool[] = [
+export const TOOLS: ToolDefinition[] = [
   {
-    id: 'allergen',
-    name: 'Alerjen Planlayıcı',
-    description: 'Alerjenleri takip edin ve güvenli tarifler bulun.',
-    icon: 'shield-outline',
-    color: '#EF4444',
-    bg: '#FEF2F2',
-    route: '/safety-check',
+    slug: 'besin-takvimi',
+    title: 'Besin Deneme Takvimi',
+    description: 'Yeni besinleri tanıtırken takip edin ve kayıt tutun.',
+    icon: 'calendar-outline',
+    color: '#16A34A', bg: '#DCFCE7',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/besin-takvimi',
+    requiresAuth: true,
   },
   {
-    id: 'food-check',
-    name: 'Bu Gıda Verilir mi?',
-    description: 'Herhangi bir gıdanın bebeğe uygun olup olmadığını öğrenin.',
-    icon: 'search-outline',
-    color: '#F59E0B',
-    bg: '#FFFBEB',
-    route: '/safety-check',
+    slug: 'alerjen-planlayici',
+    title: 'Alerjen Deneme Planlayıcı',
+    description: 'Alerjen besinleri güvenli şekilde tanıtmak için plan yapın.',
+    icon: 'shield-half-outline',
+    color: '#DC2626', bg: '#FEE2E2',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/alerjen-planlayici',
   },
   {
-    id: 'food-intro',
-    name: 'Ek Gıdaya Başlama',
-    description: 'Ek gıdaya geçiş için rehber ve öneriler.',
+    slug: 'bu-gida-verilir-mi',
+    title: 'Bu Gıda Verilir mi?',
+    description: 'Bebeğinizin yaşına göre hangi gıdaları verebileceğinizi öğrenin.',
+    icon: 'shield-checkmark-outline',
+    color: '#16A34A', bg: '#DCFCE7',
+    route: '/safety-check',
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/bu-gida-verilir-mi',
+  },
+  {
+    slug: 'ek-gidaya-baslama',
+    title: 'Ek Gıdaya Başlama Kontrolü',
+    description: 'Bebeğiniz ek gıdaya başlamaya hazır mı? Kontrol edin.',
     icon: 'restaurant-outline',
-    color: '#FF8A65',
-    bg: '#FFF3EE',
-    route: '/food-guide',
+    color: '#F97316', bg: '#FFEDD5',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/ek-gidaya-baslama',
   },
   {
-    id: 'food-guide',
-    name: 'Ek Gıda Rehberi',
-    description: 'Hangi besin ne zaman verilmeli? Adım adım rehber.',
-    icon: 'nutrition-outline',
-    color: '#22C55E',
-    bg: '#F0FDF4',
+    slug: 'ek-gida-rehberi',
+    title: 'Ek Gıda Rehberi',
+    description: 'Ek gıdaya geçiş sürecinde adım adım rehberlik.',
+    icon: 'book-outline',
+    color: '#0EA5E9', bg: '#E0F2FE',
     route: '/food-guide',
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/ek-gida-rehberi',
   },
   {
-    id: 'water',
-    name: 'Su İhtiyacı',
-    description: 'Bebeğinizin günlük su ihtiyacını hesaplayın.',
+    slug: 'su-ihtiyaci',
+    title: 'Su İhtiyacı Hesaplayıcı',
+    description: 'Bebeğinizin günlük su ihtiyacını yaş ve beslenme şekline göre hesaplayın.',
     icon: 'water-outline',
-    color: '#06B6D4',
-    bg: '#ECFEFF',
-    route: '/food-guide',
+    color: '#06B6D4', bg: '#CFFAFE',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/su-ihtiyaci',
   },
   {
-    id: 'percentile',
-    name: 'Persentil Hesaplayıcı',
-    description: 'Boy ve kilo persentilini hesaplayın.',
+    slug: 'persentil',
+    title: 'Persentil Hesaplayıcı',
+    description: 'Bebeğinizin boy ve kilo persentilini WHO standartlarına göre hesaplayın.',
     icon: 'analytics-outline',
-    color: '#3B82F6',
-    bg: '#EFF6FF',
+    color: '#3B82F6', bg: '#DBEAFE',
     route: '/growth',
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/persentil',
   },
   {
-    id: 'blw',
-    name: 'BLW Hazırlık Testi',
-    description: 'Bebeğiniz katı gıdaya hazır mı? Test edin.',
-    icon: 'happy-outline',
-    color: '#EC4899',
-    bg: '#FDF2F8',
+    slug: 'blw-testi',
+    title: 'BLW Hazırlık Testi',
+    description: "Bebeğiniz Baby-Led Weaning'e hazır mı? Hemen test edin!",
+    icon: 'checkmark-circle-outline',
+    color: '#7C3AED', bg: '#EDE9FE',
     route: '/blw-test',
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/blw-testi',
   },
   {
-    id: 'stain',
-    name: 'Leke Ansiklopedisi',
-    description: 'Her türlü lekeye karşı pratik çözümler.',
+    slug: 'leke-rehberi',
+    title: 'Leke Ansiklopedisi',
+    description: 'Bebek kıyafetlerindeki lekeleri nasıl çıkaracağınızı öğrenin.',
     icon: 'shirt-outline',
-    color: '#6366F1',
-    bg: '#EEF2FF',
-    route: '/food-guide',
+    color: '#8B5CF6', bg: '#EDE9FE',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/leke-rehberi',
   },
   {
-    id: 'air',
-    name: 'Hava Kalitesi',
-    description: 'Bulunduğunuz bölgedeki hava kalitesini öğrenin.',
+    slug: 'hava-kalitesi',
+    title: 'Hava Kalitesi Rehberi',
+    description: 'Güncel hava kalitesine göre bebeğiniz için dış mekan aktivitesi önerileri alın.',
     icon: 'cloud-outline',
-    color: '#0EA5E9',
-    bg: '#F0F9FF',
-    route: '/food-guide',
+    color: '#0284C7', bg: '#E0F2FE',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/hava-kalitesi',
   },
   {
-    id: 'diaper',
-    name: 'Akıllı Bez',
-    description: 'Bebek bezi takibi ve uyarı sistemi.',
-    icon: 'body-outline',
-    color: '#F43F5E',
-    bg: '#FFF1F2',
-    route: '/food-guide',
+    slug: 'bez-hesaplayici',
+    title: 'Akıllı Bez Hesaplayıcı',
+    description: 'Bebeğinizin yaş ve kilosuna göre günlük bez ihtiyacını hesaplayın ve pişik riskini değerlendirin.',
+    icon: 'calculator-outline',
+    color: '#EC4899', bg: '#FCE7F3',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/bez-hesaplayici',
   },
   {
-    id: 'hygiene',
-    name: 'Günlük Hijyen',
-    description: 'Bebek hijyeni için günlük rutin önerileri.',
-    icon: 'hand-left-outline',
-    color: '#14B8A6',
-    bg: '#F0FDFA',
-    route: '/food-guide',
+    slug: 'hijyen-hesaplayici',
+    title: 'Günlük Hijyen İhtiyacı Hesaplayıcı',
+    description: 'Bebeğinizin yaşına ve aktivitesine göre günlük mendil ve hijyen ürünü ihtiyacını hesaplayın.',
+    icon: 'sparkles-outline',
+    color: '#14B8A6', bg: '#CCFBF1',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/hijyen-hesaplayici',
   },
   {
-    id: 'bath',
-    name: 'Banyo Planlayıcı',
-    description: 'Banyo rutini ve güvenli sıcaklık rehberi.',
-    icon: 'water-outline',
-    color: '#2563EB',
-    bg: '#EFF6FF',
-    route: '/food-guide',
+    slug: 'banyo-planlayici',
+    title: 'Banyo Rutini Planlayıcı',
+    description: 'Bebeğiniz için mevsime göre ideal banyo sıklığını ve rutinini planlayın.',
+    icon: 'water',
+    color: '#0EA5E9', bg: '#E0F2FE',
+    route: null,
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/banyo-planlayici',
   },
   {
-    id: 'vaccine',
-    name: 'Aşı Takvimi',
-    description: 'Aşı zamanlamalarını takip edin ve hatırlatıcılar alın.',
+    slug: 'asi-takvimi',
+    title: 'Aşı Takvimi',
+    description: 'Bebeğinizin aşı takvimini takip edin ve hatırlatıcılar alın.',
     icon: 'medkit-outline',
-    color: '#10B981',
-    bg: '#ECFDF5',
+    color: '#10B981', bg: '#D1FAE5',
     route: '/vaccines',
-  },
-  {
-    id: 'serving',
-    name: 'Sunum Önerileri',
-    description: 'Yaşa göre en iyi sunum şekillerini öğrenin.',
-    icon: 'fast-food-outline',
-    color: '#EAB308',
-    bg: '#FEFCE8',
-    route: '/food-guide',
-  },
-  {
-    id: 'three-day',
-    name: '3 Gün Kuralı',
-    description: 'Yeni gıdalarda 3 gün bekleme kuralını takip edin.',
-    icon: 'time-outline',
-    color: '#8B5CF6',
-    bg: '#F5F3FF',
-    route: '/food-guide',
-  },
-  {
-    id: 'trial',
-    name: 'Besin Deneme Takvimi',
-    description: 'Yeni gıda denemelerini planlayın ve kaydedin.',
-    icon: 'leaf-outline',
-    color: '#84CC16',
-    bg: '#F7FEE7',
-    route: '/food-guide',
+    webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/asi-takvimi',
   },
 ];
 

@@ -162,7 +162,7 @@ export default function HomeScreen() {
           ) : blogPosts.length > 0 ? (
             <>
               {/* Hero post */}
-              <BlogCard post={blogPosts[0]} hero />
+              <BlogCard post={blogPosts[0]} variant="hero" />
               {/* Rest as compact cards */}
               {blogPosts.slice(1).map((post) => (
                 <BlogCard key={post.id} post={post} />

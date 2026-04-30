@@ -453,6 +453,49 @@ export interface RecipePaginatedResponse {
   total_pages: number;
 }
 
+// ─── Ingredient Guide Types ────────────────────────────────────────────────────
+
+/** Standalone ingredient item returned by the /kg/v1/ingredients guide endpoint. */
+export interface IngredientGuideItem {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string;
+  image?: string;
+  category?: string;
+  start_age?: string;
+  benefits?: string;
+  allergy_risk?: 'Düşük' | 'Orta' | 'Yüksek' | string;
+  season?: string | string[];
+  storage_tips?: string;
+  prep_methods?: string[];
+  // Detail-page fields (used in step 3)
+  prep_by_age?: any[];
+  selection_tips?: string;
+  pro_tips?: string;
+  pairings?: any[];
+  nutrition?: Record<string, any>;
+  related_recipes?: any[];
+  faq?: any[];
+  allergen_info?: any;
+  allergens?: string[];
+  nutrition_per_100g?: any;
+  prep_methods_list?: any[];
+  image_credit?: string;
+  seo?: {
+    title?: string;
+    description?: string;
+    focus_keywords?: string[];
+    og_image?: string;
+  };
+}
+
+export interface IngredientGuideResponse {
+  ingredients: IngredientGuideItem[];
+  total: number;
+  pages: number;
+}
+
 // ─── Food Introduction Types ───────────────────────────────────────────────────
 
 export interface FoodIntroductionItem {

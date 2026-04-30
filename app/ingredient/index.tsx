@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,13 +25,19 @@ const AGE_FILTERS: { label: string; months: number | undefined }[] = [
   { label: '12+ ay', months: 12 },
 ];
 
+const QUICK_GUIDES = [
+  { title: 'Ek Gıda Rehberi', icon: 'leaf-outline' as const, color: '#7CB342', bg: '#F0FDF4', route: '/food-guide' },
+  { title: 'Büyüme Takibi', icon: 'trending-up-outline' as const, color: '#0EA5E9', bg: '#E0F2FE', route: '/growth' },
+  { title: 'Aşı Takvimi', icon: 'medical-outline' as const, color: '#EF4444', bg: '#FEF2F2', route: '/vaccines' },
+];
+
 export default function IngredientListScreen() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedAge, setSelectedAge] = useState<number | undefined>(undefined);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { ingredients, isLoading } = useIngredients({ search: debouncedSearch, age: selectedAge });
+  const { ingredients, isLoading, error } = useIngredients({ search: debouncedSearch, age: selectedAge });
 
   const handleSearchChange = (text: string) => {
     setSearch(text);
@@ -74,11 +81,37 @@ export default function IngredientListScreen() {
           )}
         </View>
 
+        {/* Quick Guides strip */}
+        <View style={styles.quickGuidesContainer}>
+          <Text style={styles.quickGuidesTitle}>Diğer Rehberler</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.quickGuidesScroll}
+          >
+            {QUICK_GUIDES.map((guide) => (
+              <TouchableOpacity
+                key={guide.title}
+                style={[styles.quickGuideCard, { backgroundColor: guide.bg }]}
+                activeOpacity={0.8}
+                onPress={() => router.push(guide.route as never)}
+              >
+                <View style={[styles.quickGuideIconWrap, { backgroundColor: guide.color + '22' }]}>
+                  <Ionicons name={guide.icon} size={20} color={guide.color} />
+                </View>
+                <Text style={styles.quickGuideText} numberOfLines={2}>
+                  {guide.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
         {/* Age filter */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="mt-3"
+          className="mt-2"
           contentContainerStyle={{ paddingRight: 8 }}
         >
           {AGE_FILTERS.map((f) => (
@@ -110,7 +143,13 @@ export default function IngredientListScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {isLoading ? (
+        {error ? (
+          <EmptyState
+            icon="wifi-outline"
+            title="Malzemeler yüklenemedi"
+            description="Daha sonra tekrar deneyin."
+          />
+        ) : isLoading ? (
           <View className="items-center py-12">
             <ActivityIndicator color={COLORS.primary} size="large" />
             <Text className="text-gray-400 text-sm mt-3">Yükleniyor...</Text>
@@ -137,3 +176,42 @@ export default function IngredientListScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  quickGuidesContainer: {
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  quickGuidesTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  quickGuidesScroll: {
+    paddingRight: 8,
+    gap: 10,
+  },
+  quickGuideCard: {
+    width: 130,
+    height: 76,
+    borderRadius: 16,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  quickGuideIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickGuideText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1F2937',
+    lineHeight: 16,
+  },
+});

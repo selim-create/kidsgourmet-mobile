@@ -1,33 +1,34 @@
 import useSWR from 'swr';
-import { getFoodIntroductionItems } from '../services/food-introduction-service';
-import type { FoodIntroductionItem } from '../lib/types';
-import { API_ENDPOINTS } from '../lib/constants';
-import { useActiveChild } from '../contexts/ActiveChildContext';
+import { getIngredients } from '../services/ingredient-service';
+import type { ListIngredient } from '../lib/types';
 
 export function useIngredients(filters?: { search?: string; age?: number }) {
   const search = filters?.search?.trim() ?? '';
-  const { activeChild } = useActiveChild();
+  const age = filters?.age;
 
-  // Only fetch when an active child is known; null key disables the SWR request
-  const key = activeChild
-    ? `${API_ENDPOINTS.FOOD_INTRODUCTION_SUGGESTED}?child_id=${activeChild.id}`
-    : null;
+  // Auth-independent key — Beslenme Rehberi is publicly accessible
+  const key = `ingredients?search=${search}&age=${age ?? ''}`;
 
-  const { data, error, isLoading } = useSWR<FoodIntroductionItem[]>(
+  const { data, error, isLoading } = useSWR<ListIngredient[] | { items: ListIngredient[] }>(
     key,
-    () => getFoodIntroductionItems(activeChild!.id),
+    () => getIngredients({ search: search || undefined }),
   );
 
-  // Client-side filtering for search and age
-  const allItems = data ?? [];
+  // Defensive guard: handle both plain array and wrapped { items: [...] } responses
+  const allItems: ListIngredient[] = Array.isArray(data)
+    ? data
+    : Array.isArray((data as { items?: ListIngredient[] })?.items)
+      ? (data as { items: ListIngredient[] }).items
+      : [];
+
+  // Client-side age filter (server-side search is handled via SWR key/fetcher)
   const filtered = allItems.filter((item) => {
-    const matchesSearch =
-      !search || item.food_name.toLowerCase().includes(search.toLowerCase());
     const matchesAge =
-      !filters?.age ||
-      !item.recommended_age_months ||
-      item.recommended_age_months <= filters.age;
-    return matchesSearch && matchesAge;
+      !age ||
+      item.min_age_months === null ||
+      item.min_age_months === undefined ||
+      item.min_age_months <= age;
+    return matchesAge;
   });
 
   return {

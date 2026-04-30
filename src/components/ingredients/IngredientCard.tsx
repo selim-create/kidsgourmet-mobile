@@ -4,26 +4,25 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { formatStartAge } from '../../utils/ageFormatter';
-import type { FoodIntroductionItem } from '../../lib/types';
+import type { ListIngredient } from '../../lib/types';
 
 interface IngredientCardProps {
-  item: FoodIntroductionItem;
+  item: ListIngredient;
   onPress?: () => void;
 }
 
-const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  low: { label: 'Düşük Alerji', color: '#16A34A', bg: '#DCFCE7' },
-  medium: { label: 'Orta Alerji', color: '#CA8A04', bg: '#FEF9C3' },
-  high: { label: 'Yüksek Alerji', color: '#DC2626', bg: '#FEE2E2' },
-};
+const ALLERGEN_BADGE = { label: 'Alerjen Uyarısı', color: '#DC2626', bg: '#FEE2E2' };
+const NO_ALLERGEN_BADGE = { label: 'Düşük Alerji', color: '#16A34A', bg: '#DCFCE7' };
 
 export function IngredientCard({ item, onPress }: IngredientCardProps) {
-  const riskKey = item.allergen_risk ?? 'low';
-  const risk = RISK_CONFIG[riskKey] ?? RISK_CONFIG.low;
+  const hasAllergenWarning = Boolean(item.allergen_warning);
+  const badge = hasAllergenWarning ? ALLERGEN_BADGE : NO_ALLERGEN_BADGE;
 
   const handlePress = () => {
     if (onPress) {
       onPress();
+    } else if (item.slug) {
+      router.push(`/ingredients/${item.slug}`);
     } else {
       router.push(`/ingredient/${item.id}`);
     }
@@ -63,7 +62,7 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
         {/* Info */}
         <View className="ml-3 flex-1">
           <Text className="text-dark font-bold text-base" numberOfLines={1}>
-            {item.food_name}
+            {item.name}
           </Text>
 
           {item.category ? (
@@ -72,21 +71,21 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
 
           <View className="flex-row items-center gap-2 mt-2">
             {/* Start age badge */}
-            {item.recommended_age_months ? (
+            {item.min_age_months !== null && item.min_age_months !== undefined ? (
               <View className="bg-primary/10 rounded-full px-2 py-0.5">
                 <Text className="text-primary text-xs font-semibold">
-                  {formatStartAge(item.recommended_age_months)}
+                  {formatStartAge(item.min_age_months)}
                 </Text>
               </View>
             ) : null}
 
-            {/* Allergy risk badge */}
+            {/* Allergen badge */}
             <View
               className="rounded-full px-2 py-0.5"
-              style={{ backgroundColor: risk.bg }}
+              style={{ backgroundColor: badge.bg }}
             >
-              <Text className="text-xs font-semibold" style={{ color: risk.color }}>
-                {risk.label}
+              <Text className="text-xs font-semibold" style={{ color: badge.color }}>
+                {hasAllergenWarning ? item.allergen_warning : badge.label}
               </Text>
             </View>
           </View>

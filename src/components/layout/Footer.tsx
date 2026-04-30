@@ -51,7 +51,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: 'Beslenme',
     links: [
-      { label: 'Beslenme Rehberi', route: '/blog' },
+      { label: 'Beslenme Rehberi', route: '/(tabs)/guide' },
       { label: 'Yaş Grupları', route: '/blog' },
       { label: 'Alerji & Diyet', route: '/blog' },
       { label: 'Vitamin & Mineral', route: '/blog' },

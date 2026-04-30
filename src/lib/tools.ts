@@ -112,7 +112,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebek kıyafetlerindeki lekeleri nasıl çıkaracağınızı öğrenin.',
     icon: 'shirt-outline',
     color: '#8B5CF6', bg: '#EDE9FE',
-    route: null,
+    route: '/akilli-asistan/leke-rehberi',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/leke-rehberi',
   },
   {

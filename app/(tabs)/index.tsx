@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { router } from 'expo-router';
 import useSWR, { useSWRConfig } from 'swr';
+import { useCollapsibleHeader } from '../../src/hooks/use-collapsible-header';
 import { AppHeader } from '../../src/components/ui/AppHeader';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { RecipeCard } from '../../src/components/recipes/RecipeCard';
@@ -29,6 +30,7 @@ export default function HomeScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const { mutate } = useSWRConfig();
+  const { scrollY, scrollHandler } = useCollapsibleHeader();
 
   const { data: recipesData, isLoading: loadingRecipes } = useSWR(
     'home-recipes',
@@ -56,9 +58,11 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      <AppHeader />
-      <ScrollView
+      <AppHeader showGreeting scrollY={scrollY} />
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
         }
@@ -179,7 +183,7 @@ export default function HomeScreen() {
 
         {/* ── FOOTER ─────────────────────────────────────────────────────── */}
         <Footer />
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }

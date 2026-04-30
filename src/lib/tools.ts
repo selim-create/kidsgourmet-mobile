@@ -139,7 +139,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin yaşına ve aktivitesine göre günlük mendil ve hijyen ürünü ihtiyacını hesaplayın.',
     icon: 'sparkles-outline',
     color: '#14B8A6', bg: '#CCFBF1',
-    route: null,
+    route: '/akilli-asistan/hijyen-hesaplayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/hijyen-hesaplayici',
   },
   {

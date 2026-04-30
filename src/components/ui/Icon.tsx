@@ -17,6 +17,7 @@ import {
   faChevronRight,
   faChevronLeft,
   faLink,
+  faHandSparkles,
   faDroplet,
   faRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
@@ -38,6 +39,7 @@ library.add(
   faChevronRight,
   faChevronLeft,
   faLink,
+  faHandSparkles,
   faDroplet,
   faRotateLeft,
 );
@@ -58,6 +60,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'chevron-right': faChevronRight,
   'chevron-left': faChevronLeft,
   'link': faLink,
+  'hand-sparkles': faHandSparkles,
   'droplet': faDroplet,
   'rotate-left': faRotateLeft,
 };

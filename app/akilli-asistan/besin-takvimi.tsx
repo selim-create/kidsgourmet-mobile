@@ -204,6 +204,10 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
       Toast.show({ type: 'error', text1: 'Besin adı zorunlu', text2: 'Lütfen bir besin adı girin.' });
       return;
     }
+    if (!childId) {
+      Toast.show({ type: 'error', text1: 'Çocuk seçilmedi', text2: 'Lütfen önce bir çocuk profili seçin.' });
+      return;
+    }
 
     const input: FoodTrialInput = {
       food_name: foodName.trim(),
@@ -278,15 +282,28 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
               <Text className="text-base text-dark ml-2">{displayDate(formatDateISO(startDate))}</Text>
             </TouchableOpacity>
             {showDatePicker && (
-              <DateTimePicker
-                value={startDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(_event, selected) => {
-                  setShowDatePicker(false);
-                  if (selected) setStartDate(selected);
-                }}
-              />
+              <>
+                <DateTimePicker
+                  value={startDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(_event, selected) => {
+                    if (Platform.OS === 'android') {
+                      setShowDatePicker(false);
+                    }
+                    if (selected) setStartDate(selected);
+                  }}
+                />
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(false)}
+                    activeOpacity={0.8}
+                    className="mt-2 bg-green-600 rounded-xl py-2 items-center"
+                  >
+                    <Text className="text-white font-semibold text-sm">Tamam</Text>
+                  </TouchableOpacity>
+                )}
+              </>
             )}
           </View>
 

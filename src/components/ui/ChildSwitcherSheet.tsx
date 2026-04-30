@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
   Modal,
   View,
@@ -86,6 +86,14 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
   const { children, activeChild, setActiveChild } = useActiveChild();
   const slideAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up pending navigation timers on unmount
+  useEffect(() => {
+    return () => {
+      if (navTimerRef.current) clearTimeout(navTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -106,7 +114,7 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
     }
   }, [visible, slideAnim, fadeAnim]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: SHEET_HEIGHT,
@@ -119,23 +127,23 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
         useNativeDriver: true,
       }),
     ]).start(() => onClose());
-  };
+  }, [slideAnim, fadeAnim, onClose]);
 
-  const handleSelect = (child: Child) => {
+  const handleSelect = useCallback((child: Child) => {
     setActiveChild(child);
     handleClose();
-  };
+  }, [setActiveChild, handleClose]);
 
-  const handleAddChild = () => {
+  const handleAddChild = useCallback(() => {
     handleClose();
     // TODO: replace with dedicated child-add screen when available
-    setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
-  };
+    navTimerRef.current = setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
+  }, [handleClose]);
 
-  const handleManage = () => {
+  const handleManage = useCallback(() => {
     handleClose();
-    setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
-  };
+    navTimerRef.current = setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
+  }, [handleClose]);
 
   return (
     <Modal

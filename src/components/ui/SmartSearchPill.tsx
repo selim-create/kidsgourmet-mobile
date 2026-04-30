@@ -41,7 +41,7 @@ export function SmartSearchPill() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [suggestions.length]);
+  }, [suggestions]);
 
   return (
     <TouchableOpacity

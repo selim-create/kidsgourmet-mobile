@@ -12,7 +12,7 @@
  *   title             – 'detail' variant için başlık
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -58,7 +58,7 @@ function useLogoTapEasterEgg() {
   const lastTap = useRef(0);
   const [quietMode, setQuietMode] = useState(false);
 
-  const onLogoPress = () => {
+  const onLogoPress = useCallback(() => {
     const now = Date.now();
     if (now - lastTap.current < 1000) {
       tapCount.current += 1;
@@ -70,7 +70,7 @@ function useLogoTapEasterEgg() {
       tapCount.current = 0;
       setQuietMode((prev) => !prev);
     }
-  };
+  }, []);
 
   return { quietMode, onLogoPress };
 }

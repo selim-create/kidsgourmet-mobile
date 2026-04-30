@@ -631,6 +631,9 @@ export interface SolidFoodReadinessResult {
     can_hold_objects?: boolean;
   };
   notes?: string;
+  recommendations?: string[];
+  disclaimer?: string;
+  sponsor?: string;
   checked_at?: string;
 }
 

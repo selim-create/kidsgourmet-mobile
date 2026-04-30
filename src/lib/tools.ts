@@ -67,7 +67,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğiniz ek gıdaya başlamaya hazır mı? Kontrol edin.',
     icon: 'restaurant-outline',
     color: '#F97316', bg: '#FFEDD5',
-    route: null,
+    route: '/akilli-asistan/ek-gidaya-baslama',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/ek-gidaya-baslama',
   },
   {

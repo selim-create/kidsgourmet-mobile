@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kidsgourmet.mobile"
+      "bundleIdentifier": "com.kidsgourmet.mobile",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Çocuğunuzun veya profilinizin fotoğrafını seçmek için galeri erişimine ihtiyacımız var.",
+        "NSCameraUsageDescription": "Çocuğunuzun veya profilinizin fotoğrafını çekmek için kamera erişimine ihtiyacımız var."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +36,13 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Çocuğunuzun veya profilinizin fotoğrafını seçmek için galeri erişimine ihtiyacımız var.",
+          "cameraPermission": "Çocuğunuzun veya profilinizin fotoğrafını çekmek için kamera erişimine ihtiyacımız var."
+        }
+      ],
       [
         "expo-font",
         {

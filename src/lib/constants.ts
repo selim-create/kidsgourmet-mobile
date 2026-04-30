@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
 
   // User
   PROFILE: '/kg/v1/user/profile',
+  USER_AVATAR: '/kg/v1/user/avatar',
   CHILDREN: '/kg/v1/user/children',
   CHILD: (id: number) => `/kg/v1/user/children/${id}`,
   AVATAR: (id: number) => `/kg/v1/user/children/${id}/avatar`,

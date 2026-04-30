@@ -1,12 +1,29 @@
 // ─── Core Types ───────────────────────────────────────────────────────────────
 
+export interface SocialLinks {
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+  website?: string;
+}
+
 export interface User {
   id: number;
   email: string;
   name: string;
   display_name?: string;
+  username?: string;
   avatar_url?: string;
-  role?: string;
+  role?: 'subscriber' | 'editor' | 'administrator' | 'kg_expert' | string;
+  parent_role?: 'Anne' | 'Baba' | 'Bakıcı' | 'Diğer' | string;
+  gender?: 'male' | 'female' | 'other';
+  birth_date?: string;
+  is_expert?: boolean;
+  biography?: string;
+  expertise?: string[];
+  social_links?: SocialLinks;
+  show_email?: boolean;
   created_at?: string;
 }
 
@@ -17,6 +34,10 @@ export interface Child {
   gender?: 'male' | 'female' | 'other';
   avatar_url?: string;
   allergies?: string[];
+  allergens?: string[];
+  diet_types?: string[];
+  notes?: string;
+  age_months?: number;
   dietary_restrictions?: string[];
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import useSWR from 'swr';
 import { getChild } from '../../../../src/services/user-service';
@@ -17,7 +17,7 @@ export default function EditChildScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFBE6' }}>
+      <View style={styles.loadingContainer}>
         <LoadingSpinner />
       </View>
     );
@@ -25,3 +25,13 @@ export default function EditChildScreen() {
 
   return <ChildWizard mode="edit" child={child} />;
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFBE6',
+  },
+});
+

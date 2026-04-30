@@ -307,11 +307,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
                   }`}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    className={`text-xs font-medium ${
-                      isSelected ? 'text-dark' : 'text-dark'
-                    }`}
-                  >
+                  <Text className="text-xs font-medium text-dark">
                     {dt}
                   </Text>
                 </TouchableOpacity>

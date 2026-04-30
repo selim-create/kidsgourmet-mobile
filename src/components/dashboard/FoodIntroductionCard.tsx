@@ -43,7 +43,7 @@ export function FoodIntroductionCard({ items, isLoading }: FoodIntroductionCardP
           <TouchableOpacity
             key={item.id}
             activeOpacity={0.8}
-            onPress={() => router.push(`/ingredient/${item.id}`)}
+            onPress={() => router.push(`/ingredients/${item.id}`)}
             style={{
               width: 108,
               backgroundColor: '#fff',

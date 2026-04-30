@@ -126,13 +126,8 @@ export default function DashboardScreen() {
 
   // Derive vaccine lists
   const allVaccines = Array.isArray(vaccines) ? vaccines : [];
-  // is_overdue is not in the typed interface but may be present at runtime
-  const overdueVaccines = allVaccines.filter(
-    (v) => (v as unknown as Record<string, unknown>).is_overdue === true,
-  );
-  // missing_nutrients is not in NutritionSummary interface but may be present at runtime
-  const missingNutrients: string[] =
-    (missingNutrientsData as unknown as Record<string, unknown>)?.missing_nutrients as string[] ?? [];
+  const overdueVaccines = allVaccines.filter((v) => v.is_overdue === true);
+  const missingNutrients: string[] = missingNutrientsData?.missing_nutrients ?? [];
 
   const ageMonths = activeChild?.birth_date
     ? calculateAgeInMonths(activeChild.birth_date)
@@ -271,7 +266,7 @@ export default function DashboardScreen() {
             {/* ── Section: Sağlık & Aşı ────────────────────────────────────── */}
             {activeChild && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sağlık &amp; Aşı 💉</Text>
+                <Text style={styles.sectionTitle}>Sağlık & Aşı 💉</Text>
                 <VaccineWidget
                   vaccines={allVaccines}
                   isLoading={loadingVaccines}

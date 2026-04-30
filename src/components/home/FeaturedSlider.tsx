@@ -242,7 +242,7 @@ function IngredientFeaturedCard({ item }: { item: MappedFeaturedItem }) {
   return (
     <TouchableOpacity
       activeOpacity={0.88}
-      onPress={() => router.push(`/ingredient/${data.slug}`)}
+      onPress={() => router.push(`/ingredients/${data.slug}`)}
       style={{ width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10 }}
     >
       <View style={{ position: 'relative' }}>

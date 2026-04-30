@@ -40,11 +40,14 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
   const handlePress = () => {
     if (onPress) {
       onPress();
-    } else if (item.slug) {
-      router.push(`/ingredient/${item.slug}` as never);
-    } else {
-      router.push(`/ingredient/${item.id}` as never);
+      return;
     }
+    // Detail page lives at app/ingredients/[slug].tsx (plural).
+    // Singular /ingredient is the LIST route only.
+    const target = item.slug
+      ? `/ingredients/${item.slug}`
+      : `/ingredients/${item.id}`;
+    router.push(target as never);
   };
 
   return (

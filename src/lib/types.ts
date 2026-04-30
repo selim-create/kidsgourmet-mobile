@@ -852,33 +852,36 @@ export interface HygieneCalculatorResult {
 // ─── Diaper Calculator Types ──────────────────────────────────────────────────
 
 export interface DiaperInput {
-  age_months: number;
-  weight_kg?: number;
-  child_id?: number;
+  baby_weight_kg: number;
+  baby_age_months: number;
+  daily_changes: number;
 }
 
 export interface DiaperCalculatorResult {
-  diapers_per_day: number;
-  diapers_per_month: number;
-  current_size?: string;
-  next_size_at?: string;
-  tips?: string[];
-  disclaimer?: string;
+  recommended_size: string;
+  size_range: string;
+  daily_count: number;
+  monthly_count: number;
+  monthly_packs: number;
+  pack_type: string;
+  size_change_alert?: string;
+  tips: string[];
+  sponsor?: ToolSponsorData;
 }
 
 export interface RashRiskInput {
-  age_months: number;
-  frequency_per_day?: number;
-  skin_sensitivity?: 'low' | 'medium' | 'high';
-  child_id?: number;
+  change_frequency: number;
+  night_diaper_hours: number;
+  humidity_level: 'low' | 'medium' | 'high';
+  has_diarrhea: boolean;
 }
 
 export interface RashRiskResult {
   risk_level: 'low' | 'medium' | 'high';
-  risk_score?: number;
-  factors?: string[];
-  recommendations?: string[];
-  disclaimer?: string;
+  risk_score: number;
+  risk_factors: string[];
+  prevention_tips: string[];
+  sponsor?: ToolSponsorData;
 }
 
 // ─── Air Quality Types ────────────────────────────────────────────────────────

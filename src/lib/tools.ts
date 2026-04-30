@@ -130,7 +130,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin yaş ve kilosuna göre günlük bez ihtiyacını hesaplayın ve pişik riskini değerlendirin.',
     icon: 'calculator-outline',
     color: '#EC4899', bg: '#FCE7F3',
-    route: null,
+    route: '/akilli-asistan/bez-hesaplayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/bez-hesaplayici',
   },
   {

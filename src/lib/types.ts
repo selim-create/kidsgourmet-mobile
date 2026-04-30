@@ -368,6 +368,7 @@ export interface NutritionSummary {
   fat_total?: number;
   meals_count?: number;
   water_intake?: number;
+  missing_nutrients?: string[];
 }
 
 // ─── Safety Types ─────────────────────────────────────────────────────────────
@@ -518,6 +519,7 @@ export interface Vaccine {
   doses?: number;
   description?: string;
   is_mandatory?: boolean;
+  is_overdue?: boolean;
 }
 
 // ─── Dashboard Types ──────────────────────────────────────────────────────────

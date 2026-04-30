@@ -86,6 +86,11 @@ export default function ProfileScreen() {
 
   const menuItems = [
     {
+      icon: 'speedometer-outline' as const,
+      label: 'Panelim',
+      onPress: () => router.push('/dashboard'),
+    },
+    {
       icon: 'person-outline' as const,
       label: 'Profil Düzenle',
       onPress: () => {},

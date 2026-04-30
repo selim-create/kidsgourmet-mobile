@@ -26,6 +26,7 @@ import type {
   RashRiskInput,
   RashRiskResult,
   AirQualityResult,
+  AirQualityInput,
   StainGuide,
   StainSearchResponse,
 } from '../lib/types';
@@ -266,11 +267,8 @@ export async function calculateRashRisk(input: RashRiskInput): Promise<RashRiskR
 
 // ─── Air Quality ──────────────────────────────────────────────────────────────
 
-export async function analyzeAirQuality(params: {
-  lat: number;
-  lon: number;
-}): Promise<AirQualityResult> {
-  return api.post<AirQualityResult>(API_ENDPOINTS.AIR_QUALITY_ANALYZE, params, {
+export async function analyzeAirQuality(input: AirQualityInput): Promise<AirQualityResult> {
+  return api.post<AirQualityResult>(API_ENDPOINTS.AIR_QUALITY_ANALYZE, input, {
     skipAuth: true,
   });
 }

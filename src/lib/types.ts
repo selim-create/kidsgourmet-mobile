@@ -849,6 +849,16 @@ export interface HygieneCalculatorResult {
   disclaimer?: string;
 }
 
+// ─── Shared Tool Types ────────────────────────────────────────────────────────
+
+export interface ToolSponsorData {
+  name: string;
+  logo?: string;
+  url?: string;
+  cta?: string;
+  [key: string]: unknown;
+}
+
 // ─── Diaper Calculator Types ──────────────────────────────────────────────────
 
 export interface DiaperInput {
@@ -898,14 +908,6 @@ export interface AirQualityResult {
 }
 
 // ─── Stain Encyclopedia Types ─────────────────────────────────────────────────
-
-export interface ToolSponsorData {
-  name: string;
-  logo?: string;
-  url?: string;
-  cta?: string;
-  [key: string]: unknown;
-}
 
 export interface StainGuide {
   id: number;

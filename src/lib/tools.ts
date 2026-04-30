@@ -49,8 +49,9 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Alerjen besinleri güvenli şekilde tanıtmak için plan yapın.',
     icon: 'shield-half-outline',
     color: '#DC2626', bg: '#FEE2E2',
-    route: null,
+    route: '/akilli-asistan/alerjen-planlayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/alerjen-planlayici',
+    requiresAuth: true,
   },
   {
     slug: 'bu-gida-verilir-mi',

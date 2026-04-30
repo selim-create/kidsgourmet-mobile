@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Share,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +15,35 @@ import Toast from 'react-native-toast-message';
 import { ToolHeader } from '../../../src/components/tools/ToolHeader';
 import { Icon } from '../../../src/components/ui/Icon';
 import { getStainBySlug } from '../../../src/services/tool-service';
+
+const getCategoryLabel = (category: string) => {
+  const labels: Record<string, string> = {
+    food: 'Yemek Lekeleri',
+    bodily: 'Vücut Sıvıları',
+    outdoor: 'Dış Mekan',
+    craft: 'Sanat/Oyun',
+    household: 'Ev İçi',
+  };
+  return labels[category] || category;
+};
+
+const getDifficultyLabel = (difficulty: string) => {
+  switch (difficulty) {
+    case 'easy': return 'Kolay';
+    case 'medium': return 'Orta';
+    case 'hard': return 'Zor';
+    default: return difficulty;
+  }
+};
+
+const getDifficultyColors = (difficulty: string): { bg: string; text: string } => {
+  switch (difficulty) {
+    case 'easy': return { bg: '#D1FAE5', text: '#065F46' };
+    case 'medium': return { bg: '#FEF3C7', text: '#92400E' };
+    case 'hard': return { bg: '#FEE2E2', text: '#991B1B' };
+    default: return { bg: '#F3F4F6', text: '#374151' };
+  }
+};
 
 export default function StainDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -30,7 +58,7 @@ export default function StainDetailScreen() {
     try {
       await Share.share({
         message: stain
-          ? `${stain.title} — Leke Ansiklopedisi: ${url}`
+          ? `${stain.emoji} ${stain.name} — Leke Ansiklopedisi: ${url}`
           : url,
         url,
       });
@@ -85,30 +113,28 @@ export default function StainDetailScreen() {
     );
   }
 
+  const difficultyColors = getDifficultyColors(stain.difficulty);
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['bottom']}>
-      <ToolHeader title={stain.title} />
+      <ToolHeader title={stain.name} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <View className="bg-white border-b border-gray-100 px-4 pt-5 pb-6">
-          {stain.image ? (
-            <Image
-              source={{ uri: stain.image }}
-              className="w-full h-48 rounded-2xl mb-4 bg-gray-100"
-              resizeMode="cover"
-            />
-          ) : null}
-
           <View className="flex-row items-start justify-between gap-3">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-dark mb-2">{stain.title}</Text>
-              {stain.stain_type ? (
-                <View className="flex-row">
-                  <View className="bg-purple-100 rounded-full px-3 py-1">
-                    <Text className="text-xs font-semibold text-purple-700">{stain.stain_type}</Text>
-                  </View>
+              <Text className="text-4xl mb-2">{stain.emoji}</Text>
+              <Text className="text-2xl font-bold text-dark mb-2">{stain.name}</Text>
+              <View className="flex-row gap-2 flex-wrap">
+                <View className="bg-purple-100 rounded-full px-3 py-1">
+                  <Text className="text-xs font-semibold text-purple-700">{getCategoryLabel(stain.category)}</Text>
                 </View>
-              ) : null}
+                <View className="rounded-full px-3 py-1" style={{ backgroundColor: difficultyColors.bg }}>
+                  <Text className="text-xs font-semibold" style={{ color: difficultyColors.text }}>
+                    {getDifficultyLabel(stain.difficulty)}
+                  </Text>
+                </View>
+              </View>
             </View>
 
             <View className="flex-row gap-2">
@@ -131,8 +157,8 @@ export default function StainDetailScreen() {
         </View>
 
         <View className="px-4 pt-4 gap-4">
-          {/* Removal Steps */}
-          {stain.removal_steps && stain.removal_steps.length > 0 ? (
+          {/* Steps */}
+          {stain.steps && stain.steps.length > 0 ? (
             <View className="bg-white rounded-2xl p-4 border border-gray-100">
               <View className="flex-row items-center gap-2 mb-4">
                 <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center">
@@ -140,32 +166,20 @@ export default function StainDetailScreen() {
                 </View>
                 <Text className="text-base font-bold text-dark">Temizleme Adımları</Text>
               </View>
-              {stain.removal_steps.map((step, index) => (
-                <View key={index} className="flex-row gap-3 mb-3">
-                  <View className="w-6 h-6 rounded-full bg-purple-600 items-center justify-center flex-shrink-0 mt-0.5">
-                    <Text className="text-white text-xs font-bold">{index + 1}</Text>
+              {stain.steps.map((stepItem, index) => (
+                <View key={index} className="mb-4">
+                  <View className="flex-row gap-3">
+                    <View className="w-6 h-6 rounded-full bg-purple-600 items-center justify-center flex-shrink-0 mt-0.5">
+                      <Text className="text-white text-xs font-bold">{stepItem.step}</Text>
+                    </View>
+                    <Text className="flex-1 text-sm text-gray-700 leading-5">{stepItem.instruction}</Text>
                   </View>
-                  <Text className="flex-1 text-sm text-gray-700 leading-5">{step}</Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
-
-          {/* Products */}
-          {stain.products && stain.products.length > 0 ? (
-            <View className="bg-white rounded-2xl p-4 border border-gray-100">
-              <View className="flex-row items-center gap-2 mb-4">
-                <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center">
-                  <Icon name="box" size={16} color="#3B82F6" />
-                </View>
-                <Text className="text-base font-bold text-dark">Önerilen Ürünler</Text>
-              </View>
-              {stain.products.map((product, index) => (
-                <View key={index} className="flex-row items-start gap-2.5 mb-2.5">
-                  <View className="w-5 h-5 rounded-full bg-blue-50 items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon name="check-circle" size={12} color="#3B82F6" />
-                  </View>
-                  <Text className="flex-1 text-sm text-gray-700 leading-5">{product}</Text>
+                  {stepItem.tip ? (
+                    <View className="ml-9 mt-2 flex-row items-start gap-2">
+                      <Icon name="lightbulb" size={12} color="#D97706" />
+                      <Text className="flex-1 text-xs text-yellow-700 leading-4">{stepItem.tip}</Text>
+                    </View>
+                  ) : null}
                 </View>
               ))}
             </View>
@@ -191,23 +205,30 @@ export default function StainDetailScreen() {
             </View>
           ) : null}
 
-          {/* Tips */}
-          {stain.tips && stain.tips.length > 0 ? (
-            <View className="bg-yellow-50 rounded-2xl p-4 border border-yellow-200">
+          {/* Related Ingredients */}
+          {stain.related_ingredients && stain.related_ingredients.length > 0 ? (
+            <View className="bg-white rounded-2xl p-4 border border-gray-100">
               <View className="flex-row items-center gap-2 mb-4">
-                <View className="w-8 h-8 rounded-full bg-yellow-100 items-center justify-center">
-                  <Icon name="lightbulb" size={16} color="#D97706" />
+                <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center">
+                  <Icon name="box" size={16} color="#3B82F6" />
                 </View>
-                <Text className="text-base font-bold text-yellow-900">İpuçları</Text>
+                <Text className="text-base font-bold text-dark">İlgili Maddeler</Text>
               </View>
-              {stain.tips.map((tip, index) => (
-                <View key={index} className="flex-row items-start gap-2.5 mb-2.5">
-                  <View className="flex-shrink-0 mt-0.5">
-                    <Icon name="lightbulb" size={12} color="#D97706" />
+              <View className="flex-row flex-wrap gap-2">
+                {stain.related_ingredients.map((ingredient, index) => (
+                  <View key={index} className="bg-blue-50 rounded-full px-3 py-1">
+                    <Text className="text-xs text-blue-700 font-medium">{ingredient}</Text>
                   </View>
-                  <Text className="flex-1 text-sm text-yellow-800 leading-5">{tip}</Text>
-                </View>
-              ))}
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          {/* Sponsor CTA */}
+          {stain.sponsor ? (
+            <View className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
+              <Text className="text-xs text-purple-500 font-medium mb-1">Sponsor</Text>
+              <Text className="text-sm text-purple-800 font-semibold">{stain.sponsor.name}</Text>
             </View>
           ) : null}
 

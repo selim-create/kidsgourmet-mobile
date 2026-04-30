@@ -277,17 +277,12 @@ export async function analyzeAirQuality(params: {
 
 // ─── Stain Encyclopedia ───────────────────────────────────────────────────────
 
-export async function searchStains(query: string): Promise<StainSearchResponse> {
-  return api.get<StainSearchResponse>(
+export async function searchStains(query: string): Promise<StainGuide[]> {
+  const response = await api.get<StainSearchResponse>(
     `${API_ENDPOINTS.STAIN_ENCYCLOPEDIA_SEARCH}?q=${encodeURIComponent(query)}`,
     { skipAuth: true },
   );
-}
-
-export async function getPopularStains(): Promise<StainGuide[]> {
-  return api.get<StainGuide[]>(API_ENDPOINTS.STAIN_ENCYCLOPEDIA_POPULAR, {
-    skipAuth: true,
-  });
+  return response.stains;
 }
 
 export async function getStainBySlug(slug: string): Promise<StainGuide> {

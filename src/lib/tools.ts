@@ -148,7 +148,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğiniz için mevsime göre ideal banyo sıklığını ve rutinini planlayın.',
     icon: 'water',
     color: '#0EA5E9', bg: '#E0F2FE',
-    route: null,
+    route: '/akilli-asistan/banyo-planlayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/banyo-planlayici',
   },
   {

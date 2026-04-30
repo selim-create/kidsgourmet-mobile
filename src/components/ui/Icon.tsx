@@ -23,6 +23,11 @@ import {
   faMoon,
   faDroplet,
   faHandSparkles,
+  faBath,
+  faCalendar,
+  faClock,
+  faHourglass,
+  faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -48,6 +53,11 @@ library.add(
   faMoon,
   faDroplet,
   faHandSparkles,
+  faBath,
+  faCalendar,
+  faClock,
+  faHourglass,
+  faCheck,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -72,6 +82,11 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'moon': faMoon,
   'droplet': faDroplet,
   'hand-sparkles': faHandSparkles,
+  'bath': faBath,
+  'calendar': faCalendar,
+  'clock': faClock,
+  'hourglass': faHourglass,
+  'check': faCheck,
 };
 
 export interface IconProps {

@@ -815,12 +815,14 @@ export interface BathPlannerAgeGroup {
 export interface BathPlannerConfig {
   seasons: string[];
   age_groups: BathPlannerAgeGroup[];
+  skin_types?: string[];
 }
 
 export interface BathPlannerInput {
-  age_months: number;
+  baby_age_months: number;
+  skin_type: string;
   season: string;
-  child_id?: number;
+  has_eczema: boolean;
 }
 
 export interface BathPlannerResult {

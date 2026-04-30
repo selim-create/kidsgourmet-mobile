@@ -17,6 +17,12 @@ import {
   faChevronRight,
   faChevronLeft,
   faLink,
+  faBath,
+  faCalendar,
+  faClock,
+  faDroplet,
+  faHourglass,
+  faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -36,6 +42,12 @@ library.add(
   faChevronRight,
   faChevronLeft,
   faLink,
+  faBath,
+  faCalendar,
+  faClock,
+  faDroplet,
+  faHourglass,
+  faCheck,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -54,6 +66,12 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'chevron-right': faChevronRight,
   'chevron-left': faChevronLeft,
   'link': faLink,
+  'bath': faBath,
+  'calendar': faCalendar,
+  'clock': faClock,
+  'droplet': faDroplet,
+  'hourglass': faHourglass,
+  'check': faCheck,
 };
 
 export interface IconProps {

@@ -28,6 +28,7 @@ import {
   faClock,
   faHourglass,
   faCheck,
+  faUtensils,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -58,6 +59,7 @@ library.add(
   faClock,
   faHourglass,
   faCheck,
+  faUtensils,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -71,6 +73,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'share': faShare,
   'times': faTimes,
   'check-circle': faCheckCircle,
+  'circle-check': faCheckCircle,
   'info-circle': faInfoCircle,
   'exclamation-circle': faExclamationCircle,
   'chevron-right': faChevronRight,
@@ -87,6 +90,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'clock': faClock,
   'hourglass': faHourglass,
   'check': faCheck,
+  'utensils': faUtensils,
 };
 
 export interface IconProps {

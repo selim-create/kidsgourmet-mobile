@@ -16,6 +16,7 @@ import {
   faExclamationCircle,
   faChevronRight,
   faChevronLeft,
+  faLink,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -34,6 +35,7 @@ library.add(
   faExclamationCircle,
   faChevronRight,
   faChevronLeft,
+  faLink,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -51,6 +53,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'exclamation-circle': faExclamationCircle,
   'chevron-right': faChevronRight,
   'chevron-left': faChevronLeft,
+  'link': faLink,
 };
 
 export interface IconProps {

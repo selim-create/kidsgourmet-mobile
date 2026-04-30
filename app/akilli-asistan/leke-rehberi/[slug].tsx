@@ -117,7 +117,7 @@ export default function StainDetailScreen() {
                 activeOpacity={0.7}
                 className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center"
               >
-                <Icon name="share" size={16} color="#475569" />
+                <Icon name="link" size={16} color="#475569" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleShare}

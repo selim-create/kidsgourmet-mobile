@@ -462,7 +462,7 @@ export default function IngredientBySlugScreen() {
               <SectionHeader icon="heart-outline" title="Faydaları" />
               <View style={{ gap: 6 }}>
                 {ingredient.benefits
-                  .split(/[.\n]/)
+                  .split(/\.\s+|\n/)
                   .map((s) => s.trim())
                   .filter(Boolean)
                   .map((line, idx) => (
@@ -498,7 +498,7 @@ export default function IngredientBySlugScreen() {
               <SectionHeader icon="analytics-outline" title="Besin Değerleri (100g)" />
               {nutritionRows.map((n, idx) => (
                 <View
-                  key={idx}
+                  key={n.label || idx}
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',

@@ -3,28 +3,47 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { formatStartAge } from '../../utils/ageFormatter';
-import type { ListIngredient } from '../../lib/types';
+import type { IngredientGuideItem, ListIngredient } from '../../lib/types';
+
+// Accept both the new guide type and the legacy list type
+type IngredientCardItem = IngredientGuideItem | ListIngredient;
 
 interface IngredientCardProps {
-  item: ListIngredient;
+  item: IngredientCardItem;
   onPress?: () => void;
 }
 
-const ALLERGEN_BADGE = { label: 'Alerjen Uyarısı', color: '#DC2626', bg: '#FEE2E2' };
-const NO_ALLERGEN_BADGE = { label: 'Düşük Alerji', color: '#16A34A', bg: '#DCFCE7' };
+function getAllergyRisk(item: IngredientCardItem): string | undefined {
+  if ('allergy_risk' in item && item.allergy_risk) return item.allergy_risk as string;
+  if ('allergen_warning' in item && item.allergen_warning) return item.allergen_warning as string;
+  return undefined;
+}
+
+function getStartAgeLabel(item: IngredientCardItem): string | null {
+  if ('start_age' in item && item.start_age) return item.start_age as string;
+  return null;
+}
+
+function getAllergenBadge(item: IngredientCardItem) {
+  const risk = getAllergyRisk(item);
+  if (!risk) return { label: 'Düşük Alerji', color: '#16A34A', bg: '#DCFCE7' };
+  if (risk === 'Düşük') return { label: 'Düşük Alerji', color: '#16A34A', bg: '#DCFCE7' };
+  if (risk === 'Orta') return { label: 'Orta Alerji', color: '#D97706', bg: '#FEF3C7' };
+  if (risk === 'Yüksek') return { label: 'Yüksek Alerji', color: '#DC2626', bg: '#FEE2E2' };
+  return { label: risk, color: '#DC2626', bg: '#FEE2E2' };
+}
 
 export function IngredientCard({ item, onPress }: IngredientCardProps) {
-  const hasAllergenWarning = Boolean(item.allergen_warning);
-  const badge = hasAllergenWarning ? ALLERGEN_BADGE : NO_ALLERGEN_BADGE;
+  const badge = getAllergenBadge(item);
+  const startAge = getStartAgeLabel(item);
 
   const handlePress = () => {
     if (onPress) {
       onPress();
     } else if (item.slug) {
-      router.push(`/ingredients/${item.slug}`);
+      router.push(`/ingredient/${item.slug}` as never);
     } else {
-      router.push(`/ingredient/${item.id}`);
+      router.push(`/ingredient/${item.id}` as never);
     }
   };
 
@@ -71,11 +90,9 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
 
           <View className="flex-row items-center gap-2 mt-2">
             {/* Start age badge */}
-            {item.min_age_months !== null && item.min_age_months !== undefined ? (
+            {startAge ? (
               <View className="bg-primary/10 rounded-full px-2 py-0.5">
-                <Text className="text-primary text-xs font-semibold">
-                  {formatStartAge(item.min_age_months)}
-                </Text>
+                <Text className="text-primary text-xs font-semibold">{startAge}</Text>
               </View>
             ) : null}
 
@@ -85,7 +102,7 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
               style={{ backgroundColor: badge.bg }}
             >
               <Text className="text-xs font-semibold" style={{ color: badge.color }}>
-                {hasAllergenWarning ? item.allergen_warning : badge.label}
+                {badge.label}
               </Text>
             </View>
           </View>
@@ -96,3 +113,4 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
     </TouchableOpacity>
   );
 }
+

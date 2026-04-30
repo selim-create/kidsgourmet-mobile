@@ -10,6 +10,16 @@ export async function updateUserProfile(data: Partial<User>): Promise<User> {
   return api.put<User>(API_ENDPOINTS.PROFILE, data);
 }
 
+export async function uploadUserAvatar(
+  formData: FormData,
+): Promise<{ id: number; url: string }> {
+  return api.post<{ id: number; url: string }>(
+    API_ENDPOINTS.USER_AVATAR,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } as HeadersInit },
+  );
+}
+
 export async function getChildren(): Promise<Child[]> {
   return api.get<Child[]>(API_ENDPOINTS.CHILDREN);
 }

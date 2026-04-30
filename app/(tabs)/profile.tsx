@@ -93,13 +93,28 @@ export default function ProfileScreen() {
     {
       icon: 'person-outline' as const,
       label: 'Profil Düzenle',
-      onPress: () => {},
+      onPress: () => router.push('/profile/edit'),
+    },
+    {
+      icon: 'people-outline' as const,
+      label: 'Çocuklarım',
+      onPress: () => router.push('/profile/children'),
     },
     {
       icon: 'notifications-outline' as const,
-      label: 'Bildirimler',
-      onPress: () => {},
+      label: 'Bildirimler & Tercihler',
+      onPress: () => router.push('/profile/preferences'),
     },
+    ...(user?.is_expert ||
+    ['administrator', 'editor', 'kg_expert'].includes(user?.role ?? '')
+      ? [
+          {
+            icon: 'ribbon-outline' as const,
+            label: 'Uzman Profili',
+            onPress: () => router.push('/profile/expert'),
+          },
+        ]
+      : []),
     {
       icon: 'book-outline' as const,
       label: 'Blog & Keşfet',
@@ -160,7 +175,10 @@ export default function ProfileScreen() {
               <Text className="text-dark font-bold text-base">
                 Çocuk Profilleri
               </Text>
-              <TouchableOpacity className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center">
+              <TouchableOpacity
+                className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center"
+                onPress={() => router.push('/profile/children/new')}
+              >
                 <Ionicons name="add" size={18} color="#FF8A65" />
               </TouchableOpacity>
             </View>

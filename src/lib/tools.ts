@@ -85,7 +85,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin günlük su ihtiyacını yaş ve beslenme şekline göre hesaplayın.',
     icon: 'water-outline',
     color: '#06B6D4', bg: '#CFFAFE',
-    route: null,
+    route: '/akilli-asistan/su-ihtiyaci',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/su-ihtiyaci',
   },
   {

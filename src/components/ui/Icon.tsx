@@ -18,6 +18,8 @@ import {
   faChevronLeft,
   faLink,
   faHandSparkles,
+  faDroplet,
+  faRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -38,6 +40,8 @@ library.add(
   faChevronLeft,
   faLink,
   faHandSparkles,
+  faDroplet,
+  faRotateLeft,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -57,6 +61,8 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'chevron-left': faChevronLeft,
   'link': faLink,
   'hand-sparkles': faHandSparkles,
+  'droplet': faDroplet,
+  'rotate-left': faRotateLeft,
 };
 
 export interface IconProps {

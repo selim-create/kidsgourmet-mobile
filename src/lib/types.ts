@@ -836,17 +836,17 @@ export interface BathPlannerResult {
 // ─── Hygiene Calculator Types ─────────────────────────────────────────────────
 
 export interface HygieneInput {
-  age_months: number;
-  activity_level?: 'low' | 'medium' | 'high';
-  child_id?: number;
+  baby_age_months: number;
+  daily_diaper_changes: number;
+  outdoor_hours: number;
+  meal_count: number;
 }
 
 export interface HygieneCalculatorResult {
-  wipes_per_day: number;
-  bath_frequency?: string;
-  products_needed?: string[];
-  tips?: string[];
-  disclaimer?: string;
+  monthly_wipes_needed: number;
+  recommendations: string[];
+  carry_bag_essentials: string[];
+  sponsor?: ToolSponsorData;
 }
 
 // ─── Shared Tool Types ────────────────────────────────────────────────────────

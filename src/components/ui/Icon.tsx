@@ -22,6 +22,7 @@ import {
   faShield,
   faMoon,
   faDroplet,
+  faHandSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -46,6 +47,7 @@ library.add(
   faShield,
   faMoon,
   faDroplet,
+  faHandSparkles,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -69,6 +71,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'shield': faShield,
   'moon': faMoon,
   'droplet': faDroplet,
+  'hand-sparkles': faHandSparkles,
 };
 
 export interface IconProps {

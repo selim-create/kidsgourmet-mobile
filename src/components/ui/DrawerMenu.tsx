@@ -58,6 +58,7 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     title: 'Ana Menü',
     items: [
+      { label: 'Panelim', icon: 'speedometer-outline', route: '/dashboard' },
       { label: 'Ana Sayfa', icon: 'home-outline', route: '/(tabs)' },
       { label: 'Tarifler', icon: 'restaurant-outline', route: '/(tabs)/recipes' },
       { label: 'Keşfet', icon: 'compass-outline', route: '/(tabs)/discover' },

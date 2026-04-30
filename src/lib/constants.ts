@@ -140,10 +140,10 @@ export const API_ENDPOINTS = {
   BATH_PLANNER_GENERATE: '/kg/v1/tools/bath-planner/generate',
 
   // Hygiene Calculator
-  HYGIENE_CALCULATOR: '/kg/v1/tools/hygiene-calculator',
+  HYGIENE_CALCULATOR: '/kg/v1/tools/hygiene-calculator/calculate',
 
   // Diaper Calculator
-  DIAPER_CALCULATOR: '/kg/v1/tools/diaper-calculator',
+  DIAPER_CALCULATOR: '/kg/v1/tools/diaper-calculator/calculate',
   DIAPER_RASH_RISK: '/kg/v1/tools/diaper-calculator/rash-risk',
 
   // Air Quality

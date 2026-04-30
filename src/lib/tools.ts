@@ -85,7 +85,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin günlük su ihtiyacını yaş ve beslenme şekline göre hesaplayın.',
     icon: 'water-outline',
     color: '#06B6D4', bg: '#CFFAFE',
-    route: null,
+    route: '/akilli-asistan/su-ihtiyaci',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/su-ihtiyaci',
   },
   {
@@ -130,7 +130,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin yaş ve kilosuna göre günlük bez ihtiyacını hesaplayın ve pişik riskini değerlendirin.',
     icon: 'calculator-outline',
     color: '#EC4899', bg: '#FCE7F3',
-    route: null,
+    route: '/akilli-asistan/bez-hesaplayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/bez-hesaplayici',
   },
   {
@@ -139,7 +139,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğinizin yaşına ve aktivitesine göre günlük mendil ve hijyen ürünü ihtiyacını hesaplayın.',
     icon: 'sparkles-outline',
     color: '#14B8A6', bg: '#CCFBF1',
-    route: null,
+    route: '/akilli-asistan/hijyen-hesaplayici',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/hijyen-hesaplayici',
   },
   {

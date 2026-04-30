@@ -106,6 +106,17 @@ export interface Ingredient {
   allergen_warning?: string;
 }
 
+/** Ingredient item returned by the /kg/v1/ingredients listing endpoint. */
+export interface ListIngredient {
+  id: number;
+  slug?: string;
+  name: string;
+  image?: string;
+  category?: string;
+  min_age_months?: number;
+  allergen_warning?: string;
+}
+
 export interface IngredientDetail {
   id: number;
   slug: string;

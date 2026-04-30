@@ -25,10 +25,16 @@ import {
   faHandSparkles,
   faBath,
   faCalendar,
+  faCalendarDays,
   faClock,
   faHourglass,
   faCheck,
   faUtensils,
+  faPlus,
+  faTrash,
+  faPen,
+  faFlask,
+  faCircleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -56,10 +62,16 @@ library.add(
   faHandSparkles,
   faBath,
   faCalendar,
+  faCalendarDays,
   faClock,
   faHourglass,
   faCheck,
   faUtensils,
+  faPlus,
+  faTrash,
+  faPen,
+  faFlask,
+  faCircleExclamation,
 );
 
 const ICON_MAP: Record<string, IconDefinition> = {
@@ -76,6 +88,7 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'circle-check': faCheckCircle,
   'info-circle': faInfoCircle,
   'exclamation-circle': faExclamationCircle,
+  'circle-exclamation': faCircleExclamation,
   'chevron-right': faChevronRight,
   'chevron-left': faChevronLeft,
   'link': faLink,
@@ -87,10 +100,15 @@ const ICON_MAP: Record<string, IconDefinition> = {
   'hand-sparkles': faHandSparkles,
   'bath': faBath,
   'calendar': faCalendar,
+  'calendar-days': faCalendarDays,
   'clock': faClock,
   'hourglass': faHourglass,
   'check': faCheck,
   'utensils': faUtensils,
+  'plus': faPlus,
+  'trash': faTrash,
+  'pen': faPen,
+  'flask': faFlask,
 };
 
 export interface IconProps {

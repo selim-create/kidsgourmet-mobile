@@ -39,7 +39,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Yeni besinleri tanıtırken takip edin ve kayıt tutun.',
     icon: 'calendar-outline',
     color: '#16A34A', bg: '#DCFCE7',
-    route: null,
+    route: '/akilli-asistan/besin-takvimi',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/besin-takvimi',
     requiresAuth: true,
   },

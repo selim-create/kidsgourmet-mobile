@@ -901,15 +901,44 @@ export interface RashRiskResult {
 
 // ─── Air Quality Types ────────────────────────────────────────────────────────
 
-export interface AirQualityResult {
+export interface AirQualityInput {
+  home_type: string;
+  has_pets: boolean;
+  has_smoker: boolean;
+  heating_type: string;
+  season: 'winter' | 'spring' | 'summer' | 'autumn';
+  child_age_months?: number;
+  respiratory_issues?: boolean;
+  ventilation_frequency?: 'multiple_daily' | 'daily' | 'rarely';
+  cooking_frequency?: 'high' | 'medium' | 'low';
+}
+
+export interface AirQualityRiskFactor {
+  factor: string;
+  impact: string;
+  severity?: string;
+  category?: string;
+}
+
+export interface AirQualityExternalAqi {
   aqi: number;
-  category: string;
-  color?: string;
-  outdoor_recommendation: string;
-  activity_suggestions?: string[];
-  health_notes?: string[];
-  source?: string;
-  measured_at?: string;
+  quality_level: {
+    level: string;
+    color: string;
+    description: string;
+  };
+  is_safe_for_outdoor: boolean;
+}
+
+export interface AirQualityResult {
+  risk_level: 'low' | 'medium' | 'high';
+  risk_score: number;
+  risk_factors: AirQualityRiskFactor[];
+  recommendations: string[];
+  seasonal_alerts: string[];
+  indoor_tips?: string[];
+  external_aqi?: AirQualityExternalAqi;
+  sponsor?: ToolSponsorData;
 }
 
 // ─── Stain Encyclopedia Types ─────────────────────────────────────────────────

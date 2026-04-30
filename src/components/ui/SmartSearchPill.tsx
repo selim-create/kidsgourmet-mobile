@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -30,7 +30,7 @@ export function SmartSearchPill() {
     );
   }
 
-  const suggestions = buildSuggestions(activeChild?.name, ageMonths);
+  const suggestions = useMemo(() => buildSuggestions(activeChild?.name, ageMonths), [activeChild?.name, ageMonths]);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

@@ -22,6 +22,8 @@ import type { Child } from '../../lib/types';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SHEET_HEIGHT = Math.min(340, SCREEN_HEIGHT * 0.5);
+/** Delay (ms) to wait for the sheet close animation before navigating. */
+const NAVIGATION_DELAY_MS = 240;
 
 /** Gradient colors per age group. */
 function getAgeGradient(ageMonths: number): [string, string] {
@@ -127,12 +129,12 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
   const handleAddChild = () => {
     handleClose();
     // TODO: replace with dedicated child-add screen when available
-    setTimeout(() => router.push('/(tabs)/profile'), 240);
+    setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
   };
 
   const handleManage = () => {
     handleClose();
-    setTimeout(() => router.push('/(tabs)/profile'), 240);
+    setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
   };
 
   return (

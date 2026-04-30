@@ -19,7 +19,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
@@ -36,6 +36,7 @@ import { SmartSearchPill } from './SmartSearchPill';
 import { ChildSwitcherPill } from './ChildSwitcherPill';
 import { ChildSwitcherSheet } from './ChildSwitcherSheet';
 import { HeaderGreeting } from './HeaderGreeting';
+import { useBottomRowStyle } from '../../hooks/use-collapsible-header';
 import { COLORS } from '../../lib/constants';
 
 export interface AppHeaderProps {
@@ -114,15 +115,8 @@ export function AppHeader({
   // ── Bottom row: show when auth and has children (or "add child" pill) ───────
   const showBottomRow = isAuthenticated && showChildSwitcher;
 
-  // ── Collapsible bottom row animated style ───────────────────────────────────
-  // When scrollY is NOT provided, the worklet returns static visible values.
-  const animatedBottomRowStyle = useAnimatedStyle(() => {
-    if (!scrollY) return { height: 48, opacity: 1, overflow: 'hidden' };
-    const clampedY = Math.min(Math.max(scrollY.value, 0), 80);
-    const height = 48 - (clampedY / 80) * 48;
-    const opacity = 1 - clampedY / 48;
-    return { height, opacity, overflow: 'hidden' };
-  });
+  // ── Collapsible bottom row animated style (via shared hook to avoid duplication) ──
+  const animatedBottomRowStyle = useBottomRowStyle(scrollY);
 
   // ── Detail variant: simple back-arrow header ─────────────────────────────────
   if (variant === 'detail') {
@@ -291,6 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingBottom: 6,
+    overflow: 'hidden',
   },
   hamburgerWrap: {
     position: 'relative',

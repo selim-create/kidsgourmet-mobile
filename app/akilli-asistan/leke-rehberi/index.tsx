@@ -190,12 +190,10 @@ export default function StainListScreen() {
                 </View>
               </View>
 
-              {!isSearching && searchResults !== null ? (
+              {!isSearching && searchResults !== null && safeResults.length > 0 ? (
                 <View className="px-4 pt-4 pb-2">
                   <Text className="text-sm text-gray-500">
-                    {safeResults.length > 0
-                      ? `"${query}" için ${safeResults.length} sonuç`
-                      : null}
+                    {`"${query}" için ${safeResults.length} sonuç`}
                   </Text>
                 </View>
               ) : null}

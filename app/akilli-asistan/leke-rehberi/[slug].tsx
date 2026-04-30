@@ -166,18 +166,18 @@ export default function StainDetailScreen() {
                 </View>
                 <Text className="text-base font-bold text-dark">Temizleme Adımları</Text>
               </View>
-              {stain.steps.map((s, index) => (
+              {stain.steps.map((stepItem, index) => (
                 <View key={index} className="mb-4">
                   <View className="flex-row gap-3">
                     <View className="w-6 h-6 rounded-full bg-purple-600 items-center justify-center flex-shrink-0 mt-0.5">
-                      <Text className="text-white text-xs font-bold">{s.step}</Text>
+                      <Text className="text-white text-xs font-bold">{stepItem.step}</Text>
                     </View>
-                    <Text className="flex-1 text-sm text-gray-700 leading-5">{s.instruction}</Text>
+                    <Text className="flex-1 text-sm text-gray-700 leading-5">{stepItem.instruction}</Text>
                   </View>
-                  {s.tip ? (
+                  {stepItem.tip ? (
                     <View className="ml-9 mt-2 flex-row items-start gap-2">
                       <Icon name="lightbulb" size={12} color="#D97706" />
-                      <Text className="flex-1 text-xs text-yellow-700 leading-4">{s.tip}</Text>
+                      <Text className="flex-1 text-xs text-yellow-700 leading-4">{stepItem.tip}</Text>
                     </View>
                   ) : null}
                 </View>

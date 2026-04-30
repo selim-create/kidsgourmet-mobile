@@ -896,22 +896,32 @@ export interface AirQualityResult {
 
 // ─── Stain Encyclopedia Types ─────────────────────────────────────────────────
 
+export interface ToolSponsorData {
+  name: string;
+  logo?: string;
+  url?: string;
+  cta?: string;
+  [key: string]: unknown;
+}
+
 export interface StainGuide {
   id: number;
   slug: string;
-  title: string;
-  stain_type?: string;
-  removal_steps?: string[];
-  products?: string[];
-  warnings?: string[];
-  tips?: string[];
-  image?: string;
+  name: string;
+  emoji: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  steps: { step: number; instruction: string; tip?: string }[];
+  warnings: string[];
+  related_ingredients: string[];
+  sponsor?: ToolSponsorData;
 }
 
 export interface StainSearchResponse {
-  results: StainGuide[];
-  total?: number;
-  query?: string;
+  total: number;
+  stains: StainGuide[];
+  categories: { id: string; label: string }[];
+  sponsor: ToolSponsorData | null;
 }
 
 

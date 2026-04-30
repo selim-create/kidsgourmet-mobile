@@ -151,7 +151,6 @@ export const API_ENDPOINTS = {
 
   // Stain Encyclopedia
   STAIN_ENCYCLOPEDIA_SEARCH: '/kg/v1/tools/stain-encyclopedia/search',
-  STAIN_ENCYCLOPEDIA_POPULAR: '/kg/v1/tools/stain-encyclopedia/popular',
   STAIN_ENCYCLOPEDIA_BY_SLUG: (slug: string) => `/kg/v1/tools/stain-encyclopedia/${slug}`,
 
   // Sponsored Tools

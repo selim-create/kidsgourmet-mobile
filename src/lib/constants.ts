@@ -190,6 +190,22 @@ export const API_ENDPOINTS = {
   USER_PUBLIC: (username: string) => `/kg/v1/user/${username}`,
   EXPERT_PUBLIC: (username: string) => `/kg/v1/experts/${username}`,
   EXPERTS_LIST: '/kg/v1/experts',
+
+  // Community
+  CIRCLES: '/kg/v1/community/circles',
+  CIRCLE_FOLLOW: (id: number) => `/kg/v1/community/circles/${id}/follow`,
+  CIRCLE_UNFOLLOW: (id: number) => `/kg/v1/community/circles/${id}/unfollow`,
+  USER_CIRCLES: '/kg/v1/community/user/circles',
+  DISCUSSIONS: '/kg/v1/community/discussions',
+  DISCUSSION_BY_ID: (id: number) => `/kg/v1/community/discussions/${id}`,
+  DISCUSSION_BY_SLUG: (slug: string) => `/kg/v1/community/discussions/${slug}`,
+  DISCUSSION_COMMENTS: (id: number) => `/kg/v1/community/discussions/${id}/comments`,
+  USER_DISCUSSIONS: '/kg/v1/community/user/discussions',
+  FEED: '/kg/v1/community/feed',
+  TOP_CONTRIBUTORS: '/kg/v1/community/top-contributors',
+  DISCUSSION_VOTE: (id: number) => `/kg/v1/community/discussions/${id}/vote`,
+  COMMENT_VOTE: (id: number) => `/kg/v1/community/comments/${id}/vote`,
+  COMMUNITY_REPORT: '/kg/v1/community/report',
 } as const;
 
 export const APP_NAME = 'KidsGourmet';

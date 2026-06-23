@@ -37,11 +37,11 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
 ];
 
 const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: string; icon: IoniconName; isUrl?: boolean }[] = [
-  { key: 'instagram', label: 'Instagram', placeholder: 'instagram.com/kullanıcı', icon: 'logo-instagram' },
-  { key: 'twitter', label: 'X (Twitter)', placeholder: 'x.com/kullanıcı', icon: 'logo-twitter' },
-  { key: 'facebook', label: 'Facebook', placeholder: 'facebook.com/kullanıcı', icon: 'logo-facebook' },
-  { key: 'linkedin', label: 'LinkedIn', placeholder: 'linkedin.com/in/kullanıcı', icon: 'logo-linkedin' },
-  { key: 'youtube', label: 'YouTube', placeholder: 'youtube.com/kullanıcı', icon: 'logo-youtube' },
+  { key: 'instagram', label: 'Instagram', placeholder: '@kullanici_adi', icon: 'logo-instagram' },
+  { key: 'twitter', label: 'X (Twitter)', placeholder: '@kullanici_adi', icon: 'logo-twitter' },
+  { key: 'facebook', label: 'Facebook', placeholder: 'facebook.com/sayfaniz', icon: 'logo-facebook' },
+  { key: 'linkedin', label: 'LinkedIn', placeholder: 'linkedin.com/in/adsoyadiniz', icon: 'logo-linkedin' },
+  { key: 'youtube', label: 'YouTube', placeholder: 'youtube.com/@kanaliniz', icon: 'logo-youtube' },
   { key: 'website', label: 'Web Sitesi', placeholder: 'https://siteniz.com', icon: 'globe-outline', isUrl: true },
 ];
 
@@ -134,7 +134,9 @@ export default function ProfileEditScreen() {
     setSaving(true);
     try {
       const cleanedSocialLinks: SocialLinks = Object.fromEntries(
-        Object.entries(socialLinks).filter(([, v]) => typeof v === 'string' && v.trim() !== ''),
+        Object.entries(socialLinks)
+          .map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v])
+          .filter(([, v]) => typeof v === 'string' && v !== ''),
       ) as SocialLinks;
       const payload: Record<string, unknown> = {
         name: name.trim(),
@@ -397,7 +399,7 @@ export default function ProfileEditScreen() {
                   onChangeText={(val) => {
                     setSocialLinks((prev) => {
                       const next = { ...prev };
-                      if (val) {
+                      if (val.trim()) {
                         next[field.key] = val;
                       } else {
                         delete next[field.key];

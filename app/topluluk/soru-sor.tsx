@@ -53,9 +53,10 @@ export default function SoruSorScreen() {
 
   useEffect(() => {
     const parsedCircleId = Number(initialCircleId.current);
-    const matchingCircleId = circles?.find((circle) => circle.id === parsedCircleId)?.id;
-    if (!matchingCircleId || selectedCircleId) return;
-    setSelectedCircleId(matchingCircleId);
+    const hasMatchingCircle = Number.isFinite(parsedCircleId)
+      && !!circles?.some((circle) => circle.id === parsedCircleId);
+    if (!hasMatchingCircle || selectedCircleId) return;
+    setSelectedCircleId(parsedCircleId);
   }, [circles, selectedCircleId]);
 
   // ── Validation ──────────────────────────────────────────────────────────────

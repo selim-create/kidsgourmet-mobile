@@ -24,9 +24,11 @@ import {
   updateUserProfile,
   uploadUserAvatar,
 } from '../../src/services/user-service';
+import type { ComponentProps } from 'react';
 import type { SocialLinks } from '../../src/lib/types';
 
 type Gender = 'male' | 'female' | 'other';
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'female', label: 'Kadın' },
@@ -34,13 +36,13 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'other', label: 'Diğer' },
 ];
 
-const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: string; icon: string }[] = [
+const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: string; icon: IoniconName; isUrl?: boolean }[] = [
   { key: 'instagram', label: 'Instagram', placeholder: 'instagram.com/kullanıcı', icon: 'logo-instagram' },
   { key: 'twitter', label: 'X (Twitter)', placeholder: 'x.com/kullanıcı', icon: 'logo-twitter' },
   { key: 'facebook', label: 'Facebook', placeholder: 'facebook.com/kullanıcı', icon: 'logo-facebook' },
   { key: 'linkedin', label: 'LinkedIn', placeholder: 'linkedin.com/in/kullanıcı', icon: 'logo-linkedin' },
   { key: 'youtube', label: 'YouTube', placeholder: 'youtube.com/kullanıcı', icon: 'logo-youtube' },
-  { key: 'website', label: 'Web Sitesi', placeholder: 'https://siteniz.com', icon: 'globe-outline' },
+  { key: 'website', label: 'Web Sitesi', placeholder: 'https://siteniz.com', icon: 'globe-outline', isUrl: true },
 ];
 
 export default function ProfileEditScreen() {
@@ -131,6 +133,9 @@ export default function ProfileEditScreen() {
     }
     setSaving(true);
     try {
+      const cleanedSocialLinks: SocialLinks = Object.fromEntries(
+        Object.entries(socialLinks).filter(([, v]) => typeof v === 'string' && v.trim() !== ''),
+      ) as SocialLinks;
       const payload: Record<string, unknown> = {
         name: name.trim(),
         email: email.trim(),
@@ -139,7 +144,7 @@ export default function ProfileEditScreen() {
         birth_date: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
         biography: biography.trim() || undefined,
         show_email: showEmail,
-        social_links: Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
+        social_links: Object.keys(cleanedSocialLinks).length > 0 ? cleanedSocialLinks : undefined,
       };
       if (password.trim()) {
         payload.password = password.trim();
@@ -386,16 +391,24 @@ export default function ProfileEditScreen() {
                   index < SOCIAL_FIELDS.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
-                <Ionicons name={field.icon as 'globe-outline'} size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
+                <Ionicons name={field.icon} size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
                 <TextInput
                   value={socialLinks[field.key] ?? ''}
-                  onChangeText={(val) =>
-                    setSocialLinks((prev) => ({ ...prev, [field.key]: val || undefined }))
-                  }
+                  onChangeText={(val) => {
+                    setSocialLinks((prev) => {
+                      const next = { ...prev };
+                      if (val) {
+                        next[field.key] = val;
+                      } else {
+                        delete next[field.key];
+                      }
+                      return next;
+                    });
+                  }}
                   placeholder={field.placeholder}
                   placeholderTextColor="#9CA3AF"
                   autoCapitalize="none"
-                  keyboardType="url"
+                  keyboardType={field.isUrl ? 'url' : 'default'}
                   className="flex-1 text-dark text-sm"
                 />
               </View>

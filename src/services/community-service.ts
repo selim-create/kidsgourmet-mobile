@@ -11,6 +11,34 @@ import type {
   TopContributor,
   VoteResponse,
 } from '../lib/types';
+import { ensureCommentDefaults, ensureDiscussionDefaults } from '../utils/helpers';
+
+function normalizeCircle(circle: Circle): Circle {
+  const resolvedColor = circle.color_code ?? circle.color;
+  const resolvedIcon = circle.icon ?? circle.icon_name;
+  return {
+    ...circle,
+    color: resolvedColor,
+    color_code: resolvedColor,
+    icon: resolvedIcon,
+    icon_name: circle.icon_name ?? resolvedIcon,
+  };
+}
+
+function normalizeDiscussion(discussion: Discussion): Discussion {
+  return ensureDiscussionDefaults({
+    ...discussion,
+    circle: discussion.circle ? normalizeCircle(discussion.circle) : discussion.circle,
+    circle_id: discussion.circle_id ?? discussion.circle?.id,
+  });
+}
+
+function normalizeComment(comment: DiscussionComment): DiscussionComment {
+  return ensureCommentDefaults({
+    ...comment,
+    is_expert_comment: comment.is_expert_comment ?? comment.is_expert_answer,
+  });
+}
 
 // ─── Circles ──────────────────────────────────────────────────────────────────
 
@@ -19,8 +47,8 @@ export async function getCircles(): Promise<Circle[]> {
     API_ENDPOINTS.CIRCLES,
     { skipAuth: true },
   );
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object' && 'circles' in data) return data.circles;
+  if (Array.isArray(data)) return data.map(normalizeCircle);
+  if (data && typeof data === 'object' && 'circles' in data) return data.circles.map(normalizeCircle);
   return [];
 }
 
@@ -28,8 +56,8 @@ export async function getUserCircles(): Promise<Circle[]> {
   const data = await api.get<Circle[] | { circles: Circle[] }>(
     API_ENDPOINTS.USER_CIRCLES,
   );
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object' && 'circles' in data) return data.circles;
+  if (Array.isArray(data)) return data.map(normalizeCircle);
+  if (data && typeof data === 'object' && 'circles' in data) return data.circles.map(normalizeCircle);
   return [];
 }
 
@@ -78,7 +106,7 @@ export async function getDiscussions(
 
   if (Array.isArray(data)) {
     return {
-      discussions: data,
+      discussions: data.map(normalizeDiscussion),
       total: data.length,
       page: filters.page ?? 1,
       per_page: filters.per_page ?? 20,
@@ -86,19 +114,24 @@ export async function getDiscussions(
     };
   }
 
-  return data as DiscussionsResponse;
+  return {
+    ...data,
+    discussions: (data.discussions ?? []).map(normalizeDiscussion),
+  } as DiscussionsResponse;
 }
 
 export async function getDiscussionById(id: number): Promise<Discussion> {
-  return api.get<Discussion>(API_ENDPOINTS.DISCUSSION_BY_ID(id), {
+  const data = await api.get<Discussion>(API_ENDPOINTS.DISCUSSION_BY_ID(id), {
     skipAuth: true,
   });
+  return normalizeDiscussion(data);
 }
 
 export async function getDiscussionBySlug(slug: string): Promise<Discussion> {
-  return api.get<Discussion>(API_ENDPOINTS.DISCUSSION_BY_SLUG(slug), {
+  const data = await api.get<Discussion>(API_ENDPOINTS.DISCUSSION_BY_SLUG(slug), {
     skipAuth: true,
   });
+  return normalizeDiscussion(data);
 }
 
 export async function getDiscussionComments(
@@ -108,8 +141,8 @@ export async function getDiscussionComments(
     API_ENDPOINTS.DISCUSSION_COMMENTS(discussionId),
     { skipAuth: true },
   );
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object' && 'comments' in data) return data.comments;
+  if (Array.isArray(data)) return data.map(normalizeComment);
+  if (data && typeof data === 'object' && 'comments' in data) return data.comments.map(normalizeComment);
   return [];
 }
 

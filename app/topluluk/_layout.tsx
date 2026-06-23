@@ -5,6 +5,8 @@ export default function ToplulukLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="soru-sor" />
+      <Stack.Screen name="[slug]" />
+      <Stack.Screen name="odak/[slug]" />
     </Stack>
   );
 }

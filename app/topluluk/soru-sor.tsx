@@ -25,7 +25,7 @@ import type { Circle } from '../../src/lib/types';
 export default function SoruSorScreen() {
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
-  const params = useLocalSearchParams<{ konu?: string }>();
+  const params = useLocalSearchParams<{ konu?: string; circle?: string }>();
 
   const [selectedCircleId, setSelectedCircleId] = useState<number | null>(null);
   const [title, setTitle] = useState('');
@@ -38,6 +38,7 @@ export default function SoruSorScreen() {
 
   // Pre-fill title from `konu` query param (only on initial mount)
   const initialKonu = useRef(params.konu);
+  const initialCircleId = useRef(params.circle);
   useEffect(() => {
     if (initialKonu.current) {
       setTitle(initialKonu.current);
@@ -49,6 +50,18 @@ export default function SoruSorScreen() {
     'community/circles',
     () => getCircles(),
   );
+
+  useEffect(() => {
+    const parsedCircleId = Number(initialCircleId.current);
+    if (
+      !Number.isFinite(parsedCircleId)
+      || !circles?.some((circle) => circle.id === parsedCircleId)
+      || selectedCircleId
+    ) {
+      return;
+    }
+    setSelectedCircleId(parsedCircleId);
+  }, [circles, selectedCircleId]);
 
   // ── Validation ──────────────────────────────────────────────────────────────
 

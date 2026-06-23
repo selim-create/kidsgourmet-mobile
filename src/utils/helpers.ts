@@ -227,3 +227,29 @@ export function ensureDiscussionDefaults<T extends {
     tags: discussion.tags ?? [],
   };
 }
+
+/**
+ * Ensure a discussion comment object has all required default values.
+ */
+export function ensureCommentDefaults<T extends {
+  parent_id?: number | null;
+  vote_count?: number;
+  upvote_count?: number;
+  downvote_count?: number;
+  user_vote?: 'up' | 'down' | null;
+  replies?: unknown[];
+  is_expert_comment?: boolean;
+  is_expert_answer?: boolean;
+}>(comment: T): T {
+  return {
+    ...comment,
+    parent_id: comment.parent_id ?? null,
+    vote_count: comment.vote_count ?? 0,
+    upvote_count: comment.upvote_count ?? 0,
+    downvote_count: comment.downvote_count ?? 0,
+    user_vote: comment.user_vote ?? null,
+    replies: comment.replies ?? [],
+    is_expert_answer: comment.is_expert_answer ?? false,
+    is_expert_comment: comment.is_expert_comment ?? false,
+  };
+}

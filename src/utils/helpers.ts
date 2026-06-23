@@ -249,6 +249,7 @@ export function ensureCommentDefaults<T extends {
     downvote_count: comment.downvote_count ?? 0,
     user_vote: comment.user_vote ?? null,
     replies: comment.replies ?? [],
+    is_expert_answer: comment.is_expert_answer ?? false,
     is_expert_comment: comment.is_expert_comment ?? false,
   };
 }

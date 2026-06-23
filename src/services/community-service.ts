@@ -14,10 +14,14 @@ import type {
 import { ensureCommentDefaults, ensureDiscussionDefaults } from '../utils/helpers';
 
 function normalizeCircle(circle: Circle): Circle {
+  const resolvedColor = circle.color_code ?? circle.color;
+  const resolvedIcon = circle.icon ?? circle.icon_name;
   return {
     ...circle,
-    color: circle.color ?? circle.color_code,
-    icon: circle.icon ?? circle.icon_name,
+    color: resolvedColor,
+    color_code: resolvedColor,
+    icon: resolvedIcon,
+    icon_name: circle.icon_name ?? resolvedIcon,
   };
 }
 

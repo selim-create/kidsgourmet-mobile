@@ -243,7 +243,7 @@ export function ensureCommentDefaults<T extends {
 }>(comment: T): T {
   return {
     ...comment,
-    parent_id: comment.parent_id ?? 0,
+    parent_id: comment.parent_id ?? null,
     vote_count: comment.vote_count ?? 0,
     upvote_count: comment.upvote_count ?? 0,
     downvote_count: comment.downvote_count ?? 0,

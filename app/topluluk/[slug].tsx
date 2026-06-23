@@ -254,13 +254,8 @@ export default function DiscussionDetailScreen() {
       await voteDiscussion(discussionIdValue, vote);
     } catch {
       await mutateDiscussion();
-      setRelatedTopics(
-        (relatedData?.discussions ?? [])
-          .filter((item) => item.id !== discussion?.id)
-          .slice(0, 3),
-      );
     }
-  }, [discussion?.id, isAuthenticated, mutateDiscussion, relatedData?.discussions, requireAuth]);
+  }, [isAuthenticated, mutateDiscussion, requireAuth]);
 
   const handleFavoriteToggle = useCallback(async (discussionIdValue: number, isFavorite: boolean) => {
     if (!isAuthenticated) {
@@ -377,7 +372,7 @@ export default function DiscussionDetailScreen() {
     const commentTextValue = stripHtml(decodeHtmlEntities(comment.content));
     const timeAgo = formatRelativeTime(comment.created_at);
     const isExpert = comment.is_expert_comment || comment.is_expert_answer;
-    const upvoteCount = comment.upvote_count ?? Math.max(0, comment.vote_count ?? 0);
+    const upvoteCount = comment.upvote_count ?? 0;
     const downvoteCount = comment.downvote_count ?? 0;
     const replies = repliesByParent[comment.id] ?? [];
 

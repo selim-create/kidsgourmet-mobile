@@ -286,12 +286,14 @@ export default function CircleDetailScreen() {
                 <Text style={styles.heroDescription}>{circle.description}</Text>
               ) : null}
 
-              <View style={styles.heroStats}>
-                <View style={styles.heroStatChip}>
-                  <Ionicons name="chatbubbles-outline" size={16} color={COLORS.gray[500]} />
-                  <Text style={styles.heroStatText}>{circle?.discussion_count ?? discussions.length} tartışma</Text>
+              {typeof circle?.discussion_count === 'number' ? (
+                <View style={styles.heroStats}>
+                  <View style={styles.heroStatChip}>
+                    <Ionicons name="chatbubbles-outline" size={16} color={COLORS.gray[500]} />
+                    <Text style={styles.heroStatText}>{circle.discussion_count} tartışma</Text>
+                  </View>
                 </View>
-              </View>
+              ) : null}
 
               <TouchableOpacity
                 style={[

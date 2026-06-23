@@ -8,11 +8,10 @@ import { ChildWizard } from '../../../../src/components/profile/ChildWizard';
 
 export default function EditChildScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const childId = Number(id);
 
   const { data: child, isLoading } = useSWR(
-    childId ? `child-${childId}` : null,
-    () => getChild(childId),
+    id ? `child-${id}` : null,
+    () => getChild(id),
   );
 
   if (isLoading) {

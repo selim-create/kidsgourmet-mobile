@@ -7,19 +7,21 @@ import { uploadChildAvatar } from '../../services/user-service';
 import Toast from 'react-native-toast-message';
 
 interface ChildAvatarPickerProps {
-  childId?: number;
+  childUuid?: string;
   currentUrl?: string | null;
   name: string;
   size?: number;
   onChange: (url: string) => void;
+  onUploaded?: () => void;
 }
 
 export function ChildAvatarPicker({
-  childId,
+  childUuid,
   currentUrl,
   name,
   size = 80,
   onChange,
+  onUploaded,
 }: ChildAvatarPickerProps) {
   const [uploading, setUploading] = React.useState(false);
   const [localUri, setLocalUri] = React.useState<string | null>(null);
@@ -64,8 +66,8 @@ export function ChildAvatarPicker({
       const asset = result.assets[0];
       const uri = asset.uri;
 
-      if (!childId) {
-        // No child ID yet — return local URI to parent
+      if (!childUuid) {
+        // No child UUID yet — return local URI to parent
         setLocalUri(uri);
         onChange(uri);
         return;
@@ -73,17 +75,15 @@ export function ChildAvatarPicker({
 
       // Upload immediately
       setUploading(true);
-      const formData = new FormData();
-      formData.append('avatar', {
+      const updated = await uploadChildAvatar(childUuid, {
         uri,
-        type: asset.mimeType ?? 'image/jpeg',
-        name: asset.fileName ?? 'avatar.jpg',
-      } as unknown as Blob);
-
-      const updated = await uploadChildAvatar(childId, formData);
-      const newUrl = updated.avatar_url ?? uri;
+        mimeType: asset.mimeType,
+        fileName: asset.fileName,
+      });
+      const newUrl = updated.avatar_url ?? updated.url ?? updated.avatar?.url ?? uri;
       setLocalUri(newUrl);
       onChange(newUrl);
+      onUploaded?.();
       Toast.show({ type: 'success', text1: 'Avatar güncellendi' });
     } catch {
       Toast.show({ type: 'error', text1: 'Avatar yüklenemedi' });

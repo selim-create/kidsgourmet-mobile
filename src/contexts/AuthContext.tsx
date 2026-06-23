@@ -26,6 +26,9 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Refresh well before the 15-min signed-URL expiry
+const AVATAR_REFRESH_INTERVAL_MS = 12 * 60 * 1000;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +82,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     }
   }, []);
+
+  // Periodically refresh the profile to get fresh signed avatar URLs
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(() => {
+      refreshUser().catch(() => {/* silent */});
+    }, AVATAR_REFRESH_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [user, refreshUser]);
 
   return (
     <AuthContext.Provider

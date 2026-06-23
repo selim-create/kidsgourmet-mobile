@@ -10,8 +10,15 @@ export const API_ENDPOINTS = {
   PROFILE: '/kg/v1/user/profile',
   USER_AVATAR: '/kg/v1/user/avatar',
   CHILDREN: '/kg/v1/user/children',
+  /** @deprecated Use CHILD_PROFILE(uuid) instead */
   CHILD: (id: number) => `/kg/v1/user/children/${id}`,
+  /** @deprecated Use CHILD_PROFILE_AVATAR(uuid) instead */
   AVATAR: (id: number) => `/kg/v1/user/children/${id}/avatar`,
+
+  // Child Profiles (NEW — correct UUID-based)
+  CHILD_PROFILES: '/kg/v1/child-profiles',
+  CHILD_PROFILE: (uuid: string) => `/kg/v1/child-profiles/${uuid}`,
+  CHILD_PROFILE_AVATAR: (uuid: string) => `/kg/v1/child-profiles/${uuid}/avatar`,
 
   // Recipes
   RECIPES: '/kg/v1/recipes',

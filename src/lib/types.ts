@@ -8,33 +8,76 @@ export interface SocialLinks {
   website?: string;
 }
 
+export interface UserStats {
+  question_count: number;
+  comment_count: number;
+}
+
+export interface EditUrls {
+  new_post?: string;
+  new_recipe?: string;
+  new_ingredient?: string;
+  new_discussion?: string;
+}
+
+export interface CanEdit {
+  posts?: boolean;
+  recipes?: boolean;
+  ingredients?: boolean;
+  discussions?: boolean;
+}
+
 export interface User {
   id: number;
   email: string;
   name: string;
   display_name?: string;
   username?: string;
-  avatar_url?: string;
+  /** Avatar URL — may be signed for some setups */
+  avatar_url?: string | null;
   role?: 'subscriber' | 'editor' | 'administrator' | 'kg_expert' | string;
   parent_role?: 'Anne' | 'Baba' | 'Bakıcı' | 'Diğer' | string;
   gender?: 'male' | 'female' | 'other';
   birth_date?: string;
   is_expert?: boolean;
+  is_admin?: boolean;
+  is_editor?: boolean;
+  has_editor_access?: boolean;
+  admin_url?: string;
+  edit_urls?: EditUrls;
+  can_edit?: CanEdit;
+  can_edit_others?: CanEdit;
   biography?: string;
   expertise?: string[];
   social_links?: SocialLinks;
   show_email?: boolean;
+  followed_circles?: number[];
+  stats?: UserStats;
+  /** Child list returned by /profile endpoint */
+  children?: Child[];
   created_at?: string;
 }
 
+export type FeedingStyle = 'breast' | 'formula' | 'mixed' | 'solid' | string;
+
 export interface Child {
-  id: number;
+  /** UUID string from backend (NOT number!) */
+  id: string;
   name: string;
   birth_date: string;
   gender?: 'male' | 'female' | 'other';
-  avatar_url?: string;
+  /** Primary field returned by backend */
   allergies?: string[];
+  /** @deprecated kept for backward compatibility with older mobile code that used `allergens` */
   allergens?: string[];
+  feeding_style?: FeedingStyle;
+  photo_id?: number | null;
+  kvkk_consent?: boolean;
+  created_at?: string;
+  avatar_path?: string | null;
+  has_avatar?: boolean;
+  /** Signed URL, ~15 min expiry — refresh by reloading profile */
+  avatar_url?: string | null;
   diet_types?: string[];
   notes?: string;
   age_months?: number;

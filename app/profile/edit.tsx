@@ -87,13 +87,11 @@ export default function ProfileEditScreen() {
 
       const asset = result.assets[0];
       setUploadingAvatar(true);
-      const formData = new FormData();
-      formData.append('avatar', {
+      const response = await uploadUserAvatar({
         uri: asset.uri,
-        type: asset.mimeType ?? 'image/jpeg',
-        name: asset.fileName ?? 'avatar.jpg',
-      } as unknown as Blob);
-      const response = await uploadUserAvatar(formData);
+        mimeType: asset.mimeType,
+        fileName: asset.fileName,
+      });
       setAvatarUrl(response.url);
       await refreshUser();
       Toast.show({ type: 'success', text1: 'Avatar güncellendi' });
@@ -269,7 +267,9 @@ export default function ProfileEditScreen() {
             <DateTimePicker
               value={birthDate ?? new Date()}
               mode="date"
-              display="compact"
+              display="spinner"
+              locale="tr-TR"
+              themeVariant="light"
               maximumDate={new Date()}
               onChange={(_, date) => date && setBirthDate(date)}
             />
@@ -290,6 +290,7 @@ export default function ProfileEditScreen() {
                   value={birthDate ?? new Date()}
                   mode="date"
                   display="default"
+                  locale="tr-TR"
                   maximumDate={new Date()}
                   onChange={(_, date) => {
                     setShowDatePicker(false);

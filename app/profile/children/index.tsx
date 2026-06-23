@@ -28,7 +28,7 @@ export default function ChildrenListScreen() {
     mutate,
   } = useSWR(API_ENDPOINTS.CHILDREN, () => getChildren());
 
-  const handleDelete = (id: number, name: string) => {
+  const handleDelete = (uuid: string, name: string) => {
     Alert.alert(
       'Çocuğu Sil',
       `${name} profilini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`,
@@ -39,7 +39,7 @@ export default function ChildrenListScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await deleteChild(id);
+              await deleteChild(uuid);
               await reloadChildren();
               await mutate();
               Toast.show({ type: 'success', text1: `${name} silindi` });

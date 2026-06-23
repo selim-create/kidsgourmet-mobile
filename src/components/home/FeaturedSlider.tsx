@@ -59,7 +59,7 @@ function mapApiTypeToContentType(apiType: FeaturedItem['type']): FeaturedContent
   }
 }
 
-// ─── Card Components ──────────────────────────────────────────────────────────
+// ─── Card Components ───────────────────────────────────────────────────────────
 
 function RecipeFeaturedCard({ item }: { item: MappedFeaturedItem }) {
   const { data } = item;
@@ -96,9 +96,9 @@ function RecipeFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Ionicons name="restaurant-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Tarif</Text>
         </View>
-        {data.meta.age_group ? (
-          <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: data.meta.age_group_color ?? '#FF8A65', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
-            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>{data.meta.age_group}</Text>
+        {data.meta?.age_group ? (
+          <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: data.meta?.age_group_color ?? '#FF8A65', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
+            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>{data.meta?.age_group}</Text>
           </View>
         ) : null}
       </View>
@@ -107,10 +107,10 @@ function RecipeFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         {data.excerpt ? (
           <Text style={{ fontSize: 13, color: COLORS.gray[500], lineHeight: 18 }} numberOfLines={2}>{data.excerpt}</Text>
         ) : null}
-        {data.meta.author_name ? (
+        {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
-            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta.author_name}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
       </View>
@@ -138,9 +138,9 @@ function GuideFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Ionicons name="newspaper-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Rehber</Text>
         </View>
-        {data.meta.category ? (
+        {data.meta?.category ? (
           <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
-            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta.category}</Text>
+            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta?.category}</Text>
           </View>
         ) : null}
       </View>
@@ -149,10 +149,10 @@ function GuideFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         {data.excerpt ? (
           <Text style={{ fontSize: 13, color: COLORS.gray[500], lineHeight: 18 }} numberOfLines={2}>{data.excerpt}</Text>
         ) : null}
-        {data.meta.author_name ? (
+        {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
-            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta.author_name}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
       </View>
@@ -174,9 +174,9 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Ionicons name="chatbubbles-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Soru</Text>
         </View>
-        {data.meta.answer_count !== undefined ? (
+        {data.meta?.answer_count !== undefined ? (
           <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
-            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta.answer_count} yanıt</Text>
+            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta?.answer_count} yanıt</Text>
           </View>
         ) : null}
       </View>
@@ -185,10 +185,10 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         {data.excerpt ? (
           <Text style={{ fontSize: 13, color: COLORS.gray[500], lineHeight: 18 }} numberOfLines={2}>{data.excerpt}</Text>
         ) : null}
-        {data.meta.author_name ? (
+        {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
-            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta.author_name}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
       </View>
@@ -198,14 +198,14 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
 
 function SponsorFeaturedCard({ item }: { item: MappedFeaturedItem }) {
   const { data } = item;
-  const sponsorName = data.meta.sponsor_name ?? data.title ?? 'Sponsorlu';
-  const sponsorLogo = data.meta.sponsor_logo;
+  const sponsorName = data.meta?.sponsor_name ?? data.title ?? 'Sponsorlu';
+  const sponsorLogo = data.meta?.sponsor_logo;
 
   return (
     <TouchableOpacity
       activeOpacity={0.88}
       onPress={() => handleSponsorPress(data)}
-      style={{ width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10, borderWidth: 2, borderColor: '#334155' }}
+      style={{ width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10 }}
     >
       <View style={{ position: 'relative' }}>
         {data.image ? (
@@ -220,7 +220,7 @@ function SponsorFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           </View>
         )}
         {/* Brand badge: logo + name (graceful fallback: "Sponsorlu") */}
-        <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#334155', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#334155', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
           {sponsorLogo ? (
             <Image source={{ uri: sponsorLogo }} style={{ width: 16, height: 16, borderRadius: 8 }} contentFit="contain" />
           ) : null}
@@ -257,9 +257,9 @@ function IngredientFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Ionicons name="leaf-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Malzeme</Text>
         </View>
-        {data.meta.start_age ? (
+        {data.meta?.start_age ? (
           <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
-            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta.start_age}+</Text>
+            <Text style={{ color: '#fff', fontSize: 11 }}>{data.meta?.start_age}+</Text>
           </View>
         ) : null}
       </View>
@@ -268,10 +268,10 @@ function IngredientFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         {data.excerpt ? (
           <Text style={{ fontSize: 13, color: COLORS.gray[500], lineHeight: 18 }} numberOfLines={2}>{data.excerpt}</Text>
         ) : null}
-        {data.meta.allergy_risk ? (
+        {data.meta?.allergy_risk ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <Ionicons name="warning-outline" size={14} color={COLORS.gray[400]} />
-            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>Alerji riski: {data.meta.allergy_risk}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>Alerji riski: {data.meta?.allergy_risk}</Text>
           </View>
         ) : null}
       </View>
@@ -307,7 +307,7 @@ function ToolFeaturedCard() {
   );
 }
 
-// ─── Filter Tab Config ────────────────────────────────────────────────────────
+// ─── Filter Tab Config ──────────────────────────────────────────────────────────
 
 interface TabConfig {
   type: FilterTab;
@@ -339,8 +339,8 @@ export function FeaturedSlider() {
   const { data: apiItems = [] } = useSWR<FeaturedItem[]>('all-featured', () => getAllFeatured(5));
 
   const lastSponsor = useMemo(() => apiItems.find(i => i.type === 'sponsor'), [apiItems]);
-  const sponsorName = lastSponsor?.meta.sponsor_name || 'Sponsor';
-  const sponsorLogo = lastSponsor?.meta.sponsor_logo || '';
+  const sponsorName = lastSponsor?.meta?.sponsor_name || 'Sponsor';
+  const sponsorLogo = lastSponsor?.meta?.sponsor_logo || '';
 
   const allItems: MappedFeaturedItem[] = useMemo(() => [
     ...apiItems.map((item): MappedFeaturedItem => ({

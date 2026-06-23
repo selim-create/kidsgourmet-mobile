@@ -10,7 +10,7 @@ export interface FeaturedItem {
   image?: string;
   excerpt?: string;
   date: string;
-  meta: {
+  meta?: {
     age_group?: string;
     age_group_color?: string;
     prep_time?: string;
@@ -46,7 +46,13 @@ export async function getAllFeatured(limit = 5): Promise<FeaturedItem[]> {
     const response = await api.get<{ success: boolean; data: FeaturedItem[] }>(
       `${API_ENDPOINTS.FEATURED}?limit=${limit}`
     );
-    return response?.data || [];
+    const items = response?.data ?? [];
+    // Defensive: the API occasionally omits `meta`, which would crash the
+    // featured cards (e.g. `data.meta.category`). Guarantee an object here.
+    return items.map((item) => ({
+      ...item,
+      meta: item.meta ?? {},
+    }));
   } catch {
     return [];
   }

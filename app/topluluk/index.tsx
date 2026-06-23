@@ -17,10 +17,9 @@ import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
 
 import { Avatar } from '../../src/components/ui/Avatar';
-import { Badge } from '../../src/components/ui/Badge';
+import { DiscussionCard } from '../../src/components/community/DiscussionCard';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
-import { useAuth } from '../../src/contexts/AuthContext';
 import { COLORS } from '../../src/lib/constants';
 import {
   getCircles,
@@ -30,177 +29,7 @@ import {
   reportContent,
 } from '../../src/services/community-service';
 import { addFavoriteItem, removeFavoriteItem } from '../../src/services/favorites-service';
-import { formatRelativeTime, decodeHtmlEntities, stripHtml, truncate } from '../../src/utils/helpers';
 import type { Circle, Discussion, TopContributor } from '../../src/lib/types';
-
-// ─── DiscussionCard ───────────────────────────────────────────────────────────
-
-interface DiscussionCardProps {
-  discussion: Discussion;
-  onVote: (id: number, vote: 'up' | 'down') => void;
-  onFavoriteToggle: (id: number, isFav: boolean) => void;
-  onReport: (id: number) => void;
-}
-
-function DiscussionCard({ discussion, onVote, onFavoriteToggle, onReport }: DiscussionCardProps) {
-  const { isAuthenticated } = useAuth();
-  const title = decodeHtmlEntities(discussion.title);
-  const excerpt = discussion.excerpt
-    ? truncate(stripHtml(decodeHtmlEntities(discussion.excerpt)), 120)
-    : '';
-  const authorName = discussion.author?.display_name ?? discussion.author?.name ?? 'Anonim';
-  const timeAgo = formatRelativeTime(discussion.created_at);
-  const commentCount = discussion.answer_count ?? discussion.comment_count ?? 0;
-
-  const handlePress = () => {
-    router.push(`/topluluk/${discussion.slug}` as never);
-  };
-
-  const handleCirclePress = () => {
-    if (discussion.circle?.slug) {
-      router.push(`/topluluk/odak/${discussion.circle.slug}` as never);
-    }
-  };
-
-  const handleFavorite = () => {
-    if (!isAuthenticated) {
-      router.push('/(auth)/login');
-      return;
-    }
-    onFavoriteToggle(discussion.id, discussion.is_favorite ?? false);
-  };
-
-  const handleMoreMenu = () => {
-    Alert.alert('', '', [
-      {
-        text: 'Raporla',
-        style: 'destructive',
-        onPress: () => onReport(discussion.id),
-      },
-      { text: 'İptal', style: 'cancel' },
-    ]);
-  };
-
-  const handleVote = (vote: 'up' | 'down') => {
-    if (!isAuthenticated) {
-      router.push('/(auth)/login');
-      return;
-    }
-    onVote(discussion.id, vote);
-  };
-
-  const upvoteCount = discussion.upvote_count ?? Math.max(0, discussion.vote_count ?? 0);
-  const downvoteCount = discussion.downvote_count ?? 0;
-
-  return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.97}
-      onPress={handlePress}
-    >
-      {/* Header: avatar + author + time + menu */}
-      <View style={styles.cardHeader}>
-        <View style={styles.cardAuthorRow}>
-          <Avatar uri={discussion.author?.avatar_url} name={authorName} size={36} />
-          <View style={styles.cardAuthorInfo}>
-            <Text style={styles.cardAuthorName}>{authorName}</Text>
-            <Text style={styles.cardTime}>{timeAgo}</Text>
-          </View>
-        </View>
-        <TouchableOpacity onPress={handleMoreMenu} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Ionicons name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Circle badge + expert badge */}
-      <View style={styles.cardBadgeRow}>
-        {discussion.circle && (
-          <TouchableOpacity onPress={handleCirclePress} activeOpacity={0.75}>
-            <View style={[styles.circleBadge, { backgroundColor: discussion.circle.color ? discussion.circle.color + '22' : '#FF8A6522' }]}>
-              <Text style={[styles.circleBadgeText, { color: discussion.circle.color ?? COLORS.primary }]}>
-                {discussion.circle.name}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        {(discussion.has_expert_answer || discussion.is_answered) && (
-          <View style={styles.expertBadge}>
-            <Ionicons name="checkmark-circle" size={12} color="#16A34A" />
-            <Text style={styles.expertBadgeText}>Uzman Yanıtladı</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Title */}
-      <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
-        <Text style={styles.cardTitle} numberOfLines={2}>{title}</Text>
-      </TouchableOpacity>
-
-      {/* Excerpt */}
-      {excerpt ? (
-        <Text style={styles.cardExcerpt} numberOfLines={3}>{excerpt}</Text>
-      ) : null}
-
-      {/* Footer: votes + comments + favorite */}
-      <View style={styles.cardFooter}>
-        {/* Upvote */}
-        <TouchableOpacity
-          style={[styles.voteButton, discussion.user_vote === 'up' && styles.voteButtonActive]}
-          onPress={() => handleVote('up')}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={discussion.user_vote === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
-            size={16}
-            color={discussion.user_vote === 'up' ? COLORS.primary : COLORS.gray[400]}
-          />
-          {upvoteCount > 0 && (
-            <Text style={[styles.voteCount, discussion.user_vote === 'up' && styles.voteCountActive]}>
-              {upvoteCount}
-            </Text>
-          )}
-        </TouchableOpacity>
-
-        {/* Downvote */}
-        <TouchableOpacity
-          style={[styles.voteButton, discussion.user_vote === 'down' && styles.voteButtonDownActive]}
-          onPress={() => handleVote('down')}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={discussion.user_vote === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
-            size={16}
-            color={discussion.user_vote === 'down' ? '#EF4444' : COLORS.gray[400]}
-          />
-          {downvoteCount > 0 && (
-            <Text style={[styles.voteCount, discussion.user_vote === 'down' && styles.voteCountDown]}>
-              {downvoteCount}
-            </Text>
-          )}
-        </TouchableOpacity>
-
-        {/* Comment count */}
-        <TouchableOpacity style={styles.commentButton} onPress={handlePress} activeOpacity={0.7}>
-          <Ionicons name="chatbubble-outline" size={16} color={COLORS.gray[400]} />
-          <Text style={styles.commentCount}>{commentCount}</Text>
-        </TouchableOpacity>
-
-        {/* Favorite */}
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={handleFavorite}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={discussion.is_favorite ? 'heart' : 'heart-outline'}
-            size={18}
-            color={discussion.is_favorite ? '#EF4444' : COLORS.gray[400]}
-          />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 // ─── TopContributorCard ───────────────────────────────────────────────────────
 
@@ -228,7 +57,6 @@ function TopContributorCard({ contributor, rank }: { contributor: TopContributor
 
 export default function CommunityHomeScreen() {
   const insets = useSafeAreaInsets();
-  const { isAuthenticated } = useAuth();
 
   const [selectedCircle, setSelectedCircle] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');

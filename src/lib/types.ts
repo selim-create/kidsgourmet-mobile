@@ -1268,7 +1268,9 @@ export interface Circle {
   slug: string;
   description?: string;
   icon?: string;
+  icon_name?: string;
   color?: string;
+  color_code?: string;
   member_count?: number;
   discussion_count?: number;
   is_following?: boolean;
@@ -1332,6 +1334,7 @@ export interface DiscussionComment {
   upvote_count?: number;
   downvote_count?: number;
   user_vote?: 'up' | 'down' | null;
+  is_expert_comment?: boolean;
   is_expert_answer?: boolean;
   parent_id?: number | null;
   replies?: DiscussionComment[];

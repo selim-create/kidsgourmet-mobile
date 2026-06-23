@@ -583,7 +583,7 @@ export default function ExpertProfileScreen() {
                             }}
                           >
                             <Ionicons
-                              name={faToIonicon(q.circle.icon) as any}
+                              name={faToIonicon(q.circle.icon)}
                               size={12}
                               color={q.circle.color_code}
                             />

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+
 /**
  * Map recipe difficulty to icon names (Ionicons).
  */
@@ -48,7 +50,12 @@ export function getSafetyIcon(
   }
 }
 
-const FA_TO_IONICON_MAP: Record<string, string> = {
+/**
+ * Known FontAwesome class → Ionicons glyph mappings used by circle icons.
+ * The API returns FA class strings (e.g. 'fa-heart') for circle icons;
+ * we map these to the Ionicons equivalents supported in React Native.
+ */
+const FA_TO_IONICON_MAP: Record<string, keyof typeof Ionicons.glyphMap> = {
   'fa-question': 'help-circle-outline',
   'fa-heart': 'heart-outline',
   'fa-utensils': 'restaurant-outline',
@@ -60,6 +67,6 @@ const FA_TO_IONICON_MAP: Record<string, string> = {
  * Map a FontAwesome class string to an Ionicons glyph name.
  * Falls back to 'pricetag-outline' for unknown icons.
  */
-export function faToIonicon(faClass: string): string {
+export function faToIonicon(faClass: string): keyof typeof Ionicons.glyphMap {
   return FA_TO_IONICON_MAP[faClass] ?? 'pricetag-outline';
 }

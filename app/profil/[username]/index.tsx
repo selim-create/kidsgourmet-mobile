@@ -181,7 +181,7 @@ export default function PublicProfileScreen() {
                       }}
                     >
                       <Ionicons
-                        name={faToIonicon(question.circle.icon) as any}
+                        name={faToIonicon(question.circle.icon)}
                         size={18}
                         color={question.circle.color_code}
                       />

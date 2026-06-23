@@ -32,6 +32,8 @@ import { VaccineWidget } from '../../src/components/dashboard/VaccineWidget';
 import { ShoppingListWidget } from '../../src/components/dashboard/ShoppingListWidget';
 import { FoodIntroductionCard } from '../../src/components/dashboard/FoodIntroductionCard';
 import { DailyRecommendations } from '../../src/components/dashboard/DailyRecommendations';
+import { FoodIntroductionGuideWidget } from '../../src/components/dashboard/FoodIntroductionGuideWidget';
+import { QuickToolsWidget } from '../../src/components/dashboard/QuickToolsWidget';
 
 // Services
 import { getCurrentMealPlan } from '../../src/services/meal-plan-service';
@@ -209,7 +211,12 @@ export default function DashboardScreen() {
 
             {/* ── Section: Haftalık Bakış ───────────────────────────────────── */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Haftalık Bakış 📅</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={styles.sectionTitle}>Haftalık Bakış 📅</Text>
+                <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/dashboard/haftalik-plan')}>
+                  <Text style={{ fontSize: 13, color: COLORS.primary, fontWeight: '600' }}>Tümünü Gör →</Text>
+                </TouchableOpacity>
+              </View>
               <WeeklyOverview
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
@@ -229,6 +236,28 @@ export default function DashboardScreen() {
               </View>
             )}
 
+            {/* ── Section: Sana Özel Öneriler ───────────────────────────────── */}
+            {activeChild && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Sana Özel Öneriler ✨</Text>
+                <DailyRecommendations
+                  recommendations={recommendations ?? []}
+                  isLoading={loadingRecommendations}
+                />
+              </View>
+            )}
+
+            {/* ── Section: Bu Hafta Denenebilir ─────────────────────────────── */}
+            {activeChild && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Bu Hafta Denenebilir 🍎</Text>
+                <FoodIntroductionCard
+                  items={foodIntroItems ?? []}
+                  isLoading={loadingFoodIntro}
+                />
+              </View>
+            )}
+
             {/* ── Section: Beslenme Durumu ──────────────────────────────────── */}
             {activeChild && (
               <View style={styles.section}>
@@ -236,6 +265,33 @@ export default function DashboardScreen() {
                 <NutritionSummaryCard
                   summary={nutritionSummary}
                   isLoading={loadingNutrition}
+                />
+              </View>
+            )}
+
+            {/* ── Section: Aşı Takvimi ─────────────────────────────────────── */}
+            {activeChild && (
+              <View style={styles.section}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <Text style={styles.sectionTitle}>Aşı Takvimi 💉</Text>
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/vaccines')}>
+                    <Text style={{ fontSize: 13, color: COLORS.primary, fontWeight: '600' }}>Tüm Aşılar →</Text>
+                  </TouchableOpacity>
+                </View>
+                <VaccineWidget
+                  vaccines={allVaccines}
+                  isLoading={loadingVaccines}
+                />
+              </View>
+            )}
+
+            {/* ── Section: Büyüme Takibi ────────────────────────────────────── */}
+            {activeChild && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Büyüme Takibi 📈</Text>
+                <GrowthTrackingWidget
+                  growthData={growthData}
+                  isLoading={loadingGrowth}
                 />
               </View>
             )}
@@ -252,25 +308,11 @@ export default function DashboardScreen() {
               </View>
             )}
 
-            {/* ── Section: Büyüme Takibi ────────────────────────────────────── */}
+            {/* ── Section: Yaş Rehberi ──────────────────────────────────────── */}
             {activeChild && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Büyüme Takibi 📈</Text>
-                <GrowthTrackingWidget
-                  growthData={growthData}
-                  isLoading={loadingGrowth}
-                />
-              </View>
-            )}
-
-            {/* ── Section: Sağlık & Aşı ────────────────────────────────────── */}
-            {activeChild && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sağlık & Aşı 💉</Text>
-                <VaccineWidget
-                  vaccines={allVaccines}
-                  isLoading={loadingVaccines}
-                />
+                <Text style={styles.sectionTitle}>Yaş Rehberi 📖</Text>
+                <FoodIntroductionGuideWidget ageMonths={ageMonths} />
               </View>
             )}
 
@@ -283,27 +325,10 @@ export default function DashboardScreen() {
               />
             </View>
 
-            {/* ── Section: Yaş Rehberi ──────────────────────────────────────── */}
-            {activeChild && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Yaş Rehberi 🍎</Text>
-                <FoodIntroductionCard
-                  items={foodIntroItems ?? []}
-                  isLoading={loadingFoodIntro}
-                />
-              </View>
-            )}
-
-            {/* ── Section: Sana Özel Öneriler ───────────────────────────────── */}
-            {activeChild && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sana Özel Öneriler ✨</Text>
-                <DailyRecommendations
-                  recommendations={recommendations ?? []}
-                  isLoading={loadingRecommendations}
-                />
-              </View>
-            )}
+            {/* ── Section: Hızlı Araçlar ────────────────────────────────────── */}
+            <View style={styles.section}>
+              <QuickToolsWidget />
+            </View>
 
             {/* ── No active child empty state ───────────────────────────────── */}
             {!activeChild && (

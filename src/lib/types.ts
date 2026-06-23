@@ -658,6 +658,27 @@ export interface FavoriteCollection {
 
 // ─── Shopping List Types ──────────────────────────────────────────────────────
 
+export type ShoppingCategory =
+  | 'dairy'
+  | 'meat_protein'
+  | 'fruits_vegetables'
+  | 'grains'
+  | 'other';
+
+/** Backend wire format — fields differ from legacy frontend names */
+export interface BackendShoppingListItem {
+  id: string | number;
+  /** Backend field name (NOT "ingredient") */
+  item: string;
+  /** Backend field name (NOT "amount") */
+  quantity: string;
+  checked: boolean;
+  recipe_id?: number;
+  recipe_title?: string;
+  category?: ShoppingCategory | string;
+}
+
+/** @deprecated Use BackendShoppingListItem for new code */
 export interface ShoppingItem {
   id: number;
   name: string;
@@ -667,14 +688,22 @@ export interface ShoppingItem {
 }
 
 export interface ShoppingListItem {
-  id: number;
-  name: string;
-  category?: string;
-  quantity?: string;
-  unit?: string;
-  is_checked: boolean;
+  id: string | number;
+  /** Display name of the ingredient */
+  ingredient: string;
+  /** Quantity/amount string */
+  amount: string;
+  /** Whether this item has been checked off */
+  checked: boolean;
+  category?: ShoppingCategory | string;
   recipe_id?: number;
   recipe_title?: string;
+  /** @deprecated Use `ingredient` */
+  name?: string;
+  /** @deprecated Use `checked` */
+  is_checked?: boolean;
+  /** @deprecated Use `amount` */
+  quantity?: string;
 }
 
 export interface ShoppingList {
@@ -1100,4 +1129,36 @@ export interface MealPlanSlot {
   date: string;
   day_name: string;
   slots: MealSlot[];
+}
+
+// ─── Consent Types ────────────────────────────────────────────────────────────
+
+export type ConsentType =
+  | 'terms_accepted'
+  | 'marketing_consent'
+  | 'sensitive_data_consent'
+  | 'guardian_declaration'
+  | 'cookie_pazarlama'
+  | 'cookie_analitik';
+
+export interface UserConsent {
+  type: ConsentType;
+  value: boolean;
+  updated_at?: string;
+}
+
+export interface UserConsentHistoryEntry {
+  type: ConsentType;
+  value: boolean;
+  changed_at: string;
+  ip?: string;
+  user_agent?: string;
+}
+
+export interface UserConsentsResponse {
+  consents: UserConsent[];
+}
+
+export interface UserConsentHistoryResponse {
+  history: UserConsentHistoryEntry[];
 }

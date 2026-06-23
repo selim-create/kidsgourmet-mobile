@@ -80,10 +80,12 @@ const FOOTER_COLUMNS: FooterColumn[] = [
 ];
 
 const LEGAL_LINKS = [
-  { label: 'KVKK', url: 'https://kidsgourmet.com.tr/kvkk' },
-  { label: 'Gizlilik Politikası', url: 'https://kidsgourmet.com.tr/gizlilik' },
-  { label: 'Çerez Politikası', url: 'https://kidsgourmet.com.tr/cerez' },
-  { label: 'Kullanım Koşulları', url: 'https://kidsgourmet.com.tr/kullanim-kosullari' },
+  { label: 'KVKK', route: '/kvkk' },
+  { label: 'Gizlilik Politikası', route: '/gizlilik-politikasi' },
+  { label: 'Aydınlatma Metni', route: '/aydinlatma-metni' },
+  { label: 'Çerez Politikası', route: '/cerez-politikasi' },
+  { label: 'Kullanım Koşulları', route: '/kullanim-kosullari' },
+  { label: 'Açık Rıza Metni', route: '/acik-riza-metni' },
 ];
 
 // ─── Newsletter Form ──────────────────────────────────────────────────────────
@@ -217,8 +219,12 @@ export function Footer() {
     Linking.openURL(url).catch(() => {});
   };
 
-  const handleLegalPress = (url: string) => {
-    Linking.openURL(url).catch(() => {});
+  const handleLegalPress = (link: { route?: string; url?: string }) => {
+    if (link.route) {
+      router.push(link.route as Parameters<typeof router.push>[0]);
+    } else if (link.url) {
+      Linking.openURL(link.url).catch(() => {});
+    }
   };
 
   return (
@@ -360,7 +366,7 @@ export function Footer() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 }}>
           {LEGAL_LINKS.map((link, index) => (
             <React.Fragment key={link.label}>
-              <TouchableOpacity onPress={() => handleLegalPress(link.url)} activeOpacity={0.7}>
+              <TouchableOpacity onPress={() => handleLegalPress(link)} activeOpacity={0.7}>
                 <Text style={{ color: '#64748B', fontSize: 11 }}>{link.label}</Text>
               </TouchableOpacity>
               {index < LEGAL_LINKS.length - 1 && (

@@ -149,3 +149,81 @@ export function getInstructionContent(step: {
 }): string {
   return step.content ?? step.text ?? step.description ?? step.instruction ?? '';
 }
+
+/**
+ * Format a date string as a relative time string in Turkish.
+ * e.g. "2 dakika önce", "3 saat önce", "dün", "5 gün önce"
+ *
+ * Month and year thresholds use approximate values (30 days/month,
+ * 365 days/year) which is sufficient for human-readable relative times.
+ */
+export function formatRelativeTime(input?: string | null): string {
+  if (!input) return '';
+  const normalized = /^\d{4}-\d{2}-\d{2} /.test(input)
+    ? input.replace(' ', 'T') + 'Z'
+    : input;
+  const date = new Date(normalized);
+  if (isNaN(date.getTime())) return '';
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  const diffWeek = Math.floor(diffDay / 7);
+  const diffMonth = Math.floor(diffDay / 30);
+  const diffYear = Math.floor(diffDay / 365);
+
+  if (diffSec < 60) return 'az önce';
+  if (diffMin < 60) return `${diffMin} dakika önce`;
+  if (diffHour < 24) return `${diffHour} saat önce`;
+  if (diffDay === 1) return 'dün';
+  if (diffDay < 7) return `${diffDay} gün önce`;
+  if (diffWeek < 5) return `${diffWeek} hafta önce`;
+  if (diffMonth < 12) return `${diffMonth} ay önce`;
+  return `${diffYear} yıl önce`;
+}
+
+/**
+ * Decode common HTML entities in a string.
+ * &amp; is decoded last to prevent double-unescaping.
+ */
+export function decodeHtmlEntities(text?: string | null): string {
+  if (!text) return '';
+  return text
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)))
+    .replace(/&amp;/g, '&'); // must be last to prevent double-unescaping
+}
+
+/**
+ * Ensure a discussion object has all required default values.
+ */
+export function ensureDiscussionDefaults<T extends {
+  comment_count?: number;
+  answer_count?: number;
+  vote_count?: number;
+  upvote_count?: number;
+  downvote_count?: number;
+  user_vote?: 'up' | 'down' | null;
+  is_favorite?: boolean;
+  tags?: string[];
+}>(discussion: T): T {
+  return {
+    ...discussion,
+    comment_count: discussion.comment_count ?? discussion.answer_count ?? 0,
+    answer_count: discussion.answer_count ?? discussion.comment_count ?? 0,
+    vote_count: discussion.vote_count ?? 0,
+    upvote_count: discussion.upvote_count ?? 0,
+    downvote_count: discussion.downvote_count ?? 0,
+    user_vote: discussion.user_vote ?? null,
+    is_favorite: discussion.is_favorite ?? false,
+    tags: discussion.tags ?? [],
+  };
+}

@@ -82,6 +82,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="topluluk"
+        options={{
+          title: 'Topluluk',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'people' : 'people-outline'} size={22} color={color} />
+          ),
+        }}
+      />
       {/* Hidden tabs — accessible via drawer/header */}
       <Tabs.Screen name="favorites" options={{ href: null }} />
       <Tabs.Screen name="meal-plan" options={{ href: null }} />

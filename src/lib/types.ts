@@ -1259,3 +1259,125 @@ export interface ExpertPublicProfile {
   answered_questions?: ExpertAnsweredQuestionSlim[];
   asked_questions?: ExpertAskedQuestionSlim[];
 }
+
+// ─── Community Types ──────────────────────────────────────────────────────────
+
+export interface Circle {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  member_count?: number;
+  discussion_count?: number;
+  is_following?: boolean;
+}
+
+export interface DiscussionAuthor {
+  id: number;
+  name: string;
+  display_name?: string;
+  username?: string;
+  avatar_url?: string | null;
+  is_expert?: boolean;
+  role?: string;
+}
+
+export interface Discussion {
+  id: number;
+  title: string;
+  slug: string;
+  content?: string;
+  excerpt?: string;
+  author: DiscussionAuthor;
+  circle?: Circle;
+  circle_id?: number;
+  created_at: string;
+  updated_at?: string;
+  comment_count?: number;
+  answer_count?: number;
+  vote_count?: number;
+  upvote_count?: number;
+  downvote_count?: number;
+  user_vote?: 'up' | 'down' | null;
+  is_answered?: boolean;
+  has_expert_answer?: boolean;
+  expert_answer?: {
+    id: number;
+    content: string;
+    author: { name: string; avatar_url?: string | null };
+  } | null;
+  is_favorite?: boolean;
+  tags?: string[];
+  status?: string;
+  views?: number;
+}
+
+export interface DiscussionsResponse {
+  discussions: Discussion[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface DiscussionComment {
+  id: number;
+  content: string;
+  author: DiscussionAuthor;
+  created_at: string;
+  updated_at?: string;
+  vote_count?: number;
+  upvote_count?: number;
+  downvote_count?: number;
+  user_vote?: 'up' | 'down' | null;
+  is_expert_answer?: boolean;
+  parent_id?: number | null;
+  replies?: DiscussionComment[];
+}
+
+export interface FeedResponse {
+  discussions: Discussion[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface CreateDiscussionRequest {
+  title: string;
+  content: string;
+  circle_id: number;
+  tags?: string[];
+}
+
+export interface CreateDiscussionResponse {
+  id: number;
+  slug: string;
+  title: string;
+  status?: string;
+  message?: string;
+}
+
+export interface TopContributor {
+  id: number;
+  name: string;
+  display_name?: string;
+  username?: string;
+  avatar_url?: string | null;
+  contribution_count?: number;
+  answer_count?: number;
+  question_count?: number;
+  points?: number;
+  rank?: number;
+  is_expert?: boolean;
+}
+
+export interface VoteResponse {
+  action: 'added' | 'removed' | 'changed';
+  vote: 'up' | 'down' | null;
+  vote_count?: number;
+  upvote_count?: number;
+  downvote_count?: number;
+}

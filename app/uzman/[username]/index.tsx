@@ -258,7 +258,6 @@ export default function ExpertProfileScreen() {
           {/* Stats cards — overlapping hero */}
           <View
             className="flex-row gap-3 -mt-8 mb-4"
-            style={{ marginTop: -32, marginBottom: 16 }}
           >
             {[
               { label: 'Tarif', value: profile.stats.total_recipes },
@@ -508,7 +507,7 @@ export default function ExpertProfileScreen() {
                     <TouchableOpacity
                       key={answer.id}
                       onPress={() =>
-                        router.push(`/topluluk/${answer.slug}` as never)
+                        router.push(`/topluluk/soru/${answer.slug}` as never)
                       }
                       className="bg-white rounded-2xl shadow-sm p-4 mb-3"
                     >

@@ -1,6 +1,6 @@
 import api, { getToken } from '../lib/api';
 import { API_ENDPOINTS, API_URL } from '../lib/constants';
-import type { User, Child } from '../lib/types';
+import type { User, Child, PublicProfile, ExpertPublicProfile } from '../lib/types';
 
 const AVATAR_UPLOAD_ERROR = 'Avatar yüklenemedi';
 export async function getUserProfile(): Promise<User> {
@@ -104,4 +104,21 @@ export async function getChildAvatarUrl(uuid: string): Promise<{ url: string; ex
 
 export async function deleteChildAvatar(uuid: string): Promise<void> {
   return api.delete(API_ENDPOINTS.CHILD_PROFILE_AVATAR(uuid));
+}
+
+/** Public user profile (NO auth) */
+export async function getPublicProfile(username: string): Promise<PublicProfile> {
+  const clean = username.startsWith('@') ? username.slice(1) : username;
+  return api.get<PublicProfile>(API_ENDPOINTS.USER_PUBLIC(clean), { skipAuth: true });
+}
+
+/** Expert public profile (NO auth) */
+export async function getExpertPublicProfile(username: string): Promise<ExpertPublicProfile> {
+  const clean = username.startsWith('@') ? username.slice(1) : username;
+  return api.get<ExpertPublicProfile>(API_ENDPOINTS.EXPERT_PUBLIC(clean), { skipAuth: true });
+}
+
+/** Expert list (NO auth) */
+export async function getExperts(): Promise<ExpertPublicProfile[]> {
+  return api.get<ExpertPublicProfile[]>(API_ENDPOINTS.EXPERTS_LIST, { skipAuth: true });
 }

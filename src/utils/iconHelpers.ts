@@ -47,3 +47,19 @@ export function getSafetyIcon(
       return 'warning';
   }
 }
+
+const FA_TO_IONICON_MAP: Record<string, string> = {
+  'fa-question': 'help-circle-outline',
+  'fa-heart': 'heart-outline',
+  'fa-utensils': 'restaurant-outline',
+  'fa-baby': 'happy-outline',
+  'fa-comments': 'chatbubbles-outline',
+};
+
+/**
+ * Map a FontAwesome class string to an Ionicons glyph name.
+ * Falls back to 'pricetag-outline' for unknown icons.
+ */
+export function faToIonicon(faClass: string): string {
+  return FA_TO_IONICON_MAP[faClass] ?? 'pricetag-outline';
+}

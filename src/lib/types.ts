@@ -6,6 +6,7 @@ export interface SocialLinks {
   linkedin?: string;
   youtube?: string;
   website?: string;
+  facebook?: string;
 }
 
 export interface UserStats {
@@ -1161,4 +1162,100 @@ export interface UserConsentsResponse {
 
 export interface UserConsentHistoryResponse {
   history: UserConsentHistoryEntry[];
+}
+
+// ─── Public Profile Types ──────────────────────────────────────────────────────
+
+export interface PublicProfileQuestion {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  comment_count: number;
+  expert_answered: boolean;
+  created_at?: string;
+  circle?: {
+    slug?: string;
+    name: string;
+    icon: string;
+    color_code: string;
+  };
+}
+
+export interface PublicProfile {
+  username: string;
+  display_name: string;
+  avatar_url?: string | null;
+  parent_role?: 'Anne' | 'Baba' | 'Bakıcı' | 'Diğer' | string;
+  badges: string[];
+  stats: {
+    question_count: number;
+    approved_comments: number;
+  };
+  recent_questions?: PublicProfileQuestion[];
+}
+
+export interface ExpertRecipeSlim {
+  id: number;
+  slug: string;
+  title: string;
+  image: string;
+  prep_time?: string;
+  age_group?: string;
+  age_group_color?: string;
+}
+
+export interface ExpertBlogPostSlim {
+  id: number;
+  slug: string;
+  title: string;
+  image: string;
+  category?: string;
+  read_time?: string;
+}
+
+export interface ExpertAnsweredQuestionSlim {
+  id: number;
+  slug: string;
+  title: string;
+  answer_excerpt: string;
+  answered_at: string;
+}
+
+export interface ExpertAskedQuestionSlim {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  comment_count: number;
+  created_at: string;
+  circle?: {
+    slug?: string;
+    name: string;
+    icon: string;
+    color_code: string;
+  };
+}
+
+export interface ExpertPublicProfile {
+  id: number;
+  username: string;
+  display_name: string;
+  avatar_url?: string | null;
+  biography?: string;
+  expertise?: string[];
+  email?: string;
+  show_email?: boolean;
+  social_links?: SocialLinks;
+  stats: {
+    total_recipes: number;
+    total_blog_posts?: number;
+    total_posts?: number;
+    total_answers: number;
+    total_questions: number;
+  };
+  recipes?: ExpertRecipeSlim[];
+  blog_posts?: ExpertBlogPostSlim[];
+  answered_questions?: ExpertAnsweredQuestionSlim[];
+  asked_questions?: ExpertAskedQuestionSlim[];
 }

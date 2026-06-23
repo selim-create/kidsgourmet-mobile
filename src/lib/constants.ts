@@ -185,6 +185,11 @@ export const API_ENDPOINTS = {
   // Consents
   USER_CONSENTS: '/kg/v1/user/consents',
   USER_CONSENT_HISTORY: '/kg/v1/user/consents/history',
+
+  // Public Profiles (no auth)
+  USER_PUBLIC: (username: string) => `/kg/v1/user/${username}`,
+  EXPERT_PUBLIC: (username: string) => `/kg/v1/experts/${username}`,
+  EXPERTS_LIST: '/kg/v1/experts',
 } as const;
 
 export const APP_NAME = 'KidsGourmet';

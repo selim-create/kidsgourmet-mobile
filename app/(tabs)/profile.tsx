@@ -121,6 +121,11 @@ export default function ProfileScreen() {
       onPress: () => router.push('/blog'),
     },
     {
+      icon: 'people-circle-outline' as const,
+      label: 'Uzmanlarımız',
+      onPress: () => router.push('/uzmanlar'),
+    },
+    {
       icon: 'medical-outline' as const,
       label: 'Aşı Takvimi',
       onPress: () => router.push('/vaccines'),

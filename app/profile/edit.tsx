@@ -3,6 +3,7 @@ import {
   View,
   Text,
   ScrollView,
+  Switch,
   TouchableOpacity,
   TextInput,
   Platform,
@@ -23,13 +24,25 @@ import {
   updateUserProfile,
   uploadUserAvatar,
 } from '../../src/services/user-service';
+import type { ComponentProps } from 'react';
+import type { SocialLinks } from '../../src/lib/types';
 
 type Gender = 'male' | 'female' | 'other';
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'female', label: 'Kadın' },
   { value: 'male', label: 'Erkek' },
   { value: 'other', label: 'Diğer' },
+];
+
+const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: string; icon: IoniconName; isUrl?: boolean }[] = [
+  { key: 'instagram', label: 'Instagram', placeholder: '@kullanici_adi', icon: 'logo-instagram' },
+  { key: 'twitter', label: 'X (Twitter)', placeholder: '@kullanici_adi', icon: 'logo-twitter' },
+  { key: 'facebook', label: 'Facebook', placeholder: 'facebook.com/sayfaniz', icon: 'logo-facebook' },
+  { key: 'linkedin', label: 'LinkedIn', placeholder: 'linkedin.com/in/adsoyadiniz', icon: 'logo-linkedin' },
+  { key: 'youtube', label: 'YouTube', placeholder: 'youtube.com/@kanaliniz', icon: 'logo-youtube' },
+  { key: 'website', label: 'Web Sitesi', placeholder: 'https://siteniz.com', icon: 'globe-outline', isUrl: true },
 ];
 
 export default function ProfileEditScreen() {
@@ -43,6 +56,9 @@ export default function ProfileEditScreen() {
   const [birthDate, setBirthDate] = useState<Date | undefined>(
     user?.birth_date ? new Date(user.birth_date) : undefined,
   );
+  const [biography, setBiography] = useState(user?.biography ?? '');
+  const [showEmail, setShowEmail] = useState(user?.show_email ?? false);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(user?.social_links ?? {});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -117,12 +133,20 @@ export default function ProfileEditScreen() {
     }
     setSaving(true);
     try {
+      const cleanedSocialLinks: SocialLinks = Object.fromEntries(
+        Object.entries(socialLinks)
+          .map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v])
+          .filter(([, v]) => typeof v === 'string' && v !== ''),
+      ) as SocialLinks;
       const payload: Record<string, unknown> = {
         name: name.trim(),
         email: email.trim(),
         parent_role: parentRole || undefined,
         gender,
         birth_date: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
+        biography: biography.trim() || undefined,
+        show_email: showEmail,
+        social_links: Object.keys(cleanedSocialLinks).length > 0 ? cleanedSocialLinks : undefined,
       };
       if (password.trim()) {
         payload.password = password.trim();
@@ -323,6 +347,74 @@ export default function ProfileEditScreen() {
                 color="#9CA3AF"
               />
             </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Biyografi */}
+        <View className="mb-4">
+          <Text className="text-dark font-medium mb-1.5 text-sm">Biyografi</Text>
+          <View className="bg-white border border-gray-200 rounded-xl px-4 py-3">
+            <TextInput
+              value={biography}
+              onChangeText={setBiography}
+              placeholder="Kendinizden kısaca bahsedin..."
+              placeholderTextColor="#9CA3AF"
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+              className="text-dark text-base"
+              style={{ minHeight: 80 }}
+            />
+          </View>
+        </View>
+
+        {/* E-posta Görünürlüğü */}
+        <View className="mb-4 bg-white border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between">
+          <View className="flex-1 mr-3">
+            <Text className="text-dark font-medium text-sm">E-postamı göster</Text>
+            <Text className="text-gray-400 text-xs mt-0.5">Profilinizde e-posta adresiniz görünsün</Text>
+          </View>
+          <Switch
+            value={showEmail}
+            onValueChange={setShowEmail}
+            trackColor={{ false: '#E5E7EB', true: '#FF8A65' }}
+            thumbColor="#fff"
+          />
+        </View>
+
+        {/* Sosyal Linkler */}
+        <View className="mb-4">
+          <Text className="text-dark font-medium mb-2 text-sm">Sosyal Linkler</Text>
+          <View className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            {SOCIAL_FIELDS.map((field, index) => (
+              <View
+                key={field.key}
+                className={`flex-row items-center px-4 py-3 ${
+                  index < SOCIAL_FIELDS.length - 1 ? 'border-b border-gray-100' : ''
+                }`}
+              >
+                <Ionicons name={field.icon} size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
+                <TextInput
+                  value={socialLinks[field.key] ?? ''}
+                  onChangeText={(val) => {
+                    setSocialLinks((prev) => {
+                      const next = { ...prev };
+                      if (val.trim()) {
+                        next[field.key] = val;
+                      } else {
+                        delete next[field.key];
+                      }
+                      return next;
+                    });
+                  }}
+                  placeholder={field.placeholder}
+                  placeholderTextColor="#9CA3AF"
+                  autoCapitalize="none"
+                  keyboardType={field.isUrl ? 'url' : 'default'}
+                  className="flex-1 text-dark text-sm"
+                />
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>

@@ -183,18 +183,20 @@ export function formatRelativeTime(input?: string | null): string {
 
 /**
  * Decode common HTML entities in a string.
+ * &amp; is decoded last to prevent double-unescaping.
  */
 export function decodeHtmlEntities(text?: string | null): string {
   if (!text) return '';
   return text
-    .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)));
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)))
+    .replace(/&amp;/g, '&'); // must be last to prevent double-unescaping
 }
 
 /**

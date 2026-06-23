@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -36,13 +36,13 @@ export default function SoruSorScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  // Pre-fill title from `konu` query param
+  // Pre-fill title from `konu` query param (only on initial mount)
+  const initialKonu = useRef(params.konu);
   useEffect(() => {
-    if (params.konu && !title) {
-      setTitle(params.konu);
+    if (initialKonu.current) {
+      setTitle(initialKonu.current);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.konu]);
+  }, []);
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   const { data: circles, isLoading: circlesLoading } = useSWR<Circle[]>(

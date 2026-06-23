@@ -237,6 +237,13 @@ export default function CommunityHomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Clear debounce timer on unmount
+  React.useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, []);
+
   // ── Data fetching ──────────────────────────────────────────────────────────
 
   const { data: circles, isLoading: circlesLoading } = useSWR<Circle[]>(

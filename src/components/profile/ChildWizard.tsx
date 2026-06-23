@@ -57,7 +57,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
 
   // Step 2
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
-    child?.allergens ?? child?.allergies ?? [],
+    child?.allergies ?? child?.allergens ?? [],
   );
   const [selectedDietTypes, setSelectedDietTypes] = useState<string[]>(
     child?.diet_types ?? [],
@@ -110,7 +110,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
         name: name.trim(),
         birth_date: birthDateStr,
         gender,
-        allergens: selectedAllergens,
+        allergies: selectedAllergens,
         diet_types: selectedDietTypes,
         notes: notes.trim() || undefined,
       };
@@ -125,13 +125,11 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
       // Upload avatar if a pending local URI exists
       if (pendingAvatarUri && savedChild.id) {
         try {
-          const formData = new FormData();
-          formData.append('avatar', {
+          await uploadChildAvatar(savedChild.id, {
             uri: pendingAvatarUri,
-            type: 'image/jpeg',
-            name: 'avatar.jpg',
-          } as unknown as Blob);
-          await uploadChildAvatar(savedChild.id, formData);
+            mimeType: 'image/jpeg',
+            fileName: 'avatar.jpg',
+          });
         } catch {
           // Avatar upload failure shouldn't block the wizard
           Toast.show({
@@ -208,7 +206,9 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           <DateTimePicker
             value={birthDate}
             mode="date"
-            display="inline"
+            display="spinner"
+            locale="tr-TR"
+            themeVariant="light"
             maximumDate={new Date()}
             onChange={(_, date) => date && setBirthDate(date)}
           />
@@ -227,6 +227,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
                 value={birthDate}
                 mode="date"
                 display="default"
+                locale="tr-TR"
                 maximumDate={new Date()}
                 onChange={(_, date) => {
                   setShowDatePicker(false);
@@ -343,7 +344,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
       </Text>
       <View className="items-center py-6">
         <ChildAvatarPicker
-          childId={child?.id}
+          childUuid={child?.id}
           currentUrl={currentAvatarUrl}
           name={name || 'Çocuk'}
           size={100}

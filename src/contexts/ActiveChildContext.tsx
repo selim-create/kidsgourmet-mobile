@@ -34,8 +34,11 @@ export function ActiveChildProvider({ children }: { children: React.ReactNode })
       const list = await getChildren();
       if (list && list.length > 0) {
         setChildList(list);
-        // Only set active child if not already set
-        setActiveChildState((prev) => prev ?? list[0]);
+        // Re-bind to the latest version (so avatar_url is fresh)
+        setActiveChildState((prev) => {
+          if (!prev) return list[0];
+          return list.find((c) => c.id === prev.id) ?? list[0];
+        });
       } else {
         setChildList([]);
       }

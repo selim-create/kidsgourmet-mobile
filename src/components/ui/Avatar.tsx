@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,16 +18,25 @@ function getInitials(name?: string): string {
 }
 
 export function Avatar({ uri, name, size = 40, className }: AvatarProps) {
+  const [errored, setErrored] = useState(false);
   const style = { width: size, height: size, borderRadius: size / 2 };
   const fontSize = Math.floor(size * 0.4);
 
-  if (uri) {
+  // Reset error state when uri changes (e.g. signed URL refresh)
+  useEffect(() => {
+    setErrored(false);
+  }, [uri]);
+
+  if (uri && !errored) {
     return (
       <Image
         source={{ uri }}
         style={style}
         className={`bg-gray-200 ${className ?? ''}`}
         contentFit="cover"
+        onError={() => setErrored(true)}
+        cachePolicy="memory-disk"
+        transition={150}
       />
     );
   }

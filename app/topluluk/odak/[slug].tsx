@@ -221,6 +221,9 @@ export default function CircleDetailScreen() {
 
   const color = circle?.color_code ?? circle?.color ?? COLORS.primary;
   const iconName = faToIonicon(circle?.icon_name ?? circle?.icon ?? '');
+  const askQuestionRoute = circle
+    ? (`/topluluk/soru-sor?circle=${circle.id}` as never)
+    : ('/topluluk/soru-sor' as never);
 
   if (circlesLoading && !circle) {
     return (
@@ -321,7 +324,7 @@ export default function CircleDetailScreen() {
 
             <TouchableOpacity
               style={styles.askCard}
-              onPress={() => router.push(`/topluluk/soru-sor?circle=${circle?.id}` as never)}
+              onPress={() => router.push(askQuestionRoute)}
               activeOpacity={0.85}
             >
               <View style={styles.askCardIcon}>
@@ -355,7 +358,7 @@ export default function CircleDetailScreen() {
                 title="Bu odakta henüz tartışma bulunmuyor."
                 description="İlk soruyu siz sorun!"
                 actionLabel="Soru Sor"
-                onAction={() => router.push(`/topluluk/soru-sor?circle=${circle?.id}` as never)}
+                onAction={() => router.push(askQuestionRoute)}
               />
             ) : null}
           </>
@@ -372,7 +375,7 @@ export default function CircleDetailScreen() {
 
       <TouchableOpacity
         style={[styles.fab, { bottom: insets.bottom + 24 }]}
-        onPress={() => router.push(`/topluluk/soru-sor?circle=${circle?.id}` as never)}
+        onPress={() => router.push(askQuestionRoute)}
         activeOpacity={0.85}
       >
         <Ionicons name="add" size={28} color="#fff" />

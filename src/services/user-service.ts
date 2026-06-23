@@ -2,6 +2,7 @@ import api, { getToken } from '../lib/api';
 import { API_ENDPOINTS, API_URL } from '../lib/constants';
 import type { User, Child } from '../lib/types';
 
+const AVATAR_UPLOAD_ERROR = 'Avatar yüklenemedi';
 export async function getUserProfile(): Promise<User> {
   return api.get<User>(API_ENDPOINTS.PROFILE);
 }
@@ -35,7 +36,7 @@ export async function uploadUserAvatar(
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Avatar yüklenemedi');
+    throw new Error((err as { message?: string }).message ?? AVATAR_UPLOAD_ERROR);
   }
 
   const data = await response.json() as { id: number; source_url?: string; url?: string };
@@ -88,7 +89,7 @@ export async function uploadChildAvatar(
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Avatar yüklenemedi');
+    throw new Error((err as { message?: string }).message ?? AVATAR_UPLOAD_ERROR);
   }
 
   return response.json() as Promise<{ avatar?: { url?: string }; url?: string; avatar_url?: string }>;

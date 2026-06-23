@@ -87,7 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) return;
     const interval = setInterval(() => {
-      refreshUser().catch(() => {/* silent */});
+      // Silent failure is intentional — a background refresh should not disrupt the user
+      refreshUser().catch(() => {});
     }, AVATAR_REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [user, refreshUser]);

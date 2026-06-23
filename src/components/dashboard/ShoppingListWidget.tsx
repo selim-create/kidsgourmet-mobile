@@ -2,16 +2,16 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import type { ShoppingItem } from '../../lib/types';
+import type { ShoppingListItem } from '../../lib/types';
 
 interface ShoppingListWidgetProps {
-  items: ShoppingItem[];
+  items: ShoppingListItem[];
   isLoading?: boolean;
 }
 
 export function ShoppingListWidget({ items, isLoading }: ShoppingListWidgetProps) {
   const safeItems = Array.isArray(items) ? items : [];
-  const uncheckedCount = safeItems.filter((i) => !i.is_checked).length;
+  const uncheckedCount = safeItems.filter((i) => !(i.checked ?? i.is_checked)).length;
   const totalCount = safeItems.length;
 
   return (

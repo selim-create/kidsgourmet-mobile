@@ -41,6 +41,8 @@ export const API_ENDPOINTS = {
 
   // Shopping List
   SHOPPING_LIST: '/kg/v1/shopping-list',
+  SHOPPING_LIST_ITEM: (id: string | number) => `/kg/v1/shopping-list/${id}`,
+  SHOPPING_LIST_ITEM_TOGGLE: (id: string | number) => `/kg/v1/shopping-list/${id}/toggle`,
   SHOPPING_LIST_GENERATE: '/kg/v1/shopping-list/generate',
 
   // Blog (WordPress native)
@@ -179,6 +181,10 @@ export const API_ENDPOINTS = {
 
   // Cross-sell / Promo banners
   CROSS_SELL_BANNER: '/kg/v1/cross-sell/banner',
+
+  // Consents
+  USER_CONSENTS: '/kg/v1/user/consents',
+  USER_CONSENT_HISTORY: '/kg/v1/user/consents/history',
 } as const;
 
 export const APP_NAME = 'KidsGourmet';

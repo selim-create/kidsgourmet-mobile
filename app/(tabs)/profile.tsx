@@ -130,20 +130,59 @@ export default function ProfileScreen() {
       label: 'Beslenme Rehberi',
       onPress: () => router.push('/ingredient'),
     },
+    // Hesap & Veriler
     {
       icon: 'shield-checkmark-outline' as const,
-      label: 'Güvenlik Kontrolü',
-      onPress: () => {},
+      label: 'Rızalarım',
+      onPress: () => router.push('/dashboard/rizalarim'),
     },
     {
-      icon: 'information-circle-outline' as const,
-      label: 'Hakkında',
-      onPress: () => {},
+      icon: 'cart-outline' as const,
+      label: 'Alışveriş Listem',
+      onPress: () => router.push('/shopping-list'),
     },
     {
-      icon: 'help-circle-outline' as const,
-      label: 'Yardım & Destek',
-      onPress: () => {},
+      icon: 'calendar-outline' as const,
+      label: 'Haftalık Plan',
+      onPress: () => router.push('/dashboard/haftalik-plan'),
+    },
+  ];
+
+  const legalItems = [
+    {
+      icon: 'document-text-outline' as const,
+      label: 'KVKK Aydınlatma Metni',
+      onPress: () => router.push('/kvkk'),
+    },
+    {
+      icon: 'lock-closed-outline' as const,
+      label: 'Gizlilik Politikası',
+      onPress: () => router.push('/gizlilik-politikasi'),
+    },
+    {
+      icon: 'document-outline' as const,
+      label: 'Aydınlatma Metni',
+      onPress: () => router.push('/aydinlatma-metni'),
+    },
+    {
+      icon: 'analytics-outline' as const,
+      label: 'Çerez Politikası',
+      onPress: () => router.push('/cerez-politikasi'),
+    },
+    {
+      icon: 'reader-outline' as const,
+      label: 'Kullanım Koşulları',
+      onPress: () => router.push('/kullanim-kosullari'),
+    },
+    {
+      icon: 'checkmark-circle-outline' as const,
+      label: 'Açık Rıza Metni',
+      onPress: () => router.push('/acik-riza-metni'),
+    },
+    {
+      icon: 'mail-outline' as const,
+      label: 'KVKK Başvuru Formu',
+      onPress: () => router.push('/basvuru-formu'),
     },
   ];
 
@@ -239,6 +278,28 @@ export default function ProfileScreen() {
                 </View>
                 <Text className="text-dark flex-1 text-sm">{item.label}</Text>
                 <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+              </TouchableOpacity>
+            ))}
+          </Card>
+
+          {/* Legal Items */}
+          <Card className="mb-4">
+            <Text className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-2 px-1">
+              Yasal
+            </Text>
+            {legalItems.map((item, idx) => (
+              <TouchableOpacity
+                key={item.label}
+                onPress={item.onPress}
+                className={`flex-row items-center py-3 ${
+                  idx < legalItems.length - 1 ? 'border-b border-gray-50' : ''
+                }`}
+              >
+                <View className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center mr-3">
+                  <Ionicons name={item.icon} size={16} color="#9CA3AF" />
+                </View>
+                <Text className="text-gray-600 flex-1 text-sm">{item.label}</Text>
+                <Ionicons name="chevron-forward" size={14} color="#D1D5DB" />
               </TouchableOpacity>
             ))}
           </Card>

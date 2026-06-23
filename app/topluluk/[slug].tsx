@@ -67,10 +67,6 @@ function getVoteUpdate(currentVote: VoteKind | null | undefined, nextVote: VoteK
   return { newUserVote, upDelta, downDelta };
 }
 
-function normalizeComment(comment: DiscussionComment) {
-  return ensureCommentDefaults(comment);
-}
-
 export default function DiscussionDetailScreen() {
   const insets = useSafeAreaInsets();
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -127,14 +123,14 @@ export default function DiscussionDetailScreen() {
     () => getDiscussionComments(discussionId!),
     {
       onSuccess: (data) => {
-        setComments(data.map(normalizeComment));
+        setComments(data.map(ensureCommentDefaults));
       },
     },
   );
 
   useEffect(() => {
     if (commentsData) {
-      setComments(commentsData.map(normalizeComment));
+      setComments(commentsData.map(ensureCommentDefaults));
     }
   }, [commentsData]);
 

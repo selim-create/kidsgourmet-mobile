@@ -244,11 +244,16 @@ export default function BasvuruFormuScreen() {
               thumbColor="#fff"
             />
             <View style={{ flex: 1 }}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push('/aydinlatma-metni')}
+              >
+                <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600', lineHeight: 18 }}>
+                  KVKK Aydınlatma Metni
+                </Text>
+              </TouchableOpacity>
               <Text style={{ fontSize: 12, color: '#4B5563', lineHeight: 18 }}>
-                <TouchableOpacity onPress={() => router.push('/aydinlatma-metni')}>
-                  <Text style={{ color: COLORS.primary, fontWeight: '600' }}>KVKK Aydınlatma Metni</Text>
-                </TouchableOpacity>
-                {" "}kapsamında kişisel verilerimin işlenmesini ve bu form aracılığıyla iletişime geçilmesini kabul ediyorum.
+                kapsamında kişisel verilerimin işlenmesini ve bu form aracılığıyla iletişime geçilmesini kabul ediyorum.
               </Text>
             </View>
           </View>

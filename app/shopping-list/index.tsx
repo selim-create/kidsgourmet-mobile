@@ -169,13 +169,7 @@ export default function ShoppingListScreen() {
           text: 'Sil',
           style: 'destructive',
           onPress: async () => {
-            for (const item of checkedItems) {
-              try {
-                await removeItem(item.id);
-              } catch {
-                // continue
-              }
-            }
+            await Promise.allSettled(checkedItems.map((item) => removeItem(item.id)));
             await refresh();
           },
         },
@@ -194,13 +188,7 @@ export default function ShoppingListScreen() {
           text: 'Temizle',
           style: 'destructive',
           onPress: async () => {
-            for (const item of items) {
-              try {
-                await removeItem(item.id);
-              } catch {
-                // continue
-              }
-            }
+            await Promise.allSettled(items.map((item) => removeItem(item.id)));
             await refresh();
           },
         },

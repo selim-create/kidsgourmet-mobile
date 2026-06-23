@@ -22,7 +22,7 @@ export function useShoppingList() {
 
   const addItem = async (item: AddShoppingItemPayload) => {
     const optimisticItem: ShoppingListItem = {
-      id: `optimistic-${Date.now()}`,
+      id: `optimistic-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       ingredient: item.ingredient,
       amount: item.amount ?? '',
       checked: false,

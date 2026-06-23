@@ -75,6 +75,10 @@ const CONSENT_META: ConsentMeta[] = [
 
 // ─── History section ─────────────────────────────────────────────────────────
 
+function getConsentLabel(type: ConsentType): string {
+  return CONSENT_META.find((m) => m.type === type)?.label ?? type;
+}
+
 function ConsentHistorySection() {
   const { history, isLoading } = useConsentHistory();
 
@@ -108,7 +112,7 @@ function ConsentHistorySection() {
           />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 12, fontWeight: '600', color: '#374151' }}>
-              {CONSENT_META.find((m) => m.type === entry.type)?.label ?? entry.type}
+              {getConsentLabel(entry.type)}
             </Text>
             <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 1 }}>
               {entry.value ? 'Onaylandı' : 'İptal edildi'} · {new Date(entry.changed_at).toLocaleDateString('tr-TR')}

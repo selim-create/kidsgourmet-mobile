@@ -193,7 +193,7 @@ export default function HaftalikPlanScreen() {
               {formatDateDisplay(monday.toISOString().split('T')[0])} – {formatDateDisplay(sunday.toISOString().split('T')[0])}
             </Text>
             <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11, marginTop: 2 }}>
-              {year}, {week}. Hafta
+              {year}, {week}. hafta
             </Text>
           </View>
 

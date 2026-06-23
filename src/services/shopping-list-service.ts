@@ -55,12 +55,7 @@ export async function addShoppingListItem(
 export async function addShoppingListItems(
   items: AddShoppingItemPayload[],
 ): Promise<ShoppingListItem[]> {
-  const results: ShoppingListItem[] = [];
-  for (const item of items) {
-    const added = await addShoppingListItem(item);
-    results.push(added);
-  }
-  return results;
+  return Promise.all(items.map((item) => addShoppingListItem(item)));
 }
 
 export async function removeShoppingListItem(id: string | number): Promise<void> {
@@ -128,7 +123,11 @@ export async function deleteShoppingItem(id: number): Promise<void> {
 
 /** @deprecated Use toggleShoppingListItem */
 export async function toggleShoppingItem(id: number): Promise<ShoppingListItem> {
-  return toggleShoppingListItem(id, true);
+  // Legacy shim: fetch current state and invert
+  const list = await getShoppingList();
+  const current = list.find((i) => String(i.id) === String(id));
+  const newChecked = !(current?.checked ?? current?.is_checked ?? false);
+  return toggleShoppingListItem(id, newChecked);
 }
 
 /** @deprecated Use updateShoppingListItem */

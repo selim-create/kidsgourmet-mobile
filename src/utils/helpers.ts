@@ -153,6 +153,9 @@ export function getInstructionContent(step: {
 /**
  * Format a date string as a relative time string in Turkish.
  * e.g. "2 dakika önce", "3 saat önce", "dün", "5 gün önce"
+ *
+ * Month and year thresholds use approximate values (30 days/month,
+ * 365 days/year) which is sufficient for human-readable relative times.
  */
 export function formatRelativeTime(input?: string | null): string {
   if (!input) return '';

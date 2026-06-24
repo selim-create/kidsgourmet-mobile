@@ -3,12 +3,23 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
+// Backend string[] veya {name, percent, deficiency}[] döndürebilir
+type NutrientItem = string | { name: string; percent?: number; deficiency?: string };
+
 interface MissingNutrientsAlertProps {
-  missingNutrients?: string[];
+  missingNutrients?: NutrientItem[];
 }
 
 export function MissingNutrientsAlert({ missingNutrients }: MissingNutrientsAlertProps) {
   if (!missingNutrients || missingNutrients.length === 0) return null;
+
+  // Object gelen besinleri string'e normalize et
+  const nutrientNames = missingNutrients
+    .map((n) => (typeof n === 'string' ? n : (n.name ?? '')))
+    .filter(Boolean);
+
+  // Normalleştirme sonrası liste boşsa gösterme
+  if (nutrientNames.length === 0) return null;
 
   return (
     <TouchableOpacity
@@ -31,7 +42,7 @@ export function MissingNutrientsAlert({ missingNutrients }: MissingNutrientsAler
           Eksik Besinler
         </Text>
         <Text style={{ fontSize: 12, color: '#4C1D95', marginTop: 1 }} numberOfLines={2}>
-          Bu hafta: {missingNutrients.join(', ')}
+          Bu hafta: {nutrientNames.join(', ')}
         </Text>
       </View>
       <Ionicons name="chevron-forward" size={16} color="#7C3AED" />

@@ -506,7 +506,8 @@ export interface NutritionSummary {
   fat_total?: number;
   meals_count?: number;
   water_intake?: number;
-  missing_nutrients?: string[];
+  // Backend bazen string[], bazen {name, percent, deficiency} dizisi döndürebiliyor
+  missing_nutrients?: Array<string | { name: string; percent?: number; deficiency?: string }>;
 }
 
 // ─── Safety Types ─────────────────────────────────────────────────────────────

@@ -15,10 +15,10 @@ export async function getBLWTestResults(
 }
 
 export async function submitBLWTest(data: {
-  child_id: number;
+  child_id: string | number;
   answers: Record<string, boolean>;
 }): Promise<BLWTestResult> {
-  return api.post<BLWTestResult>(API_ENDPOINTS.TOOL_BLW_TEST, data);
+  return api.post<BLWTestResult>(API_ENDPOINTS.BLW_TEST_SUBMIT, data);
 }
 
 export async function getSolidFoodReadiness(
@@ -34,8 +34,8 @@ export async function getSolidFoodReadiness(
 }
 
 export async function submitSolidFoodCheck(data: {
-  child_id: number;
+  child_id: string | number;
   factors: Record<string, boolean>;
 }): Promise<SolidFoodReadinessResult> {
-  return api.post<SolidFoodReadinessResult>(API_ENDPOINTS.TOOL_SOLID_FOOD, data);
+  return api.post<SolidFoodReadinessResult>(API_ENDPOINTS.SOLID_FOOD_READINESS_SUBMIT, data);
 }

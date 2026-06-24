@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,18 +10,63 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Google from 'expo-auth-session/providers/google';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
+import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
 
 export default function LoginScreen() {
-  const { login } = useAuth();
+  const { login, refreshUser } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+  const [appleAvailable, setAppleAvailable] = useState(false);
+
+  const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
+    iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
+    webClientId: Constants.expoConfig?.extra?.googleWebClientId,
+  });
+
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+    try {
+      setIsLoading(true);
+      const result = await signInWithGoogle(idToken);
+      if (result.token) {
+        await refreshUser();
+        router.replace('/(tabs)');
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Google ile giriş başarısız',
+        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshUser]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
+  }, []);
+
+  useEffect(() => {
+    if (googleResponse?.type === 'success') {
+      const idToken =
+        (googleResponse.params as Record<string, string> | undefined)?.id_token ??
+        googleResponse.authentication?.idToken;
+      if (idToken) {
+        handleGoogleSuccess(idToken);
+      }
+    }
+  }, [googleResponse, handleGoogleSuccess]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -41,6 +86,46 @@ export default function LoginScreen() {
       const message =
         err instanceof Error ? err.message : 'Giriş yapılamadı. Tekrar deneyin.';
       Toast.show({ type: 'error', text1: 'Hata', text2: message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGooglePress = () => {
+    if (!googleRequest) return;
+    promptGoogleAsync();
+  };
+
+  const handleApplePress = async () => {
+    try {
+      setIsLoading(true);
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) {
+        throw new Error('Apple kimlik tokenı alınamadı.');
+      }
+
+      const result = await signInWithApple(credential.identityToken, {
+        givenName: credential.fullName?.givenName,
+        familyName: credential.fullName?.familyName,
+      });
+
+      if (result.token) {
+        await refreshUser();
+        router.replace('/(tabs)');
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'ERR_REQUEST_CANCELED') return;
+      Toast.show({
+        type: 'error',
+        text1: 'Apple ile giriş başarısız',
+        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +202,7 @@ export default function LoginScreen() {
               Giriş Yap
             </Button>
 
-            {/* Social Sign-In Placeholders */}
+            {/* Social Sign-In */}
             <View className="mt-4">
               <View className="flex-row items-center mb-4">
                 <View className="flex-1 h-px bg-gray-200" />
@@ -128,30 +213,28 @@ export default function LoginScreen() {
               <TouchableOpacity
                 className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
                 activeOpacity={0.8}
-                onPress={() => Toast.show({ type: 'info', text1: 'Yakında', text2: 'Google ile giriş özelliği yakında eklenecek.' })}
+                onPress={handleGooglePress}
+                disabled={!googleRequest || isLoading}
               >
                 <Ionicons name="logo-google" size={18} color="#EA4335" />
                 <Text className="text-dark text-sm font-medium ml-2 flex-1">
                   Google ile Giriş Yap
                 </Text>
-                <View className="bg-gray-100 rounded-full px-2 py-0.5">
-                  <Text className="text-gray-400 text-xs">Yakında</Text>
-                </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-black"
-                activeOpacity={0.8}
-                onPress={() => Toast.show({ type: 'info', text1: 'Yakında', text2: 'Apple ile giriş özelliği yakında eklenecek.' })}
-              >
-                <Ionicons name="logo-apple" size={18} color="#fff" />
-                <Text className="text-white text-sm font-medium ml-2 flex-1">
-                  Apple ile Giriş Yap
-                </Text>
-                <View className="bg-white/20 rounded-full px-2 py-0.5">
-                  <Text className="text-white/80 text-xs">Yakında</Text>
-                </View>
-              </TouchableOpacity>
+              {Platform.OS === 'ios' && appleAvailable && (
+                <TouchableOpacity
+                  className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-black"
+                  activeOpacity={0.8}
+                  onPress={handleApplePress}
+                  disabled={isLoading}
+                >
+                  <Ionicons name="logo-apple" size={18} color="#fff" />
+                  <Text className="text-white text-sm font-medium ml-2 flex-1">
+                    Apple ile Giriş Yap
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <View className="flex-row items-center justify-center mt-6">

@@ -2,7 +2,6 @@ import api, { setToken, removeToken } from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type { LoginCredentials, RegisterData, AuthResponse, User } from '../lib/types';
 import { normalizeUserProfile } from './user-service';
-
 function unwrapProfileResponse(
   response: User | { success?: boolean; message?: string; data?: User; user?: User },
   fallbackError: string,
@@ -84,4 +83,38 @@ export async function updateProfile(data: Partial<User>): Promise<User> {
     return getProfile();
   }
   return normalizeUserProfile(profile);
+}
+
+export async function signInWithGoogle(idToken: string): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>(
+    API_ENDPOINTS.AUTH_GOOGLE,
+    { id_token: idToken },
+    { skipAuth: true },
+  );
+  if (response?.token) {
+    await setToken(response.token);
+  }
+  return response;
+}
+
+export async function signInWithApple(
+  identityToken: string,
+  name?: { givenName?: string | null; familyName?: string | null },
+): Promise<AuthResponse> {
+  const payload: Record<string, unknown> = { identity_token: identityToken };
+  if (name && (name.givenName || name.familyName)) {
+    payload.name = {
+      given_name: name.givenName ?? null,
+      family_name: name.familyName ?? null,
+    };
+  }
+  const response = await api.post<AuthResponse>(
+    API_ENDPOINTS.AUTH_APPLE,
+    payload,
+    { skipAuth: true },
+  );
+  if (response?.token) {
+    await setToken(response.token);
+  }
+  return response;
 }

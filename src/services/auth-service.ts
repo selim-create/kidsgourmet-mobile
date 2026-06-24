@@ -118,3 +118,11 @@ export async function signInWithApple(
   }
   return response;
 }
+
+export async function deleteAccount(appleRefreshToken?: string): Promise<void> {
+  await api.delete(API_ENDPOINTS.AUTH_DELETE_ACCOUNT, {
+    body: appleRefreshToken
+      ? JSON.stringify({ apple_refresh_token: appleRefreshToken })
+      : undefined,
+  });
+}

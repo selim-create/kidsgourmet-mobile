@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import useSWR from 'swr';
 import {
   View,
   Text,
@@ -17,12 +18,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
+import { API_ENDPOINTS } from '../../src/lib/constants';
 import {
   calculatePercentile,
   savePercentileResult,
 } from '../../src/services/tool-service';
+import { getGrowthChartData } from '../../src/services/growth-service';
 import { setToken } from '../../src/lib/api';
-import type { PercentileResult } from '../../src/lib/types';
+import type { GrowthChartData, GrowthChartType, PercentileResult } from '../../src/lib/types';
+import { GrowthChart } from '../../src/components/growth/GrowthChart';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -447,7 +451,7 @@ function ChildSelectorModal({
 }: {
   visible: boolean;
   onClose: () => void;
-  onSelect: (childId: number) => void;
+  onSelect: (childId: string | number) => void;
 }) {
   const { children } = useActiveChild();
 
@@ -616,7 +620,7 @@ const DEFAULT_BIRTH_DATE_PLACEHOLDER = (() => {
 
 export default function PercentileCalculatorScreen() {
   const { isAuthenticated, refreshUser } = useAuth();
-  const { children, reloadChildren } = useActiveChild();
+  const { children, activeChild, reloadChildren } = useActiveChild();
 
   // Form state
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
@@ -630,10 +634,20 @@ export default function PercentileCalculatorScreen() {
   const [result, setResult] = useState<PercentileResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedChartType, setSelectedChartType] = useState<GrowthChartType>('weight_for_age');
 
   // Modal state
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
+
+  const growthChartKey = isAuthenticated && activeChild
+    ? API_ENDPOINTS.GROWTH_CHART_DATA(activeChild.id, selectedChartType)
+    : null;
+
+  const { data: growthChartData, isLoading: isGrowthChartLoading } = useSWR<GrowthChartData | null>(
+    growthChartKey,
+    () => getGrowthChartData(activeChild!.id, selectedChartType),
+  );
 
   const handleCalculate = useCallback(async () => {
     if (!gender) {
@@ -722,9 +736,10 @@ export default function PercentileCalculatorScreen() {
   }, [result, isAuthenticated, children, doSave]);
 
   const handleChildSelected = useCallback(
-    async (childId: number) => {
+    async (childId: string | number) => {
       setShowChildSelector(false);
-      await doSave(childId > 0 ? childId : undefined);
+      const numericId = Number(childId);
+      await doSave(Number.isFinite(numericId) && numericId > 0 ? numericId : undefined);
     },
     [doSave],
   );
@@ -1099,6 +1114,32 @@ export default function PercentileCalculatorScreen() {
                   </Text>
                 )}
               </TouchableOpacity>
+            </View>
+          )}
+
+          {isAuthenticated && activeChild && (
+            <View
+              style={{
+                backgroundColor: '#EFF6FF',
+                borderRadius: 14,
+                padding: 14,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: '#BFDBFE',
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E3A8A', marginBottom: 2 }}>
+                Büyüme Geçmişi 📈
+              </Text>
+              <Text style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>
+                {activeChild.name} için WHO referans eğrileri ve kayıtlı ölçümler.
+              </Text>
+              <GrowthChart
+                chartData={growthChartData ?? null}
+                isLoading={isGrowthChartLoading}
+                selectedType={selectedChartType}
+                onTypeChange={setSelectedChartType}
+              />
             </View>
           )}
 

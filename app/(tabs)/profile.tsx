@@ -297,6 +297,15 @@ export default function ProfileScreen() {
             ))}
           </Card>
 
+          <TouchableOpacity
+            onPress={() => router.push('/profile/delete-account')}
+            className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+          >
+            <Text className="text-center text-sm font-semibold text-red-600">
+              Hesabı Sil
+            </Text>
+          </TouchableOpacity>
+
           {/* Legal Items */}
           <Card className="mb-4">
             <Text className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-2 px-1">

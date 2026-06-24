@@ -14,7 +14,7 @@ export function useGrowthData() {
       ? API_ENDPOINTS.GROWTH_RECORD(activeChild.id)
       : null;
 
-  const { data, error, isLoading, mutate } = useSWR<GrowthData>(
+  const { data, error, isLoading, mutate } = useSWR<GrowthData | null>(
     key,
     () => getGrowthData(activeChild!.id),
   );

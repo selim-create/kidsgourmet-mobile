@@ -1,8 +1,14 @@
 import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
-import type { GrowthData, GrowthRecord, PercentileResult } from '../lib/types';
+import type {
+  GrowthChartData,
+  GrowthChartType,
+  GrowthData,
+  GrowthRecord,
+  PercentileResult,
+} from '../lib/types';
 
-export async function getGrowthData(childId: number): Promise<GrowthData | null> {
+export async function getGrowthData(childId: number | string): Promise<GrowthData | null> {
   try {
     return await api.get<GrowthData>(API_ENDPOINTS.GROWTH_RECORD(childId));
   } catch (err) {
@@ -25,6 +31,19 @@ export async function getPercentileResult(
   try {
     return await api.get<PercentileResult>(
       `${API_ENDPOINTS.TOOL_PERCENTILE_RESULTS}?child_id=${childId}`,
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function getGrowthChartData(
+  childId: string,
+  type?: GrowthChartType,
+): Promise<GrowthChartData | null> {
+  try {
+    return await api.get<GrowthChartData>(
+      API_ENDPOINTS.GROWTH_CHART_DATA(childId, type),
     );
   } catch {
     return null;

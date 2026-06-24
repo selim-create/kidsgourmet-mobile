@@ -46,7 +46,7 @@
 ### `POST /kg/v1/user/avatar`
 - **Status:** ✅ Confirmed working (header avatar shows correctly after upload)
 - **Mobile constant:** `USER_AVATAR` (`src/lib/constants.ts:19`)
-- **Auth:** Required (****** in header, NOT in JSON body)
+- **Auth:** Required (Bearer token in `Authorization` header — NOT in JSON body)
 - **Body:** FormData — `file` field with image
 - **Response:** `{ id: number, source_url?: string, url?: string }`
 - **Mobile usage:** `user-service.ts:uploadUserAvatar()`
@@ -133,7 +133,7 @@
 ### `POST /kg/v1/user/children/{uuid}/avatar`
 - **Status:** ✅
 - **Mobile constant:** `CHILD_PROFILE_AVATAR(uuid)` (`src/lib/constants.ts:28`)
-- **Auth:** Required (****** FormData body — `avatar` field)
+- **Auth:** Required (Bearer token in `Authorization` header; FormData body — `avatar` field)
 - **Mobile usage:** `user-service.ts:uploadChildAvatar()`
 
 ### `GET /kg/v1/user/children/{uuid}/avatar`

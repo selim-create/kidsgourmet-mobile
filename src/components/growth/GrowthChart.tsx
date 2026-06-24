@@ -13,6 +13,10 @@ interface GrowthChartProps {
 const CHART_HEIGHT = 220;
 const PADDING_X = 36;
 const PADDING_Y = 24;
+const DAYS_PER_MONTH = 30;
+const Y_LABEL_X = 6;
+const X_LABEL_Y = CHART_HEIGHT - 4;
+const MAX_X_LABEL_OFFSET = 28;
 
 const TYPE_OPTIONS: Array<{ key: GrowthChartType; label: string }> = [
   { key: 'weight_for_age', label: 'Kilo' },
@@ -194,17 +198,17 @@ export function GrowthChart({
               />
             ))}
 
-            <SvgText x={6} y={PADDING_Y} fill="#6B7280" fontSize="10">
+            <SvgText x={Y_LABEL_X} y={PADDING_Y} fill="#6B7280" fontSize="10">
               {chartModel.maxY.toFixed(1)} {unitForType(selectedType)}
             </SvgText>
-            <SvgText x={6} y={CHART_HEIGHT - PADDING_Y} fill="#6B7280" fontSize="10">
+            <SvgText x={Y_LABEL_X} y={CHART_HEIGHT - PADDING_Y} fill="#6B7280" fontSize="10">
               {chartModel.minY.toFixed(1)}
             </SvgText>
-            <SvgText x={PADDING_X} y={CHART_HEIGHT - 4} fill="#6B7280" fontSize="10">
-              {(chartModel.minX / 30).toFixed(0)} ay
+            <SvgText x={PADDING_X} y={X_LABEL_Y} fill="#6B7280" fontSize="10">
+              {(chartModel.minX / DAYS_PER_MONTH).toFixed(0)} ay
             </SvgText>
-            <SvgText x={chartWidth - PADDING_X - 28} y={CHART_HEIGHT - 4} fill="#6B7280" fontSize="10">
-              {(chartModel.maxX / 30).toFixed(0)} ay
+            <SvgText x={chartWidth - PADDING_X - MAX_X_LABEL_OFFSET} y={X_LABEL_Y} fill="#6B7280" fontSize="10">
+              {(chartModel.maxX / DAYS_PER_MONTH).toFixed(0)} ay
             </SvgText>
           </Svg>
 

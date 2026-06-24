@@ -54,7 +54,7 @@ export interface User {
   show_email?: boolean;
   followed_circles?: number[];
   stats?: UserStats;
-  registered_via?: 'apple' | 'google' | 'email' | string;
+  registered_via?: string;
   apple_refresh_token?: string;
   /** Child list returned by /profile endpoint */
   children?: Child[];

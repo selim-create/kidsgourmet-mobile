@@ -646,7 +646,7 @@ export default function PercentileCalculatorScreen() {
 
   const { data: growthChartData, isLoading: isGrowthChartLoading } = useSWR<GrowthChartData | null>(
     growthChartKey,
-    () => getGrowthChartData(String(activeChild!.id), selectedChartType),
+    () => (activeChild ? getGrowthChartData(String(activeChild.id), selectedChartType) : null),
   );
 
   const handleCalculate = useCallback(async () => {

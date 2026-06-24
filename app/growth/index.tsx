@@ -641,12 +641,12 @@ export default function PercentileCalculatorScreen() {
   const [showChildSelector, setShowChildSelector] = useState(false);
 
   const growthChartKey = isAuthenticated && activeChild
-    ? API_ENDPOINTS.GROWTH_CHART_DATA(activeChild.id, selectedChartType)
+    ? API_ENDPOINTS.GROWTH_CHART_DATA(String(activeChild.id), selectedChartType)
     : null;
 
   const { data: growthChartData, isLoading: isGrowthChartLoading } = useSWR<GrowthChartData | null>(
     growthChartKey,
-    () => getGrowthChartData(activeChild!.id, selectedChartType),
+    () => getGrowthChartData(String(activeChild!.id), selectedChartType),
   );
 
   const handleCalculate = useCallback(async () => {

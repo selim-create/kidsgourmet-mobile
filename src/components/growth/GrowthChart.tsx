@@ -10,7 +10,6 @@ interface GrowthChartProps {
   onTypeChange: (type: GrowthChartType) => void;
 }
 
-const CHART_WIDTH = Math.max(260, Math.min(Dimensions.get('window').width - 76, 340));
 const CHART_HEIGHT = 220;
 const PADDING_X = 36;
 const PADDING_Y = 24;
@@ -40,6 +39,8 @@ export function GrowthChart({
   selectedType,
   onTypeChange,
 }: GrowthChartProps) {
+  const chartWidth = Math.max(260, Math.min(Dimensions.get('window').width - 76, 340));
+
   const chartModel = useMemo(() => {
     if (!chartData) return null;
 
@@ -62,7 +63,7 @@ export function GrowthChart({
     const minY = Math.min(...yValues);
     const maxY = Math.max(...yValues);
 
-    const plotWidth = CHART_WIDTH - PADDING_X * 2;
+    const plotWidth = chartWidth - PADDING_X * 2;
     const plotHeight = CHART_HEIGHT - PADDING_Y * 2;
 
     const scaleX = (ageDays: number) => {
@@ -99,7 +100,7 @@ export function GrowthChart({
         })),
       ),
     };
-  }, [chartData]);
+  }, [chartData, chartWidth]);
 
   return (
     <View
@@ -148,11 +149,11 @@ export function GrowthChart({
         </View>
       ) : (
         <>
-          <Svg width={CHART_WIDTH} height={CHART_HEIGHT}>
+          <Svg width={chartWidth} height={CHART_HEIGHT}>
             <Line
               x1={PADDING_X}
               y1={CHART_HEIGHT - PADDING_Y}
-              x2={CHART_WIDTH - PADDING_X}
+              x2={chartWidth - PADDING_X}
               y2={CHART_HEIGHT - PADDING_Y}
               stroke="#D1D5DB"
               strokeWidth={1}
@@ -193,7 +194,7 @@ export function GrowthChart({
               />
             ))}
 
-            <SvgText x={4} y={PADDING_Y} fill="#6B7280" fontSize="10">
+            <SvgText x={6} y={PADDING_Y} fill="#6B7280" fontSize="10">
               {chartModel.maxY.toFixed(1)} {unitForType(selectedType)}
             </SvgText>
             <SvgText x={6} y={CHART_HEIGHT - PADDING_Y} fill="#6B7280" fontSize="10">
@@ -202,7 +203,7 @@ export function GrowthChart({
             <SvgText x={PADDING_X} y={CHART_HEIGHT - 4} fill="#6B7280" fontSize="10">
               {(chartModel.minX / 30).toFixed(0)} ay
             </SvgText>
-            <SvgText x={CHART_WIDTH - PADDING_X - 28} y={CHART_HEIGHT - 4} fill="#6B7280" fontSize="10">
+            <SvgText x={chartWidth - PADDING_X - 28} y={CHART_HEIGHT - 4} fill="#6B7280" fontSize="10">
               {(chartModel.maxX / 30).toFixed(0)} ay
             </SvgText>
           </Svg>

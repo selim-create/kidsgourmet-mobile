@@ -30,8 +30,8 @@ export default function DeleteAccountScreen() {
     try {
       await deleteAccount(appleRefreshToken);
       await logout();
-      router.replace('/(auth)/login');
       Toast.show({ type: 'success', text1: 'Hesabınız başarıyla silindi' });
+      router.replace('/(auth)/login');
     } catch {
       Toast.show({
         type: 'error',

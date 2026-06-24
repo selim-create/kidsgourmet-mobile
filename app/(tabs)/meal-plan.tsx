@@ -73,13 +73,13 @@ export default function MealPlanScreen() {
     );
   }
 
-  const totalMeals =
-    mealPlan?.days.reduce((acc, d) => acc + d.meals.length, 0) ?? 0;
-  const completedMeals =
-    mealPlan?.days.reduce(
-      (acc, d) => acc + d.meals.filter((m) => m.is_completed).length,
-      0,
-    ) ?? 0;
+  const days = mealPlan?.days ?? [];
+
+  const totalMeals = days.reduce((acc, d) => acc + (d.meals?.length ?? 0), 0);
+  const completedMeals = days.reduce(
+    (acc, d) => acc + (d.meals?.filter((m) => m.is_completed).length ?? 0),
+    0,
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
@@ -146,16 +146,16 @@ export default function MealPlanScreen() {
           ) : null}
 
           {/* Days */}
-          {mealPlan && mealPlan.days.length > 0 ? (
-            mealPlan.days.map((day) => (
+          {days.length > 0 ? (
+            days.map((day) => (
               <Card key={day.date} className="mb-3">
                 <View className="flex-row items-center justify-between mb-3">
                   <Text className="text-dark font-bold">{day.day_name}</Text>
                   <Text className="text-gray-400 text-xs">{day.date}</Text>
                 </View>
 
-                {day.meals.length > 0 ? (
-                  day.meals.map((meal, idx) => (
+                {(day.meals ?? []).length > 0 ? (
+                  (day.meals ?? []).map((meal, idx) => (
                     <View
                       key={idx}
                       className="flex-row items-center py-2 border-b border-gray-50 last:border-0"

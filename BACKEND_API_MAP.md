@@ -2,8 +2,8 @@
 
 > Source of truth for mobile ↔ backend API contract.
 > Derived from `src/lib/constants.ts` and `src/services/*` code audit, cross-referenced with `TOOLS_PORT_AUDIT.md`.
-> Note: `kg-core` and `kidsgourmet-web` repos are private; backend paths are confirmed via prior PR fixes and user-verified flows.
-> Last updated: 2026-06-24 (endpoint alignment: shopping-list + meal-plans active)
+> Note: `kg-core` repo is public at `selim-create/kg-core`; backend paths verified from `includes/API/*Controller.php` route registrations.
+> Last updated: 2026-06-24 (null-safety + SWR 404 audit; kg-core routes cross-referenced)
 
 ## Status Legend
 
@@ -11,7 +11,7 @@
 |---|---|
 | ✅ | Mobile uses correctly — confirmed working (user-tested or code-verified) |
 | ❌ | Mobile uses with wrong path/payload — **fixed in this PR** |
-| 🆕 | Backend likely has it; mobile doesn't actively call it yet |
+| 🆕 | Not yet implemented in kg-core backend, OR constant defined but mobile doesn't actively call it |
 | ⚠️ | Verification needed — path unconfirmed against backend source |
 | 🗑️ | Mobile constant exists but endpoint is deprecated/dead |
 
@@ -774,14 +774,14 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 - **Mobile constant:** `VACCINES_HISTORY(childId)` (`src/lib/constants.ts:135`)
 
 ### `GET /kg/v1/health/growth`
-- **Status:** ⚠️ Verification needed
+- **Status:** 🆕 Not in kg-core — no GrowthController registered in `selim-create/kg-core` (verified 2026-06-24)
 - **Mobile constants:** `GROWTH_DATA`, `GROWTH_RECORD(childId)` (`src/lib/constants.ts:209-210`)
 - **Auth:** Required
 - **Query params:** `child_id`
-- **Mobile usage:** `growth-service.ts:getGrowthData()`
+- **Mobile usage:** `growth-service.ts:getGrowthData()` — now guarded: returns `null` silently on 404
 
 ### `POST /kg/v1/health/growth`
-- **Status:** ⚠️ Verification needed
+- **Status:** 🆕 Not in kg-core — no GrowthController registered in `selim-create/kg-core` (verified 2026-06-24)
 - **Mobile constant:** `GROWTH_ADD` (`src/lib/constants.ts:211`)
 - **Auth:** Required
 - **Body:** `GrowthRecord` (without id)
@@ -800,18 +800,18 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 - **Mobile usage:** `search-service.ts:searchService.search()`
 
 ### `GET /kg/v1/recommendations/daily`
-- **Status:** ⚠️ Verification needed
+- **Status:** 🆕 Not in kg-core — `selim-create/kg-core` `RecommendationController` does not register this route (verified 2026-06-24); `getRecommendations()` service function exists but is not called from any active SWR hook
 - **Mobile constants:** `RECOMMENDATIONS`, `RECOMMENDATIONS_DAILY` (identical, `src/lib/constants.ts:82,83`)
 - **Auth:** Required
 - **Query params:** `child_id?`
-- **Mobile usage:** `recommendation-service.ts:getRecommendations()`
+- **Mobile usage:** `recommendation-service.ts:getRecommendations()` — defined only, not called
 
 ### `GET /kg/v1/recommendations/dashboard`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅ Verified from kg-core source (`selim-create/kg-core` `includes/API/RecommendationController.php`, 2026-06-24) — route exists; guarded in mobile to return `[]` silently if not yet deployed
 - **Mobile constant:** `RECOMMENDATIONS_DASHBOARD` (`src/lib/constants.ts:84`)
 - **Auth:** Required
-- **Query params:** `child_id`
-- **Mobile usage:** `recommendation-service.ts:getDashboardRecommendations()`
+- **Query params:** `child_id` (required, string)
+- **Mobile usage:** `recommendation-service.ts:getDashboardRecommendations()` — returns `[]` on error
 
 ### `GET /kg/v1/recommendations/recipes`
 - **Status:** 🆕 Constant defined, no active service function
@@ -830,18 +830,18 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 - **Mobile usage:** `featured-service.ts:getCrossSellBanner()`
 
 ### `GET /kg/v1/nutrition/weekly-summary`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅ Verified from kg-core source (`selim-create/kg-core` `includes/API/RecommendationController.php`, 2026-06-24) — route exists; guarded in mobile to return `null` silently if not yet deployed
 - **Mobile constant:** `NUTRITION_WEEKLY_SUMMARY` (`src/lib/constants.ts:90`)
 - **Auth:** Required
 - **Query params:** `child_id`, `period?` ('day'|'week'|'month')
-- **Mobile usage:** `nutrition-service.ts:getNutritionSummary()`
+- **Mobile usage:** `nutrition-service.ts:getNutritionSummary()` — returns `null` on error
 
 ### `GET /kg/v1/nutrition/missing-nutrients`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅ Verified from kg-core source (`selim-create/kg-core` `includes/API/RecommendationController.php`, 2026-06-24) — route exists; guarded in mobile to return `null` silently if not yet deployed
 - **Mobile constants:** `NUTRITION_MISSING`, `NUTRITION_MISSING_NUTRIENTS` (identical, `src/lib/constants.ts:91,92`)
 - **Auth:** Required
 - **Query params:** `child_id`
-- **Mobile usage:** `nutrition-service.ts:getMissingNutrients()`
+- **Mobile usage:** `nutrition-service.ts:getMissingNutrients()` — returns `null` on error
 
 ---
 

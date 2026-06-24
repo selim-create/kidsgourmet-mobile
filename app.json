@@ -34,7 +34,10 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFBE6"
       },
-      "package": "com.kidsgourmet.mobile"
+      "package": "com.kidsgourmet.mobile",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -65,7 +68,13 @@
     },
     "extra": {
       "googleIosClientId": "944387456679-nuv4qnlq1lvrdpl1llp31sf30n8mm1j3.apps.googleusercontent.com",
-      "googleWebClientId": "944387456679-mis73fvvfhh7p715mm50j45v61l01ljh.apps.googleusercontent.com"
+      "googleWebClientId": "944387456679-mis73fvvfhh7p715mm50j45v61l01ljh.apps.googleusercontent.com",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "6d10376f-faf7-4177-9192-35d6ab7e1d5f"
+      }
     }
   }
 }

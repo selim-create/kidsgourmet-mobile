@@ -774,18 +774,25 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 - **Mobile constant:** `VACCINES_HISTORY(childId)` (`src/lib/constants.ts:135`)
 
 ### `GET /kg/v1/health/growth`
-- **Status:** 🆕 Not in kg-core — no GrowthController registered in `selim-create/kg-core` (verified 2026-06-24)
+- **Status:** ✅
 - **Mobile constants:** `GROWTH_DATA`, `GROWTH_RECORD(childId)` (`src/lib/constants.ts:209-210`)
 - **Auth:** Required
 - **Query params:** `child_id`
-- **Mobile usage:** `growth-service.ts:getGrowthData()` — now guarded: returns `null` silently on 404
+- **Mobile usage:** `growth-service.ts:getGrowthData()`
 
 ### `POST /kg/v1/health/growth`
-- **Status:** 🆕 Not in kg-core — no GrowthController registered in `selim-create/kg-core` (verified 2026-06-24)
+- **Status:** ✅
 - **Mobile constant:** `GROWTH_ADD` (`src/lib/constants.ts:211`)
 - **Auth:** Required
 - **Body:** `GrowthRecord` (without id)
 - **Mobile usage:** `growth-service.ts:addGrowthRecord()`
+
+### `GET /kg/v1/health/growth/chart-data`
+- **Status:** ✅
+- **Mobile constant:** `GROWTH_CHART_DATA(childId, type?)`
+- **Auth:** Required
+- **Query params:** `child_id`, `type?` (`weight_for_age | height_for_age | head_for_age`)
+- **Mobile usage:** `growth-service.ts:getGrowthChartData()`
 
 ---
 

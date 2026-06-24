@@ -54,6 +54,8 @@ export interface User {
   show_email?: boolean;
   followed_circles?: number[];
   stats?: UserStats;
+  registered_via?: string;
+  apple_refresh_token?: string;
   /** Child list returned by /profile endpoint */
   children?: Child[];
   created_at?: string;
@@ -807,6 +809,31 @@ export interface GrowthData {
   records: GrowthRecord[];
   latest?: GrowthRecord;
   percentile?: PercentileResult;
+}
+
+export interface GrowthChartMeasurement {
+  age_days: number;
+  value: number;
+  percentile: number;
+  z_score: number;
+  date: string;
+}
+
+export interface GrowthReferenceCurves {
+  p3: Array<{ age_days: number; value: number }>;
+  p15: Array<{ age_days: number; value: number }>;
+  p50: Array<{ age_days: number; value: number }>;
+  p85: Array<{ age_days: number; value: number }>;
+  p97: Array<{ age_days: number; value: number }>;
+}
+
+export type GrowthChartType = 'weight_for_age' | 'height_for_age' | 'head_for_age';
+
+export interface GrowthChartData {
+  child: { name: string; gender: string; birth_date: string };
+  type: GrowthChartType;
+  measurements: GrowthChartMeasurement[];
+  reference_curves: GrowthReferenceCurves;
 }
 
 export interface PercentileResult {

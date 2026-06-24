@@ -37,7 +37,7 @@ export async function getConsents(): Promise<UserConsent[]> {
   const res = await api.get<UserConsentsResponse | UserConsent[]>(API_ENDPOINTS.USER_CONSENTS);
   const list = Array.isArray(res) ? res : (res.data ?? res.consents ?? []);
   return list
-    .map((item) => normalizeConsent(item as UserConsent | Record<string, unknown>))
+    .map((item) => normalizeConsent(item))
     .filter((item): item is UserConsent => item !== null);
 }
 
@@ -49,9 +49,12 @@ export async function updateConsent(type: ConsentType, consented: boolean): Prom
     },
   );
   if (typeof response === 'object' && response !== null && 'success' in response) {
-    return response.success !== false;
+    if (response.success === false) {
+      throw new Error('Rıza güncellemesi başarısız');
+    }
+    return true;
   }
-  return true;
+  throw new Error('Geçersiz rıza güncelleme yanıtı');
 }
 
 export async function getConsentHistory(type?: ConsentType): Promise<UserConsentHistoryEntry[]> {
@@ -63,18 +66,17 @@ export async function getConsentHistory(type?: ConsentType): Promise<UserConsent
   const normalizedHistory: UserConsentHistoryEntry[] = [];
 
   for (const item of list) {
-    const normalized = normalizeConsent(item as UserConsent | Record<string, unknown>);
+    const normalized = normalizeConsent(item);
     if (!normalized) continue;
 
-    const record = item as unknown as Record<string, unknown>;
     normalizedHistory.push({
       ...normalized,
-      changed_at: (record.changed_at as string | undefined)
+      changed_at: item.changed_at
         ?? normalized.updated_at
         ?? normalized.consented_at
         ?? undefined,
-      ip: record.ip as string | undefined,
-      user_agent: record.user_agent as string | undefined,
+      ip: item.ip,
+      user_agent: item.user_agent,
     });
   }
 

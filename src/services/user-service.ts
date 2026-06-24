@@ -56,14 +56,26 @@ export interface ChildUpsertPayload {
   terms_accepted_at?: string | null;
 }
 
+function unwrapUserResponse(
+  response: User | { success?: boolean; message?: string; data?: User; user?: User },
+  fallbackError: string,
+): User {
+  const raw = response as Record<string, unknown>;
+
+  if (typeof raw.success === 'boolean') {
+    if (!raw.success) {
+      throw new Error((raw.message as string | undefined) ?? fallbackError);
+    }
+    return (raw.data as User | undefined) ?? (raw.user as User | undefined) ?? (response as User);
+  }
+
+  return ((raw.data as User | undefined) ?? (raw.user as User | undefined) ?? (response as User));
+}
+
 export async function getUserProfile(): Promise<User> {
   const response = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.PROFILE);
-  const wrapped = response as { data?: User; user?: User };
-  const profile =
-    typeof response === 'object' && response !== null && !Array.isArray(response)
-      ? (wrapped.data ?? wrapped.user ?? response)
-      : response;
-  return normalizeUserProfile(profile as User);
+  const profile = unwrapUserResponse(response, 'Profil getirilemedi');
+  return normalizeUserProfile(profile);
 }
 
 export async function updateUserProfile(data: Partial<User>): Promise<User> {
@@ -71,15 +83,8 @@ export async function updateUserProfile(data: Partial<User>): Promise<User> {
     API_ENDPOINTS.PROFILE,
     data,
   );
-  if (typeof response === 'object' && response !== null && 'success' in response && response.success === false) {
-    throw new Error(response.message ?? 'Profil güncellenemedi');
-  }
-  const wrapped = response as { data?: User; user?: User };
-  const profile =
-    typeof response === 'object' && response !== null && !Array.isArray(response)
-      ? (wrapped.data ?? wrapped.user ?? response)
-      : response;
-  return normalizeUserProfile(profile as User);
+  const profile = unwrapUserResponse(response, 'Profil güncellenemedi');
+  return normalizeUserProfile(profile);
 }
 
 /** Upload current user's avatar (uses fetch directly to handle FormData properly in RN) */

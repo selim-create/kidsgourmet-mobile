@@ -155,9 +155,6 @@ export default function ProfileEditScreen() {
         payload.password = password.trim();
       }
       const updatedProfile = await updateUserProfile(payload as Parameters<typeof updateUserProfile>[0]);
-      if (!updatedProfile?.id) {
-        throw new Error('Profil güncellenemedi');
-      }
       setAvatarUrl(updatedProfile.avatar_url ?? avatarUrl);
       await refreshUser();
       await mutate(API_ENDPOINTS.PROFILE);

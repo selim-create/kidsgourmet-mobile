@@ -72,7 +72,7 @@ function ConsentHistorySection() {
   if (history.length === 0) {
     return (
       <Text style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', paddingVertical: 12 }}>
-        Değişiklik geçmişi yakında.
+        Değişiklik geçmişi bu sürümde yapılandırma ile kapalı.
       </Text>
     );
   }

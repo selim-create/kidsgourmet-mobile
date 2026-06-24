@@ -4,7 +4,7 @@ import type { UserConsent, UserConsentHistoryEntry, ConsentType } from '../lib/t
 import { API_ENDPOINTS } from '../lib/constants';
 import { useAuth } from '../contexts/AuthContext';
 
-const CONSENT_HISTORY_ENABLED = false;
+const CONSENT_HISTORY_ENABLED = process.env.EXPO_PUBLIC_ENABLE_CONSENT_HISTORY === 'true';
 
 export function useConsents() {
   const { isAuthenticated } = useAuth();
@@ -24,7 +24,7 @@ export function useConsents() {
     await mutate(
       async (current) => {
         const success = await updateConsent(type, consented);
-        if (!success) throw new Error('Consent update failed');
+        if (!success) throw new Error(`Rıza güncellenemedi: ${type}`);
 
         const safeCurrent = Array.isArray(current) ? current : [];
         const existing = safeCurrent.find((c) => c.consent_type === type);

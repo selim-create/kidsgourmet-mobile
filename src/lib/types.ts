@@ -1028,7 +1028,7 @@ export interface AllergenPlannerConfig {
 
 export interface AllergenPlannerInput {
   allergen_ids: string[];
-  child_id?: number;
+  child_id?: string | number;
   start_date?: string;
 }
 
@@ -1050,7 +1050,7 @@ export interface AllergenTrialPlan {
 
 export interface FoodTrial {
   id: number;
-  child_id?: number;
+  child_id?: string | number;
   food_name: string;
   start_date: string;
   status: 'planned' | 'in_progress' | 'completed' | 'reaction';
@@ -1061,7 +1061,7 @@ export interface FoodTrial {
 }
 
 export interface FoodTrialInput {
-  child_id?: number;
+  child_id?: string | number;
   food_name: string;
   start_date?: string;
   notes?: string;

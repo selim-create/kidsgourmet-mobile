@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { NutritionSummary } from '../lib/types';
 
 export async function getNutritionSummary(
-  childId: number,
+  childId: string | number,
   period?: 'day' | 'week' | 'month',
 ): Promise<NutritionSummary | null> {
   const params = new URLSearchParams({ child_id: String(childId) });
@@ -21,7 +21,7 @@ export async function getNutritionSummary(
   }
 }
 
-export async function getMissingNutrients(childId: number): Promise<NutritionSummary | null> {
+export async function getMissingNutrients(childId: string | number): Promise<NutritionSummary | null> {
   try {
     return await api.get<NutritionSummary>(
       `${API_ENDPOINTS.NUTRITION_MISSING_NUTRIENTS}?child_id=${childId}`,

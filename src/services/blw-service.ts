@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { BLWTestResult, SolidFoodReadinessResult } from '../lib/types';
 
 export async function getBLWTestResults(
-  childId: number,
+  childId: string | number,
 ): Promise<BLWTestResult | null> {
   try {
     return await api.get<BLWTestResult>(
@@ -22,7 +22,7 @@ export async function submitBLWTest(data: {
 }
 
 export async function getSolidFoodReadiness(
-  childId: number,
+  childId: string | number,
 ): Promise<SolidFoodReadinessResult | null> {
   try {
     return await api.get<SolidFoodReadinessResult>(

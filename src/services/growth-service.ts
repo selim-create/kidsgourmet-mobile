@@ -49,7 +49,7 @@ export async function deleteGrowthRecord(id: string): Promise<void> {
 }
 
 export async function getPercentileResult(
-  childId: number,
+  childId: string | number,
 ): Promise<PercentileResult | null> {
   try {
     return await api.get<PercentileResult>(

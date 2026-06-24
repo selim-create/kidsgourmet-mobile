@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { FoodIntroductionItem } from '../lib/types';
 
 export async function getFoodIntroductionItems(
-  childId?: number,
+  childId?: string | number,
 ): Promise<FoodIntroductionItem[]> {
   const params = childId ? `?child_id=${childId}` : '';
   return api.get<FoodIntroductionItem[]>(
@@ -12,7 +12,7 @@ export async function getFoodIntroductionItems(
 }
 
 export async function getNextFoodSuggestion(
-  childId: number,
+  childId: string | number,
 ): Promise<FoodIntroductionItem | null> {
   try {
     return await api.get<FoodIntroductionItem>(

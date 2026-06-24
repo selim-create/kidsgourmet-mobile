@@ -14,7 +14,7 @@ export function useNutritionSummary(period: 'day' | 'week' | 'month' = 'week') {
       ? `${API_ENDPOINTS.NUTRITION_WEEKLY_SUMMARY}?child_id=${activeChild.id}&period=${period}`
       : null;
 
-  const { data, error, isLoading } = useSWR<NutritionSummary>(
+  const { data, error, isLoading } = useSWR<NutritionSummary | null>(
     key,
     () => getNutritionSummary(activeChild!.id, period),
   );

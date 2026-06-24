@@ -69,13 +69,13 @@ export default function DashboardScreen() {
   // ── Nutrition summary
   const { data: nutritionSummary, isLoading: loadingNutrition } = useSWR(
     childId != null ? ['dashboard-nutrition', childId] : null,
-    () => getNutritionSummary(childId as number, 'week'),
+    () => getNutritionSummary(childId!, 'week'),
   );
 
   // ── Missing nutrients
   const { data: missingNutrientsData } = useSWR(
     childId != null ? ['dashboard-missing-nutrients', childId] : null,
-    () => getMissingNutrients(childId as number),
+    () => getMissingNutrients(childId!),
   );
 
   // ── Growth data
@@ -87,7 +87,7 @@ export default function DashboardScreen() {
   // ── BLW test result
   const { data: blwResult, isLoading: loadingBLW } = useSWR(
     childId != null ? ['dashboard-blw', childId] : null,
-    () => getBLWTestResults(childId as number),
+    () => getBLWTestResults(childId!),
   );
 
   // ── Vaccines
@@ -105,7 +105,7 @@ export default function DashboardScreen() {
   // ── Daily recommendations
   const { data: recommendations, isLoading: loadingRecommendations } = useSWR(
     childId != null ? ['dashboard-recommendations', childId] : null,
-    () => getDashboardRecommendations(childId as number),
+    () => getDashboardRecommendations(childId!),
   );
 
   const onRefresh = useCallback(async () => {

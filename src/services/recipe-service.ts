@@ -201,17 +201,21 @@ function normalizeRecipe(recipe: Recipe): Recipe {
   // ── substitutes: normalize top-level recipe.substitutes array ───────────────
   if (Array.isArray(raw.substitutes)) {
     normalized.substitutes = (raw.substitutes as unknown[])
-      .map((s: unknown) => {
+      .map((s: unknown): RecipeSubstitute | null => {
         if (!s || typeof s !== 'object') return null;
         const obj = s as Record<string, unknown>;
         const original = typeof obj.original === 'string' ? obj.original.trim() : '';
         const substitute = typeof obj.substitute === 'string' ? obj.substitute.trim() : '';
         if (!original || !substitute) return null;
-        return {
+        const note = typeof obj.note === 'string' ? obj.note : undefined;
+        return note ? {
           original,
           substitute,
-          note: typeof obj.note === 'string' ? obj.note : undefined,
-        } satisfies RecipeSubstitute;
+          note,
+        } : {
+          original,
+          substitute,
+        };
       })
       .filter((x): x is RecipeSubstitute => x !== null);
   }

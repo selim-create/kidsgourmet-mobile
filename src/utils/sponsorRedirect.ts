@@ -10,13 +10,13 @@ import type { FeaturedItem } from '../services/featured-service';
  *   post detail page using the item's slug.
  */
 export function handleSponsorPress(item: FeaturedItem): void {
-  const dr = item.meta.direct_redirect;
+  const dr = item.meta?.direct_redirect;
   const isDirectRedirect =
     dr === true ||
     dr === 'yes' ||
     dr === 'evet';
 
-  if (isDirectRedirect && item.meta.sponsor_url) {
+  if (isDirectRedirect && item.meta?.sponsor_url) {
     Linking.openURL(item.meta.sponsor_url).catch(() => {/* ignore */});
   } else {
     router.push(`/blog/${item.slug}`);

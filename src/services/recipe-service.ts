@@ -208,13 +208,10 @@ function normalizeRecipe(recipe: Recipe): Recipe {
         const substitute = typeof obj.substitute === 'string' ? obj.substitute.trim() : '';
         if (!original || !substitute) return null;
         const note = typeof obj.note === 'string' ? obj.note : undefined;
-        return note ? {
+        return {
           original,
           substitute,
-          note,
-        } : {
-          original,
-          substitute,
+          ...(note ? { note } : {}),
         };
       })
       .filter((x): x is RecipeSubstitute => x !== null);

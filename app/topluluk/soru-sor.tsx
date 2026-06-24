@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
 
+import { DetailPageHeader } from '../../src/components/ui/DetailPageHeader';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { COLORS } from '../../src/lib/constants';
@@ -128,15 +129,8 @@ export default function SoruSorScreen() {
 
   if (!isAuthenticated) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back-outline" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Soru Sor</Text>
-          <View style={styles.backButton} />
-        </View>
+      <View style={styles.container}>
+        <DetailPageHeader title="Soru Sor" />
 
         <EmptyState
           icon="lock-closed-outline"
@@ -156,16 +150,7 @@ export default function SoruSorScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={{ paddingTop: insets.top }}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back-outline" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Soru Sor</Text>
-          <View style={styles.backButton} />
-        </View>
-      </View>
+      <DetailPageHeader title="Soru Sor" />
 
       <ScrollView
         style={styles.scrollView}
@@ -348,25 +333,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFBE6',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  backButton: {
-    width: 36,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
   },
   scrollView: {
     flex: 1,

@@ -17,7 +17,7 @@ import { ingredientService } from '../../src/services/ingredient-service';
 import { addShoppingItem } from '../../src/services/shopping-list-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
-import { DetailHeader } from '../../src/components/ui/DetailHeader';
+import { DetailPageHeader } from '../../src/components/ui/DetailPageHeader';
 import { IngredientSafetyAlert } from '../../src/components/ingredients/IngredientSafetyAlert';
 import { PrepByAge } from '../../src/components/ingredients/PrepByAge';
 import { IngredientFAQ } from '../../src/components/ingredients/IngredientFAQ';
@@ -232,47 +232,47 @@ export default function IngredientBySlugScreen() {
         style={{
           flex: 1,
           backgroundColor: '#FFFBE6',
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingHorizontal: 24,
         }}
       >
-        <Ionicons name="nutrition-outline" size={56} color="#9CA3AF" />
-        <Text
-          style={{
-            color: COLORS.dark,
-            fontWeight: '800',
-            fontSize: 20,
-            marginTop: 16,
-            textAlign: 'center',
-          }}
-        >
-          Malzeme bulunamadı
-        </Text>
-        <Text
-          style={{
-            color: '#6B7280',
-            fontSize: 14,
-            marginTop: 8,
-            textAlign: 'center',
-            lineHeight: 20,
-          }}
-        >
-          Aradığınız malzeme mevcut değil veya kaldırılmış olabilir.
-        </Text>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            marginTop: 20,
-            backgroundColor: COLORS.primary,
-            borderRadius: 12,
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-          }}
-          activeOpacity={0.8}
-        >
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>← Geri Dön</Text>
-        </TouchableOpacity>
+        <DetailPageHeader title="Malzeme Detayı" />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+          <Ionicons name="nutrition-outline" size={56} color="#9CA3AF" />
+          <Text
+            style={{
+              color: COLORS.dark,
+              fontWeight: '800',
+              fontSize: 20,
+              marginTop: 16,
+              textAlign: 'center',
+            }}
+          >
+            Malzeme bulunamadı
+          </Text>
+          <Text
+            style={{
+              color: '#6B7280',
+              fontSize: 14,
+              marginTop: 8,
+              textAlign: 'center',
+              lineHeight: 20,
+            }}
+          >
+            Aradığınız malzeme mevcut değil veya kaldırılmış olabilir.
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{
+              marginTop: 20,
+              backgroundColor: COLORS.primary,
+              borderRadius: 12,
+              paddingHorizontal: 24,
+              paddingVertical: 12,
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>← Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -303,6 +303,8 @@ export default function IngredientBySlugScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <DetailPageHeader title={ingredient.name} />
+
       {/* ── Scrollable content ────────────────────────────────────────────── */}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -615,14 +617,6 @@ export default function IngredientBySlugScreen() {
           ) : null}
         </View>
       </ScrollView>
-
-      {/* ── Floating back / share / favorite header overlay ───────────────── */}
-      <DetailHeader
-        transparent
-        onShare={handleShare}
-        onFavorite={handleFavorite}
-        isFavorited={favorited}
-      />
 
       {/* ── M) Sticky Bottom Action Bar ───────────────────────────────────── */}
       <View

@@ -33,11 +33,27 @@ import type { Circle, Discussion, TopContributor } from '../../src/lib/types';
 
 // ─── TopContributorCard ───────────────────────────────────────────────────────
 
+function getProfileSlug(person: { id: number; slug?: string }): string {
+  if (person.slug && person.slug.trim().length > 0) return person.slug;
+  return String(person.id);
+}
+
 function TopContributorCard({ contributor, rank }: { contributor: TopContributor; rank: number }) {
   const name = contributor.display_name ?? contributor.name;
   const rankEmoji = rank === 1 ? '👑' : rank === 2 ? '🥈' : '🥉';
+  const profileSlug = getProfileSlug(contributor);
+  const profileHref = contributor.is_expert
+    ? `/uzman/${profileSlug}`
+    : `/authors/${profileSlug}`;
+
   return (
-    <View style={styles.contributorCard}>
+    <TouchableOpacity
+      style={styles.contributorCard}
+      activeOpacity={0.8}
+      onPress={() => router.push(profileHref as never)}
+      accessibilityRole="button"
+      accessibilityLabel={`${name} profiline git`}
+    >
       <Text style={styles.contributorRank}>{rankEmoji}</Text>
       <Avatar uri={contributor.avatar_url} name={name} size={42} />
       <Text style={styles.contributorName} numberOfLines={1}>{name}</Text>
@@ -49,7 +65,7 @@ function TopContributorCard({ contributor, rank }: { contributor: TopContributor
       {(contributor.answer_count ?? 0) > 0 && (
         <Text style={styles.contributorStat}>{contributor.answer_count} yanıt</Text>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
 

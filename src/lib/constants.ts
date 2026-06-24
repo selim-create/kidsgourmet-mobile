@@ -216,6 +216,7 @@ export const API_ENDPOINTS = {
 
   // Newsletter
   NEWSLETTER: '/kg/v1/newsletter',
+  NEWSLETTER_SUBSCRIBE: '/kg/v1/newsletter/subscribe',
 
   // Cross-sell / Promo banners
   CROSS_SELL_BANNER: '/kg/v1/cross-sell/banner',

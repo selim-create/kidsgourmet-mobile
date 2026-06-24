@@ -1,4 +1,5 @@
 import api from '../lib/api';
+import { API_ENDPOINTS } from '../lib/constants';
 
 export interface NewsletterSubscriptionRequest {
   email: string;
@@ -19,7 +20,7 @@ export async function subscribeNewsletter(
 ): Promise<NewsletterResponse> {
   try {
     return await api.post<NewsletterResponse>(
-      '/kg/v1/newsletter/subscribe',
+      API_ENDPOINTS.NEWSLETTER_SUBSCRIBE,
       payload,
       { skipAuth: true },
     );

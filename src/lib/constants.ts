@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   AUTH_GOOGLE: '/kg/v1/auth/google',
   AUTH_APPLE: '/kg/v1/auth/apple',
   AUTH_DELETE_ACCOUNT: '/kg/v1/user/account',
+  AUTH_CANCEL_DELETION: '/kg/v1/user/account/cancel-deletion',
   AUTH_FORGOT_PASSWORD: '/kg/v1/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/kg/v1/auth/reset-password',
 
@@ -219,16 +220,11 @@ export const API_ENDPOINTS = {
 
   // Growth
   GROWTH_DATA: '/kg/v1/health/growth',
-  GROWTH_RECORD: (childId: number | string) => `/kg/v1/health/growth?child_id=${childId}`,
+  GROWTH_RECORD: (childId: string) => `/kg/v1/health/growth?child_id=${childId}`,
   GROWTH_ADD: '/kg/v1/health/growth',
-  GROWTH_CHART_DATA: (
-    childId: string,
-    type?: 'weight_for_age' | 'height_for_age' | 'head_for_age',
-  ) => {
-    const params = new URLSearchParams({ child_id: childId });
-    if (type) params.set('type', type);
-    return `/kg/v1/health/growth/chart-data?${params.toString()}`;
-  },
+  GROWTH_UPDATE: (id: string) => `/kg/v1/health/growth/${id}`,
+  GROWTH_DELETE: (id: string) => `/kg/v1/health/growth/${id}`,
+  GROWTH_CHART_DATA: (childId: string) => `/kg/v1/health/growth/chart-data?child_id=${childId}`,
 
   // Allergens
   ALLERGENS: '/kg/v1/allergens',

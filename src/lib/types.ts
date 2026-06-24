@@ -725,6 +725,7 @@ export interface AuthResponse {
   user: User;
   redirect_url?: string;
   is_expert?: boolean;
+  account_pending_deletion?: boolean;
 }
 
 // ─── Favorites Types ──────────────────────────────────────────────────────────
@@ -796,35 +797,40 @@ export interface ShoppingList {
 // ─── Growth Types ─────────────────────────────────────────────────────────────
 
 export interface GrowthRecord {
-  id?: number;
-  child_id: number;
+  id: string;
+  child_id: string;
   date: string;
-  weight_kg?: number;
-  height_cm?: number;
-  head_circumference_cm?: number;
+  weight_kg: number | null;
+  height_cm: number | null;
+  head_circumference_cm: number | null;
   notes?: string;
+}
+
+export interface GrowthPercentile {
+  age_months: number;
+  calculated_at: string;
+  weight_percentile: number | null;
+  height_percentile: number | null;
+  head_circumference_percentile: number | null;
 }
 
 export interface GrowthData {
   records: GrowthRecord[];
-  latest?: GrowthRecord;
-  percentile?: PercentileResult;
+  latest: GrowthRecord | null;
+  percentile: GrowthPercentile | null;
 }
 
 export interface GrowthChartMeasurement {
   age_days: number;
   value: number;
-  percentile: number;
-  z_score: number;
+  percentile: number | null;
+  z_score: number | null;
   date: string;
 }
 
-export interface GrowthReferenceCurves {
-  p3: Array<{ age_days: number; value: number }>;
-  p15: Array<{ age_days: number; value: number }>;
-  p50: Array<{ age_days: number; value: number }>;
-  p85: Array<{ age_days: number; value: number }>;
-  p97: Array<{ age_days: number; value: number }>;
+export interface GrowthChartCurvePoint {
+  age_days: number;
+  value: number;
 }
 
 export type GrowthChartType = 'weight_for_age' | 'height_for_age' | 'head_for_age';
@@ -833,7 +839,13 @@ export interface GrowthChartData {
   child: { name: string; gender: string; birth_date: string };
   type: GrowthChartType;
   measurements: GrowthChartMeasurement[];
-  reference_curves: GrowthReferenceCurves;
+  reference_curves: {
+    p3: GrowthChartCurvePoint[];
+    p15: GrowthChartCurvePoint[];
+    p50: GrowthChartCurvePoint[];
+    p85: GrowthChartCurvePoint[];
+    p97: GrowthChartCurvePoint[];
+  };
 }
 
 export interface PercentileResult {

@@ -16,8 +16,8 @@ Mobile App
   │                       └── Mobile stores KG JWT in SecureStore
   │
   └── Apple Sign-In (expo-apple-authentication)
-        └── Apple returns identityToken
-              └── POST /kg/v1/auth/apple { identity_token, name? }
+        └── Apple returns identityToken + authorizationCode
+              └── POST /kg/v1/auth/apple { identity_token, authorization_code?, name? }
                     └── kg-core verifies token → returns { token, user }
                           └── Mobile stores KG JWT in SecureStore
 ```

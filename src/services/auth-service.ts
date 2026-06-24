@@ -100,6 +100,7 @@ export async function signInWithGoogle(idToken: string): Promise<AuthResponse> {
 export async function signInWithApple(
   identityToken: string,
   name?: { givenName?: string | null; familyName?: string | null },
+  authorizationCode?: string | null,
 ): Promise<AuthResponse> {
   const payload: Record<string, unknown> = { identity_token: identityToken };
   if (name && (name.givenName || name.familyName)) {
@@ -107,6 +108,9 @@ export async function signInWithApple(
       given_name: name.givenName ?? null,
       family_name: name.familyName ?? null,
     };
+  }
+  if (authorizationCode) {
+    payload.authorization_code = authorizationCode;
   }
   const response = await api.post<AuthResponse>(
     API_ENDPOINTS.AUTH_APPLE,
@@ -119,10 +123,14 @@ export async function signInWithApple(
   return response;
 }
 
-export async function deleteAccount(appleRefreshToken?: string): Promise<void> {
-  await api.delete(API_ENDPOINTS.AUTH_DELETE_ACCOUNT, {
+export async function deleteAccount(appleRefreshToken?: string): Promise<{ success: boolean; message: string; deletion_scheduled_at?: string }> {
+  return api.delete(API_ENDPOINTS.AUTH_DELETE_ACCOUNT, {
     body: appleRefreshToken
       ? JSON.stringify({ apple_refresh_token: appleRefreshToken })
       : undefined,
   });
+}
+
+export async function cancelAccountDeletion(): Promise<{ success: boolean; message: string }> {
+  return api.post(API_ENDPOINTS.AUTH_CANCEL_DELETION);
 }

@@ -5,8 +5,10 @@ import React, {
   useState,
   useCallback,
 } from 'react';
+import { Alert } from 'react-native';
 import { getToken } from '../lib/api';
 import {
+  cancelAccountDeletion,
   login as loginService,
   logout as logoutService,
   getProfile,
@@ -53,6 +55,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     const response = await loginService(credentials);
+
+    if (response.account_pending_deletion) {
+      await new Promise<void>((resolve, reject) => {
+        Alert.alert(
+          'Hesabınız silme sürecindedir',
+          'Hesabınız silme sürecindedir. Geri yüklemek ister misiniz?',
+          [
+            {
+              text: 'İptal',
+              style: 'cancel',
+              onPress: async () => {
+                try {
+                  await logoutService();
+                } catch {
+                  // no-op
+                }
+                setUser(null);
+                reject(new Error('Hesap silme sürecinde. Giriş iptal edildi.'));
+              },
+            },
+            {
+              text: 'Geri Yükle',
+              onPress: async () => {
+                try {
+                  await cancelAccountDeletion();
+                  resolve();
+                } catch (err) {
+                  try {
+                    await logoutService();
+                  } catch {
+                    // no-op
+                  }
+                  setUser(null);
+                  reject(err);
+                }
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+      });
+    }
+
     // Fetch full profile after login
     try {
       const profile = await getProfile();

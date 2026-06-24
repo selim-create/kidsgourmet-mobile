@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { getGrowthData } from '../services/growth-service';
-import type { GrowthData } from '../lib/types';
+import { getGrowthChartData, getGrowthData } from '../services/growth-service';
+import type { GrowthChartData, GrowthChartType, GrowthData } from '../lib/types';
 import { API_ENDPOINTS } from '../lib/constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useActiveChild } from '../contexts/ActiveChildContext';
@@ -21,6 +21,28 @@ export function useGrowthData() {
 
   return {
     growthData: data,
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+export function useGrowthChartData(type: GrowthChartType = 'weight_for_age') {
+  const { isAuthenticated } = useAuth();
+  const { activeChild } = useActiveChild();
+
+  const key =
+    isAuthenticated && activeChild
+      ? `growth-chart-${activeChild.id}-${type}`
+      : null;
+
+  const { data, error, isLoading, mutate } = useSWR<GrowthChartData | null>(
+    key,
+    () => getGrowthChartData(activeChild!.id, type),
+  );
+
+  return {
+    chartData: data,
     isLoading,
     error,
     mutate,

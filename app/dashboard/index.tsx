@@ -81,7 +81,7 @@ export default function DashboardScreen() {
   // ── Growth data
   const { data: growthData, isLoading: loadingGrowth } = useSWR(
     childId != null ? ['dashboard-growth', childId] : null,
-    () => getGrowthData(childId as number),
+    () => getGrowthData(String(childId)),
   );
 
   // ── BLW test result

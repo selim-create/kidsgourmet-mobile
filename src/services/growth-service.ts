@@ -8,7 +8,7 @@ import type {
   PercentileResult,
 } from '../lib/types';
 
-export async function getGrowthData(childId: number | string): Promise<GrowthData | null> {
+export async function getGrowthData(childId: string): Promise<GrowthData | null> {
   try {
     return await api.get<GrowthData>(API_ENDPOINTS.GROWTH_RECORD(childId));
   } catch (err) {
@@ -22,7 +22,18 @@ export async function getGrowthData(childId: number | string): Promise<GrowthDat
 export async function addGrowthRecord(
   record: Omit<GrowthRecord, 'id'>,
 ): Promise<GrowthRecord> {
-  return api.post<GrowthRecord>(API_ENDPOINTS.GROWTH_ADD, record);
+  return api.post<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_ADD, record).then((r) => r.record);
+}
+
+export async function updateGrowthRecord(
+  id: string,
+  data: Partial<Omit<GrowthRecord, 'id' | 'child_id'>>,
+): Promise<GrowthRecord> {
+  return api.put<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_UPDATE(id), data).then((r) => r.record);
+}
+
+export async function deleteGrowthRecord(id: string): Promise<void> {
+  await api.delete(API_ENDPOINTS.GROWTH_DELETE(id));
 }
 
 export async function getPercentileResult(
@@ -39,11 +50,11 @@ export async function getPercentileResult(
 
 export async function getGrowthChartData(
   childId: string,
-  type?: GrowthChartType,
+  type: GrowthChartType = 'weight_for_age',
 ): Promise<GrowthChartData | null> {
   try {
     return await api.get<GrowthChartData>(
-      API_ENDPOINTS.GROWTH_CHART_DATA(childId, type),
+      `${API_ENDPOINTS.GROWTH_CHART_DATA(childId)}&type=${type}`,
     );
   } catch {
     return null;

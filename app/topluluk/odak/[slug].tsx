@@ -222,14 +222,14 @@ export default function CircleDetailScreen() {
   const color = circle?.color_code ?? circle?.color ?? COLORS.primary;
   const iconName = faToIonicon(circle?.icon_name ?? circle?.icon ?? '');
   const askQuestionRoute = circle
-    ? (`/topluluk/soru-sor?circle=${circle.id}` as never)
-    : ('/topluluk/soru-sor' as never);
+    ? (`/(tabs)/topluluk/soru-sor?circle=${circle.id}` as never)
+    : ('/(tabs)/topluluk/soru-sor' as never);
 
   if (circlesLoading && !circle) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
             <Ionicons name="arrow-back" size={24} color="#374151" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Odak</Text>
@@ -244,7 +244,7 @@ export default function CircleDetailScreen() {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
             <Ionicons name="arrow-back" size={24} color="#374151" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Odak</Text>
@@ -254,7 +254,7 @@ export default function CircleDetailScreen() {
           icon="people-outline"
           title="Odak bulunamadı"
           actionLabel="← Topluluğa Dön"
-          onAction={() => router.push('/topluluk' as never)}
+          onAction={() => router.push('/(tabs)/topluluk' as never)}
         />
       </View>
     );
@@ -263,7 +263,7 @@ export default function CircleDetailScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
           <Ionicons name="arrow-back" size={24} color="#374151" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{circle?.name ?? 'Odak'}</Text>

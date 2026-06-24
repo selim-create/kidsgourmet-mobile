@@ -49,16 +49,16 @@ export function DiscussionCard({
   const circleColor = discussion.circle?.color_code ?? discussion.circle?.color ?? COLORS.primary;
   const authorSlug = getProfileSlug(discussion.author ?? {});
   const authorProfileHref = authorSlug
-    ? (discussion.author?.is_expert ? `/uzman/${authorSlug}` : `/authors/${authorSlug}`)
+    ? (discussion.author?.is_expert ? `/uzman/${authorSlug}` : `/profil/${authorSlug}`)
     : null;
 
   const handlePress = () => {
-    router.push(`/topluluk/${discussion.slug}` as never);
+    router.push(`/(tabs)/topluluk/${discussion.slug}` as never);
   };
 
   const handleCirclePress = () => {
     if (discussion.circle?.slug) {
-      router.push(`/topluluk/odak/${discussion.circle.slug}` as never);
+      router.push(`/(tabs)/topluluk/odak/${discussion.circle.slug}` as never);
     }
   };
 

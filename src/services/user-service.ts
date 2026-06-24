@@ -3,12 +3,57 @@ import { API_ENDPOINTS, API_URL } from '../lib/constants';
 import type { User, Child, PublicProfile, ExpertPublicProfile } from '../lib/types';
 
 const AVATAR_UPLOAD_ERROR = 'Avatar yüklenemedi';
+
+function toAbsoluteUrl(value?: string | null): string | null | undefined {
+  if (!value) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${API_URL}${value.startsWith('/') ? value : `/${value}`}`;
+}
+
+function normalizeChild(child: Child): Child {
+  return {
+    ...child,
+    avatar_url: toAbsoluteUrl(child.avatar_url ?? child.avatar_path ?? null),
+  };
+}
+
+export function normalizeUserProfile(user: User): User {
+  const raw = user as User & {
+    avatar?: string | null;
+    profile_image?: string | null;
+  };
+
+  return {
+    ...user,
+    name: user.name ?? user.display_name ?? '',
+    avatar_url: toAbsoluteUrl(user.avatar_url ?? raw.avatar ?? raw.profile_image ?? null) ?? null,
+    children: Array.isArray(user.children) ? user.children.map(normalizeChild) : user.children,
+  };
+}
+export interface ChildUpsertPayload {
+  name: string;
+  birth_date: string;
+  gender?: Child['gender'];
+  allergies?: string[];
+  diet_types?: string[];
+  notes?: string;
+  kvkk_consent?: boolean;
+  guardian_declaration?: boolean;
+  guardian_declaration_at?: string | null;
+  sensitive_data_consent?: boolean;
+  sensitive_data_consent_at?: string | null;
+  terms_accepted?: boolean;
+  terms_accepted_at?: string | null;
+}
+
 export async function getUserProfile(): Promise<User> {
-  return api.get<User>(API_ENDPOINTS.PROFILE);
+  const profile = await api.get<User>(API_ENDPOINTS.PROFILE);
+  return normalizeUserProfile(profile);
 }
 
 export async function updateUserProfile(data: Partial<User>): Promise<User> {
-  return api.put<User>(API_ENDPOINTS.PROFILE, data);
+  const profile = await api.put<User>(API_ENDPOINTS.PROFILE, data);
+  return normalizeUserProfile(profile);
 }
 
 /** Upload current user's avatar (uses fetch directly to handle FormData properly in RN) */
@@ -44,19 +89,23 @@ export async function uploadUserAvatar(
 }
 
 export async function getChildren(): Promise<Child[]> {
-  return api.get<Child[]>(API_ENDPOINTS.CHILDREN);
+  const children = await api.get<Child[]>(API_ENDPOINTS.CHILDREN);
+  return children.map(normalizeChild);
 }
 
 export async function getChild(uuid: string): Promise<Child> {
-  return api.get<Child>(API_ENDPOINTS.CHILD_PROFILE(uuid));
+  const child = await api.get<Child>(API_ENDPOINTS.CHILD_PROFILE(uuid));
+  return normalizeChild(child);
 }
 
-export async function createChild(data: Omit<Child, 'id'>): Promise<Child> {
-  return api.post<Child>(API_ENDPOINTS.CHILDREN, data);
+export async function createChild(data: ChildUpsertPayload): Promise<Child> {
+  const child = await api.post<Child>(API_ENDPOINTS.CHILDREN, data);
+  return normalizeChild(child);
 }
 
-export async function updateChild(uuid: string, data: Partial<Child>): Promise<Child> {
-  return api.put<Child>(API_ENDPOINTS.CHILD_PROFILE(uuid), data);
+export async function updateChild(uuid: string, data: Partial<ChildUpsertPayload>): Promise<Child> {
+  const child = await api.put<Child>(API_ENDPOINTS.CHILD_PROFILE(uuid), data);
+  return normalizeChild(child);
 }
 
 export async function deleteChild(uuid: string): Promise<void> {

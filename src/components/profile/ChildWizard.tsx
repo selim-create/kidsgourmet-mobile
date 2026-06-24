@@ -20,6 +20,7 @@ import {
   createChild,
   updateChild,
   uploadChildAvatar,
+  type ChildUpsertPayload,
 } from '../../services/user-service';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { AllergenChips } from './AllergenChips';
@@ -42,6 +43,7 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
 ];
 
 const TOTAL_STEPS = 3;
+const LEGAL_INFO_ROUTE = '/aydinlatma-metni' as const;
 
 export function ChildWizard({ mode, child }: ChildWizardProps) {
   const insets = useSafeAreaInsets();
@@ -68,6 +70,15 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
   const [pendingAvatarUri, setPendingAvatarUri] = useState<string | null>(null);
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(
     child?.avatar_url ?? null,
+  );
+  const [termsAccepted, setTermsAccepted] = useState(
+    child?.kvkk_consent ?? false,
+  );
+  const [sensitiveDataConsent, setSensitiveDataConsent] = useState(
+    child?.sensitive_data_consent ?? child?.kvkk_consent ?? false,
+  );
+  const [guardianDeclaration, setGuardianDeclaration] = useState(
+    child?.guardian_declaration ?? false,
   );
 
   const [step, setStep] = useState(1);
@@ -104,15 +115,33 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
       Toast.show({ type: 'error', text1: 'Ad zorunludur' });
       return;
     }
+    if (!termsAccepted || !sensitiveDataConsent || !guardianDeclaration) {
+      Toast.show({
+        type: 'error',
+        text1: 'Rıza gerekli',
+        text2: 'Devam etmek için gerekli veli ve veri işleme onaylarını verin.',
+      });
+      return;
+    }
     setSubmitting(true);
     try {
-      const data: Omit<Child, 'id'> = {
+      const now = new Date().toISOString();
+      const data: ChildUpsertPayload = {
         name: name.trim(),
         birth_date: birthDateStr,
         gender,
         allergies: selectedAllergens,
         diet_types: selectedDietTypes,
         notes: notes.trim() || undefined,
+        // Keep both fields aligned: child-profile payloads still use kvkk_consent,
+        // while shared consent handling expects terms_accepted semantics.
+        kvkk_consent: termsAccepted,
+        terms_accepted: termsAccepted,
+        terms_accepted_at: termsAccepted ? now : null,
+        sensitive_data_consent: sensitiveDataConsent,
+        sensitive_data_consent_at: sensitiveDataConsent ? now : null,
+        guardian_declaration: guardianDeclaration,
+        guardian_declaration_at: guardianDeclaration ? now : null,
       };
 
       let savedChild: Child;
@@ -269,6 +298,64 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View className="mt-2 rounded-2xl border border-orange-100 bg-orange-50 p-4">
+        <Text className="text-dark font-semibold text-sm mb-3">Gerekli Onaylar</Text>
+
+        <TouchableOpacity
+          className="flex-row items-start gap-3 mb-3"
+          onPress={() => setTermsAccepted((prev) => !prev)}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={termsAccepted ? 'checkbox' : 'square-outline'}
+            size={20}
+            color={termsAccepted ? '#FF8A65' : '#9CA3AF'}
+          />
+          <Text className="flex-1 text-dark text-sm">
+            Çocuğa ait verilerin işlenmesi için KVKK aydınlatma metnini okudum ve kabul ediyorum.
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push(LEGAL_INFO_ROUTE)}
+          activeOpacity={0.7}
+          className="mb-3 ml-8"
+        >
+          <Text className="text-primary text-xs font-medium">
+            Aydınlatma metnini görüntüle →
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="flex-row items-start gap-3 mb-3"
+          onPress={() => setSensitiveDataConsent((prev) => !prev)}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={sensitiveDataConsent ? 'checkbox' : 'square-outline'}
+            size={20}
+            color={sensitiveDataConsent ? '#FF8A65' : '#9CA3AF'}
+          />
+          <Text className="flex-1 text-dark text-sm">
+            Hassas veri işleme iznini veriyorum.
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="flex-row items-start gap-3"
+          onPress={() => setGuardianDeclaration((prev) => !prev)}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={guardianDeclaration ? 'checkbox' : 'square-outline'}
+            size={20}
+            color={guardianDeclaration ? '#FF8A65' : '#9CA3AF'}
+          />
+          <Text className="flex-1 text-dark text-sm">
+            Çocuk adına işlem yapmaya yetkili veli/yasal temsilci olduğumu beyan ederim.
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

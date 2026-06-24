@@ -83,6 +83,8 @@ export interface Child {
   notes?: string;
   age_months?: number;
   dietary_restrictions?: string[];
+  sensitive_data_consent?: boolean;
+  guardian_declaration?: boolean;
 }
 
 // ─── Recipe Types ──────────────────────────────────────────────────────────────

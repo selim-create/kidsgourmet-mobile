@@ -1,6 +1,7 @@
 import api, { setToken, removeToken } from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type { LoginCredentials, RegisterData, AuthResponse, User } from '../lib/types';
+import { normalizeUserProfile } from './user-service';
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>(
@@ -40,9 +41,11 @@ export async function logout(): Promise<void> {
 }
 
 export async function getProfile(): Promise<User> {
-  return api.get<User>(API_ENDPOINTS.PROFILE);
+  const profile = await api.get<User>(API_ENDPOINTS.PROFILE);
+  return normalizeUserProfile(profile);
 }
 
 export async function updateProfile(data: Partial<User>): Promise<User> {
-  return api.put<User>(API_ENDPOINTS.PROFILE, data);
+  const profile = await api.put<User>(API_ENDPOINTS.PROFILE, data);
+  return normalizeUserProfile(profile);
 }

@@ -447,7 +447,7 @@ export default function SearchScreen() {
                 {searchData.categorized.discussions.map((item: DiscussionSearchResult) => (
                   <TouchableOpacity
                     key={item.id}
-                    onPress={() => router.push(`/topluluk/${item.slug}` as any)}
+                    onPress={() => router.push(`/(tabs)/topluluk/${item.slug}` as any)}
                     activeOpacity={0.8}
                     className="bg-white rounded-2xl border border-gray-100 p-4 mb-3"
                     style={{ elevation: 1 }}

@@ -112,7 +112,7 @@ export default function ExpertProfileScreen() {
           title="Kullanıcı Bulunamadı"
           description="Bu uzman profili mevcut değil veya erişilemiyor."
           actionLabel="Topluluğa Dön"
-          onAction={() => router.push('/topluluk' as never)}
+          onAction={() => router.push('/(tabs)/topluluk' as never)}
         />
       </View>
     );
@@ -469,7 +469,7 @@ export default function ExpertProfileScreen() {
                     <TouchableOpacity
                       key={answer.id}
                       onPress={() =>
-                        router.push(`/topluluk/soru/${answer.slug}` as never)
+                        router.push(`/(tabs)/topluluk/${answer.slug}` as never)
                       }
                       className="bg-white rounded-2xl shadow-sm p-4 mb-3"
                     >
@@ -527,7 +527,7 @@ export default function ExpertProfileScreen() {
                     <TouchableOpacity
                       key={q.id}
                       onPress={() =>
-                        router.push(`/topluluk/soru/${q.slug}` as never)
+                        router.push(`/(tabs)/topluluk/${q.slug}` as never)
                       }
                       className="bg-white rounded-2xl shadow-sm p-4 mb-3"
                     >

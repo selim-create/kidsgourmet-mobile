@@ -24,17 +24,21 @@ export function ToolGradientHero({
       colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className="px-6 pt-8 pb-10 items-center"
+      className="px-6 pt-8 pb-10"
     >
-      <View className="w-16 h-16 rounded-2xl bg-white/20 items-center justify-center mb-4">
-        <Icon name={iconName} size={32} color={iconColor} />
+      <View className="items-center">
+        <View className="w-16 h-16 rounded-2xl bg-white/20 items-center justify-center mb-4">
+          <Icon name={iconName} size={32} color={iconColor} />
+        </View>
+        <View className="w-full items-center px-2">
+          <Text className="text-2xl font-bold text-white mb-2 text-center" style={{ maxWidth: 320 }}>
+            {title}
+          </Text>
+          <Text className="text-white/80 text-sm leading-5 text-center pb-1" style={{ maxWidth: 320 }}>
+            {subtitle}
+          </Text>
+        </View>
       </View>
-      <Text className="text-2xl font-bold text-white mb-2 text-center" style={{ maxWidth: 320 }}>
-        {title}
-      </Text>
-      <Text className="text-white/80 text-sm leading-5 text-center pb-1" style={{ maxWidth: 320 }}>
-        {subtitle}
-      </Text>
     </LinearGradient>
   );
 }

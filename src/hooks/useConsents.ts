@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { getConsents, updateConsent, getConsentHistory } from '../services/consent-service';
 import type { UserConsent, UserConsentHistoryEntry, ConsentType } from '../lib/types';
 import { API_ENDPOINTS } from '../lib/constants';
@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export function useConsents() {
   const { isAuthenticated } = useAuth();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const key = isAuthenticated ? API_ENDPOINTS.USER_CONSENTS : null;
 
@@ -25,6 +26,7 @@ export function useConsents() {
       },
       { optimisticData: optimistic, rollbackOnError: true },
     );
+    await globalMutate(API_ENDPOINTS.USER_CONSENT_HISTORY);
   };
 
   return {

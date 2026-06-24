@@ -115,7 +115,7 @@ export default function SoruSorScreen() {
         visibilityTime: 5000,
       });
 
-      router.replace('/topluluk' as never);
+      router.replace('/(tabs)/topluluk' as never);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Soru gönderilirken bir hata oluştu.';

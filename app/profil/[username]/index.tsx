@@ -60,7 +60,7 @@ export default function PublicProfileScreen() {
           title="Kullanıcı Bulunamadı"
           description="Bu profil mevcut değil veya erişilemiyor."
           actionLabel="Topluluğa Dön"
-          onAction={() => router.push('/topluluk' as never)}
+          onAction={() => router.push('/(tabs)/topluluk' as never)}
         />
       </View>
     );
@@ -162,7 +162,7 @@ export default function PublicProfileScreen() {
                 <TouchableOpacity
                   key={question.id}
                   onPress={() =>
-                    router.push(`/topluluk/soru/${question.slug}` as never)
+                    router.push(`/(tabs)/topluluk/${question.slug}` as never)
                   }
                   className="flex-row items-start py-3 border-b border-gray-50 last:border-0"
                 >

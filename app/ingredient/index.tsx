@@ -51,7 +51,7 @@ const SEASON_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']
 // ─── Quick Guides ─────────────────────────────────────────────────────────────
 
 const QUICK_GUIDES = [
-  { title: 'Ek Gıda Rehberi', icon: 'leaf-outline' as const, color: '#7CB342', bg: '#F0FDF4', route: '/food-guide' },
+  { title: 'Ek Gıda Rehberi', icon: 'leaf-outline' as const, color: '#7CB342', bg: '#F0FDF4', route: '/(tabs)/guide' },
   { title: 'Büyüme Takibi', icon: 'trending-up-outline' as const, color: '#0EA5E9', bg: '#E0F2FE', route: '/growth' },
   { title: 'Aşı Takvimi', icon: 'medical-outline' as const, color: '#EF4444', bg: '#FEF2F2', route: '/vaccines' },
 ];
@@ -503,4 +503,3 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
 });
-

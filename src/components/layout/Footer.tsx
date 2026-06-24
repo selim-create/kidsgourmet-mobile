@@ -86,6 +86,8 @@ const LEGAL_LINKS = [
   { label: 'Çerez Politikası', route: '/cerez-politikasi' },
   { label: 'Kullanım Koşulları', route: '/kullanim-kosullari' },
   { label: 'Açık Rıza Metni', route: '/acik-riza-metni' },
+  { label: 'Veli Beyanı', route: '/veli-beyani' },
+  { label: 'Hassas Veri İzni', route: '/hassas-veri-isleme-izni' },
 ];
 
 // ─── Newsletter Form ──────────────────────────────────────────────────────────
@@ -379,4 +381,3 @@ export function Footer() {
     </View>
   );
 }
-

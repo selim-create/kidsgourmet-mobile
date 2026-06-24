@@ -1,4 +1,4 @@
-import api from '../lib/api';
+import api, { ApiError } from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type {
   Circle,
@@ -128,10 +128,15 @@ export async function getDiscussionById(id: number): Promise<Discussion> {
 }
 
 export async function getDiscussionBySlug(slug: string): Promise<Discussion> {
-  const data = await api.get<Discussion>(API_ENDPOINTS.DISCUSSION_BY_SLUG(slug), {
-    skipAuth: true,
-  });
-  return normalizeDiscussion(data);
+  const response = await api.get<{ discussions: Discussion[]; total: number; pages: number; current_page: number }>(
+    API_ENDPOINTS.DISCUSSION_BY_SLUG(slug),
+    { skipAuth: true },
+  );
+  const discussion = response.discussions?.[0];
+  if (!discussion) {
+    throw new ApiError(`Discussion not found: ${slug}`, 404);
+  }
+  return normalizeDiscussion(discussion);
 }
 
 export async function getDiscussionComments(

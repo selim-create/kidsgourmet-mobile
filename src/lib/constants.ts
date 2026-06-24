@@ -5,6 +5,13 @@ export const API_ENDPOINTS = {
   LOGIN: '/kg/v1/auth/login',
   REGISTER: '/kg/v1/auth/register',
   LOGOUT: '/kg/v1/auth/logout',
+  /** Web-aligned aliases for AUTH_* prefix convention */
+  AUTH_LOGIN: '/kg/v1/auth/login',
+  AUTH_REGISTER: '/kg/v1/auth/register',
+  AUTH_ME: '/kg/v1/auth/me',
+  AUTH_GOOGLE: '/kg/v1/auth/google',
+  AUTH_FORGOT_PASSWORD: '/kg/v1/auth/forgot-password',
+  AUTH_RESET_PASSWORD: '/kg/v1/auth/reset-password',
 
   // User
   PROFILE: '/kg/v1/user/profile',
@@ -14,6 +21,7 @@ export const API_ENDPOINTS = {
   CHILD: (id: number) => `/kg/v1/user/children/${id}`,
   /** @deprecated Use CHILD_PROFILE_AVATAR(uuid) instead */
   AVATAR: (id: number) => `/kg/v1/user/children/${id}/avatar`,
+  USER_ME: '/kg/v1/user/me',
 
   // Child Profiles (NEW — correct UUID-based)
   CHILD_PROFILES: '/kg/v1/child-profiles',
@@ -26,6 +34,7 @@ export const API_ENDPOINTS = {
   RECIPE_BY_SLUG: (slug: string) => `/kg/v1/recipes/${slug}`,
   RECIPES_BY_AGE: (ageSlug: string) => `/kg/v1/recipes/by-age/${ageSlug}`,
   RECIPE_RELATED: (recipeId: number) => `/kg/v1/recipes/${recipeId}/related`,
+  RECIPES_FEATURED: '/kg/v1/recipes/featured',
 
   // Favorites
   FAVORITES: '/kg/v1/user/favorites',
@@ -38,6 +47,13 @@ export const API_ENDPOINTS = {
   MEAL_PLAN_CURRENT: '/kg/v1/meal-plan/current',
   MEAL_PLAN_GENERATE: '/kg/v1/meal-plan/generate',
   MEAL_PLAN_WEEK: (year: number, week: number) => `/kg/v1/meal-plan/${year}/${week}`,
+  MEAL_PLANS_GENERATE: '/kg/v1/meal-plans/generate',
+  MEAL_PLANS_ACTIVE: (childId: string) => `/kg/v1/meal-plans/active?child_id=${childId}`,
+  MEAL_PLAN_BY_ID: (id: string) => `/kg/v1/meal-plans/${id}`,
+  MEAL_PLAN_REFRESH_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/refresh`,
+  MEAL_PLAN_SKIP_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/skip`,
+  MEAL_PLAN_ASSIGN_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/assign`,
+  MEAL_PLAN_SHOPPING_LIST: (planId: string) => `/kg/v1/meal-plans/${planId}/shopping-list`,
 
   // Shopping List
   SHOPPING_LIST: '/kg/v1/shopping-list',
@@ -67,12 +83,15 @@ export const API_ENDPOINTS = {
   RECOMMENDATIONS: '/kg/v1/recommendations/daily',
   RECOMMENDATIONS_DAILY: '/kg/v1/recommendations/daily',
   RECOMMENDATIONS_DASHBOARD: '/kg/v1/recommendations/dashboard',
+  RECOMMENDATIONS_RECIPES: '/kg/v1/recommendations/recipes',
+  RECOMMENDATIONS_SIMILAR: (recipeId: number) => `/kg/v1/recommendations/similar/${recipeId}`,
 
   // Nutrition
   NUTRITION: '/kg/v1/nutrition',
   NUTRITION_WEEKLY_SUMMARY: '/kg/v1/nutrition/weekly-summary',
   NUTRITION_MISSING: '/kg/v1/nutrition/missing-nutrients',
   NUTRITION_MISSING_NUTRIENTS: '/kg/v1/nutrition/missing-nutrients',
+  NUTRITION_VARIETY_ANALYSIS: '/kg/v1/nutrition/variety-analysis',
 
   // Safety
   SAFETY_CHECK_INGREDIENT: '/kg/v1/safety/check-ingredient',
@@ -84,6 +103,10 @@ export const API_ENDPOINTS = {
   INGREDIENTS_ALL: '/kg/v1/ingredients',
   INGREDIENT_BY_SLUG: (slug: string) => `/kg/v1/ingredients/${slug}`,
   INGREDIENT_SEARCH: '/kg/v1/ingredients/search',
+  /** Web-aligned alias for INGREDIENT_SEARCH */
+  INGREDIENTS_SEARCH: '/kg/v1/ingredients/search',
+  INGREDIENT_CATEGORIES: '/kg/v1/ingredient-categories',
+  INGREDIENTS_BY_SEASON: (season: string) => `/kg/v1/ingredients?season=${encodeURIComponent(season)}`,
 
   // Authors
   AUTHOR: (id: number) => `/wp/v2/users/${id}`,
@@ -105,6 +128,12 @@ export const API_ENDPOINTS = {
   VACCINES_MASTER: '/kg/v1/health/vaccines/master',
   VACCINES_BY_CHILD: (childId: string) => `/kg/v1/health/vaccines?child_id=${childId}`,
   VACCINES_MARK_DONE: '/kg/v1/health/vaccines/mark-done',
+  VACCINES_SCHEDULE_VERSIONS: '/kg/v1/health/vaccines/schedule-versions',
+  VACCINES_UPDATE_STATUS: '/kg/v1/health/vaccines/update-status',
+  VACCINES_ADD_PRIVATE: '/kg/v1/health/vaccines/private/add',
+  VACCINES_SIDE_EFFECTS: '/kg/v1/health/vaccines/side-effects',
+  VACCINES_UPCOMING: (childId: string) => `/kg/v1/health/vaccines/upcoming?child_id=${childId}`,
+  VACCINES_HISTORY: (childId: string) => `/kg/v1/health/vaccines/history?child_id=${childId}`,
 
   // Featured
   FEATURED: '/kg/v1/featured',
@@ -132,18 +161,25 @@ export const API_ENDPOINTS = {
   TOOL_SOLID_FOOD_RESULTS: '/kg/v1/tools/solid-food-readiness/results',
   SOLID_FOOD_READINESS_CONFIG: '/kg/v1/tools/solid-food-readiness/config',
   SOLID_FOOD_READINESS_SUBMIT: '/kg/v1/tools/solid-food-readiness/submit',
+  /** Web-aligned aliases for SOLID_FOOD_READINESS_* */
+  SOLID_FOOD_CONFIG: '/kg/v1/tools/solid-food-readiness/config',
+  SOLID_FOOD_SUBMIT: '/kg/v1/tools/solid-food-readiness/submit',
 
   // Water Calculator
-  WATER_CALCULATOR: '/kg/v1/tools/water-calculator',
+  WATER_CALCULATOR: '/kg/v1/tools/water-need/calculate',
 
   // Allergen Planner
   ALLERGEN_PLANNER_CONFIG: '/kg/v1/tools/allergen-planner/config',
   ALLERGEN_PLANNER_GENERATE: '/kg/v1/tools/allergen-planner/generate',
+  ALLERGEN_LIST: '/kg/v1/tools/allergen-planner/allergens',
+  ALLERGEN_PLAN: (allergenId: string) => `/kg/v1/tools/allergen-planner/${allergenId}`,
 
   // Food Trials (auth required)
   FOOD_TRIALS: '/kg/v1/tools/food-trials',
   FOOD_TRIAL: (id: number) => `/kg/v1/tools/food-trials/${id}`,
   FOOD_TRIAL_SUMMARY: '/kg/v1/tools/food-trials/summary',
+  /** Web-aligned alias for FOOD_TRIALS (POST to create a trial) */
+  FOOD_TRIAL_ADD: '/kg/v1/tools/food-trials',
 
   // Bath Planner
   BATH_PLANNER_CONFIG: '/kg/v1/tools/bath-planner/config',
@@ -162,6 +198,9 @@ export const API_ENDPOINTS = {
   // Stain Encyclopedia
   STAIN_ENCYCLOPEDIA_SEARCH: '/kg/v1/tools/stain-encyclopedia/search',
   STAIN_ENCYCLOPEDIA_BY_SLUG: (slug: string) => `/kg/v1/tools/stain-encyclopedia/${slug}`,
+  /** Web-aligned aliases for STAIN_ENCYCLOPEDIA_* */
+  STAIN_SEARCH: '/kg/v1/tools/stain-encyclopedia/search',
+  STAIN_BY_SLUG: (slug: string) => `/kg/v1/tools/stain-encyclopedia/${slug}`,
 
   // Sponsored Tools
   SPONSORED_TOOLS: '/kg/v1/tools/sponsored',
@@ -185,27 +224,49 @@ export const API_ENDPOINTS = {
   // Consents
   USER_CONSENTS: '/kg/v1/user/consents',
   USER_CONSENT_HISTORY: '/kg/v1/user/consents/history',
+  USER_CONSENT_UPDATE: (type: string) => `/kg/v1/user/consents/${type}`,
+
+  // Collections
+  USER_COLLECTIONS: '/kg/v1/user/collections',
+  USER_COLLECTION_BY_ID: (id: string) => `/kg/v1/user/collections/${id}`,
+  USER_COLLECTION_ITEMS: (id: string) => `/kg/v1/user/collections/${id}/items`,
+  USER_SHOPPING_LIST: '/kg/v1/user/shopping-list',
 
   // Public Profiles (no auth)
-  USER_PUBLIC: (username: string) => `/kg/v1/user/${username}`,
-  EXPERT_PUBLIC: (username: string) => `/kg/v1/experts/${username}`,
+  USER_PUBLIC: (username: string) => `/kg/v1/user/public/${username}`,
+  EXPERT_PUBLIC: (username: string) => `/kg/v1/expert/public/${username}`,
   EXPERTS_LIST: '/kg/v1/experts',
+  EXPERT_DASHBOARD: '/kg/v1/expert/dashboard',
+
+  // Notifications
+  NOTIFICATION_PREFERENCES: '/kg/v1/notifications/preferences',
+  PUSH_SUBSCRIBE: '/kg/v1/notifications/push/subscribe',
+  PUSH_UNSUBSCRIBE: '/kg/v1/notifications/push/unsubscribe',
+
+  // User BLW & Percentile results
+  USER_BLW_RESULTS: '/kg/v1/user/blw-results',
+  CHILD_BLW_RESULTS: (childId: string) => `/kg/v1/user/children/${childId}/blw-results`,
+  USER_PERCENTILE_RESULTS: '/kg/v1/user/percentile-results',
+  CHILD_PERCENTILE_RESULTS: (childId: string) => `/kg/v1/user/children/${childId}/percentile-results`,
+  USER_SOLID_FOOD_RESULTS: '/kg/v1/user/solid-food-results',
+  CHILD_SOLID_FOOD_RESULTS: (childId: string) => `/kg/v1/user/children/${childId}/solid-food-results`,
 
   // Community
-  CIRCLES: '/kg/v1/community/circles',
-  CIRCLE_FOLLOW: (id: number) => `/kg/v1/community/circles/${id}/follow`,
-  CIRCLE_UNFOLLOW: (id: number) => `/kg/v1/community/circles/${id}/unfollow`,
-  USER_CIRCLES: '/kg/v1/community/user/circles',
-  DISCUSSIONS: '/kg/v1/community/discussions',
-  DISCUSSION_BY_ID: (id: number) => `/kg/v1/community/discussions/${id}`,
-  DISCUSSION_BY_SLUG: (slug: string) => `/kg/v1/community/discussions/${slug}`,
-  DISCUSSION_COMMENTS: (id: number) => `/kg/v1/community/discussions/${id}/comments`,
-  USER_DISCUSSIONS: '/kg/v1/community/user/discussions',
-  FEED: '/kg/v1/community/feed',
+  CIRCLES: '/kg/v1/circles',
+  CIRCLE_FOLLOW: (id: number) => `/kg/v1/circles/${id}/follow`,
+  CIRCLE_UNFOLLOW: (id: number) => `/kg/v1/circles/${id}/unfollow`,
+  USER_CIRCLES: '/kg/v1/user/circles',
+  DISCUSSIONS: '/kg/v1/discussions',
+  DISCUSSION_BY_ID: (id: number) => `/kg/v1/discussions/${id}`,
+  DISCUSSION_BY_SLUG: (slug: string) => `/kg/v1/discussions?slug=${encodeURIComponent(slug)}`,
+  DISCUSSION_COMMENTS: (id: number) => `/kg/v1/discussions/${id}/comments`,
+  USER_DISCUSSIONS: '/kg/v1/user/discussions',
+  FEED: '/kg/v1/feed',
   TOP_CONTRIBUTORS: '/kg/v1/community/top-contributors',
-  DISCUSSION_VOTE: (id: number) => `/kg/v1/community/discussions/${id}/vote`,
-  COMMENT_VOTE: (id: number) => `/kg/v1/community/comments/${id}/vote`,
-  COMMUNITY_REPORT: '/kg/v1/community/report',
+  DISCUSSION_VOTE: (id: number) => `/kg/v1/discussions/${id}/vote`,
+  COMMENT_VOTE: (id: number) => `/kg/v1/comments/${id}/vote`,
+  COMMUNITY_REPORT: '/kg/v1/report',
+  REPORT: '/kg/v1/report',
 } as const;
 
 export const APP_NAME = 'KidsGourmet';

@@ -185,6 +185,16 @@ export default function ProfileScreen() {
       onPress: () => router.push('/acik-riza-metni'),
     },
     {
+      icon: 'people-outline' as const,
+      label: 'Veli Beyanı',
+      onPress: () => router.push('/veli-beyani'),
+    },
+    {
+      icon: 'medkit-outline' as const,
+      label: 'Hassas Veri İşleme İzni',
+      onPress: () => router.push('/hassas-veri-isleme-izni'),
+    },
+    {
       icon: 'mail-outline' as const,
       label: 'KVKK Başvuru Formu',
       onPress: () => router.push('/basvuru-formu'),
@@ -290,7 +300,7 @@ export default function ProfileScreen() {
           {/* Legal Items */}
           <Card className="mb-4">
             <Text className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-2 px-1">
-              Yasal
+              KVKK ve Sözleşmeler
             </Text>
             {legalItems.map((item, idx) => (
               <TouchableOpacity

@@ -531,7 +531,7 @@ export default function DiscussionDetailScreen() {
           icon="chatbubble-ellipses-outline"
           title="Tartışma bulunamadı"
           actionLabel="← Topluluğa Dön"
-          onAction={() => router.push('/topluluk' as never)}
+          onAction={() => router.push('/(tabs)/topluluk' as never)}
         />
       </View>
     );
@@ -595,7 +595,7 @@ export default function DiscussionDetailScreen() {
             {discussion?.circle ? (
               <TouchableOpacity
                 style={[styles.circleTag, { backgroundColor: `${circleColor}22` }]}
-                onPress={() => router.push(`/topluluk/odak/${discussion.circle?.slug}` as never)}
+                onPress={() => router.push(`/(tabs)/topluluk/odak/${discussion.circle?.slug}` as never)}
                 activeOpacity={0.75}
               >
                 <Text style={[styles.circleTagText, { color: circleColor }]}>

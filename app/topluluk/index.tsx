@@ -44,7 +44,7 @@ function TopContributorCard({ contributor, rank }: { contributor: TopContributor
   const profileSlug = getProfileSlug(contributor);
   const profileHref = contributor.is_expert
     ? `/uzman/${profileSlug}`
-    : `/authors/${profileSlug}`;
+    : `/profil/${profileSlug}`;
 
   return (
     <TouchableOpacity
@@ -264,7 +264,7 @@ export default function CommunityHomeScreen() {
         <Text style={styles.headerTitle}>Topluluk</Text>
         <TouchableOpacity
           style={styles.headerAction}
-          onPress={() => router.push('/topluluk/soru-sor' as never)}
+          onPress={() => router.push('/(tabs)/topluluk/soru-sor' as never)}
           activeOpacity={0.7}
         >
           <Ionicons name="create-outline" size={24} color={COLORS.primary} />
@@ -376,7 +376,7 @@ export default function CommunityHomeScreen() {
                     : 'İlk soruyu siz sorun!'
                 }
                 actionLabel="Soru Sor"
-                onAction={() => router.push('/topluluk/soru-sor' as never)}
+                onAction={() => router.push('/(tabs)/topluluk/soru-sor' as never)}
               />
             )}
           </>
@@ -423,7 +423,7 @@ export default function CommunityHomeScreen() {
       {/* ── FAB ──────────────────────────────────────────────────────────────── */}
       <TouchableOpacity
         style={[styles.fab, { bottom: insets.bottom + 80 }]}
-        onPress={() => router.push('/topluluk/soru-sor' as never)}
+        onPress={() => router.push('/(tabs)/topluluk/soru-sor' as never)}
         activeOpacity={0.85}
       >
         <Ionicons name="add" size={28} color="#fff" />

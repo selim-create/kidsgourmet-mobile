@@ -28,7 +28,7 @@ const QUICK_TOOLS: QuickTool[] = [
     icon: 'book-outline',
     label: 'Beslenme Rehberi',
     description: 'Yaşa göre rehber',
-    route: '/food-guide',
+    route: '/(tabs)/guide',
     color: '#EA580C',
     bg: '#FFF7ED',
   },

@@ -94,7 +94,7 @@ export function FoodIntroductionGuideWidget({ ageMonths }: FoodIntroductionGuide
         </View>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => router.push('/food-guide')}
+          onPress={() => router.push('/(tabs)/guide')}
         >
           <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>
             Rehber →

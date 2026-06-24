@@ -77,7 +77,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Bebeğiniz için yaşa özel besin grupları, porsiyon önerileri ve doku/kıvam rehberliği ile ek gıdaya güvenli geçiş.',
     icon: 'book-outline',
     color: '#0EA5E9', bg: '#E0F2FE',
-    route: '/food-guide',
+    route: '/(tabs)/guide',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/ek-gida-rehberi',
   },
   {

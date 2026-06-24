@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../../utils/ageCalculator';
+import { formatChildAgeFromMonths } from '../../utils/formatChildAge';
 import { COLORS } from '../../lib/constants';
 import { Avatar } from './Avatar';
 import { ChildSwitcherSheet } from './ChildSwitcherSheet';
@@ -44,7 +45,7 @@ export function ChildSwitcherPill() {
         </View>
 
         <Text style={styles.label} numberOfLines={1}>
-          {firstName} · {ageMonths} ay
+          {firstName} · {formatChildAgeFromMonths(ageMonths)}
         </Text>
 
         <Ionicons name="chevron-down" size={14} color={COLORS.gray[500]} style={styles.chevron} />

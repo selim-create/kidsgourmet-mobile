@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../../utils/ageCalculator';
+import { formatChildAgeFromMonths } from '../../utils/formatChildAge';
 import { Avatar } from './Avatar';
 import { COLORS } from '../../lib/constants';
 import type { Child } from '../../lib/types';
@@ -70,7 +71,7 @@ function ChildCard({ child, isActive, onSelect }: ChildCardProps) {
         <Text style={styles.cardName} numberOfLines={1}>
           {child.name.split(' ')[0]}
         </Text>
-        <Text style={styles.cardAge}>{ageMonths} ay</Text>
+        <Text style={styles.cardAge}>{formatChildAgeFromMonths(ageMonths)}</Text>
         {allergyCount > 0 && (
           <View style={styles.allergyBadge}>
             <Text style={styles.allergyText}>{allergyCount} alerjen</Text>
@@ -136,13 +137,12 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
 
   const handleAddChild = useCallback(() => {
     handleClose();
-    // TODO: replace with dedicated child-add screen when available
-    navTimerRef.current = setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
+    navTimerRef.current = setTimeout(() => router.push('/profile/children/new'), NAVIGATION_DELAY_MS);
   }, [handleClose]);
 
   const handleManage = useCallback(() => {
     handleClose();
-    navTimerRef.current = setTimeout(() => router.push('/(tabs)/profile'), NAVIGATION_DELAY_MS);
+    navTimerRef.current = setTimeout(() => router.push('/profile/children'), NAVIGATION_DELAY_MS);
   }, [handleClose]);
 
   return (

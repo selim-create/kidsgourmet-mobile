@@ -81,7 +81,7 @@ const MENU_SECTIONS: MenuSection[] = [
       { label: 'Güvenlik Kontrolü', icon: 'shield-checkmark-outline', route: '/safety-check' },
       { label: 'BLW Hazırlık Testi', icon: 'checkmark-circle-outline', route: '/blw-test' },
       { label: 'Büyüme Takibi', icon: 'trending-up-outline', route: '/growth' },
-      { label: 'Ek Gıda Rehberi', icon: 'leaf-outline', route: '/food-guide' },
+      { label: 'Ek Gıda Rehberi', icon: 'leaf-outline', route: '/(tabs)/guide' },
       { label: 'Aşı Takvimi', icon: 'medical-outline', route: '/vaccines' },
     ],
   },

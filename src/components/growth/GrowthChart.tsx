@@ -10,7 +10,7 @@ import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
 import type { GrowthChartData, GrowthChartType } from '../../lib/types';
 
 interface GrowthChartProps {
-  chartData: GrowthChartData | null;
+  chartData: GrowthChartData | null | undefined;
   isLoading: boolean;
   selectedType: GrowthChartType;
   onTypeChange: (type: GrowthChartType) => void;
@@ -19,7 +19,7 @@ interface GrowthChartProps {
 const CHART_HEIGHT = 220;
 const PADDING_X = 36;
 const PADDING_Y = 24;
-const DAYS_PER_MONTH = 30;
+const DAYS_PER_MONTH_APPROX = 30;
 const Y_LABEL_X = 6;
 const X_LABEL_Y = CHART_HEIGHT - 4;
 const MAX_X_LABEL_OFFSET = 28;
@@ -215,10 +215,10 @@ export function GrowthChart({
               {chartModel.minY.toFixed(1)}
             </SvgText>
             <SvgText x={PADDING_X} y={X_LABEL_Y} fill="#6B7280" fontSize="10">
-              {(chartModel.minX / DAYS_PER_MONTH).toFixed(0)} ay
+              {(chartModel.minX / DAYS_PER_MONTH_APPROX).toFixed(0)} ay
             </SvgText>
             <SvgText x={chartWidth - PADDING_X - MAX_X_LABEL_OFFSET} y={X_LABEL_Y} fill="#6B7280" fontSize="10">
-              {(chartModel.maxX / DAYS_PER_MONTH).toFixed(0)} ay
+              {(chartModel.maxX / DAYS_PER_MONTH_APPROX).toFixed(0)} ay
             </SvgText>
           </Svg>
 

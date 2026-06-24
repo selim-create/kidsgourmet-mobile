@@ -1137,7 +1137,7 @@ export default function PercentileCalculatorScreen() {
                 {activeChild.name} için WHO referans eğrileri ve kayıtlı ölçümler.
               </Text>
               <GrowthChart
-                chartData={growthChartData ?? null}
+                chartData={growthChartData}
                 isLoading={isGrowthChartLoading}
                 selectedType={selectedChartType}
                 onTypeChange={setSelectedChartType}

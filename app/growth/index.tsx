@@ -1130,7 +1130,10 @@ export default function PercentileCalculatorScreen() {
                 borderColor: '#BFDBFE',
               }}
             >
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E3A8A', marginBottom: 2 }}>
+              <Text
+                accessibilityLabel="Büyüme Geçmişi"
+                style={{ fontSize: 16, fontWeight: '700', color: '#1E3A8A', marginBottom: 2 }}
+              >
                 Büyüme Geçmişi 📈
               </Text>
               <Text style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>

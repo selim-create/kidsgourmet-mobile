@@ -12,6 +12,8 @@ import { Icon } from '../../src/components/ui/Icon';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { deleteAccount } from '../../src/services/auth-service';
 
+const TOAST_DELAY_MS = 120;
+
 export default function DeleteAccountScreen() {
   const { user, logout } = useAuth();
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -33,7 +35,7 @@ export default function DeleteAccountScreen() {
       router.replace('/(auth)/login');
       setTimeout(() => {
         Toast.show({ type: 'success', text1: 'Hesabınız başarıyla silindi' });
-      }, 120);
+      }, TOAST_DELAY_MS);
     } catch {
       Toast.show({
         type: 'error',

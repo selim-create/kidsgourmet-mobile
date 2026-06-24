@@ -18,6 +18,7 @@ import Toast from 'react-native-toast-message';
 
 import { DiscussionCard } from '../../src/components/community/DiscussionCard';
 import { Avatar } from '../../src/components/ui/Avatar';
+import { DetailPageHeader } from '../../src/components/ui/DetailPageHeader';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { useAuth } from '../../src/contexts/AuthContext';
@@ -515,14 +516,8 @@ export default function DiscussionDetailScreen() {
 
   if ((discussionLoading && !discussion) || !slug) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tartışma</Text>
-          <View style={styles.headerBackButton} />
-        </View>
+      <View style={styles.container}>
+        <DetailPageHeader title="Tartışma" />
         <LoadingSpinner label="Tartışma yükleniyor..." />
       </View>
     );
@@ -530,14 +525,8 @@ export default function DiscussionDetailScreen() {
 
   if (isNotFound) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tartışma</Text>
-          <View style={styles.headerBackButton} />
-        </View>
+      <View style={styles.container}>
+        <DetailPageHeader title="Tartışma" />
         <EmptyState
           icon="chatbubble-ellipses-outline"
           title="Tartışma bulunamadı"
@@ -550,14 +539,8 @@ export default function DiscussionDetailScreen() {
 
   if (discussionError && !discussion) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tartışma</Text>
-          <View style={styles.headerBackButton} />
-        </View>
+      <View style={styles.container}>
+        <DetailPageHeader title="Tartışma" />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Tartışma yüklenemedi. Lütfen tekrar deneyin.</Text>
           <TouchableOpacity style={styles.retryButton} onPress={() => mutateDiscussion()}>
@@ -577,15 +560,7 @@ export default function DiscussionDetailScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={{ paddingTop: insets.top }}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push('/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
-          <View style={styles.headerBackButton} />
-        </View>
-      </View>
+      <DetailPageHeader title={title} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -763,27 +738,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFBE6',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  headerBackButton: {
-    width: 32,
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#1F2937',
-    marginHorizontal: 12,
   },
   content: {
     paddingVertical: 16,

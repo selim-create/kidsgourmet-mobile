@@ -7,7 +7,7 @@ import { getAuthor, getAuthorRecipes } from '../../src/services/author-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { RecipeCard } from '../../src/components/recipes/RecipeCard';
-import { DetailHeader } from '../../src/components/ui/DetailHeader';
+import { DetailPageHeader } from '../../src/components/ui/DetailPageHeader';
 import { COLORS } from '../../src/lib/constants';
 
 export default function AuthorDetailScreen() {
@@ -30,14 +30,17 @@ export default function AuthorDetailScreen() {
 
   if (!author) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#FFFBE6', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-        <Ionicons name="person-outline" size={48} color="#9CA3AF" />
-        <Text style={{ color: '#374151', fontWeight: '700', fontSize: 18, marginTop: 16 }}>
-          Yazar bulunamadı
-        </Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16 }}>
-          <Text style={{ color: COLORS.primary, fontWeight: '600' }}>← Geri Dön</Text>
-        </TouchableOpacity>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <DetailPageHeader title="Yazar Profili" />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+          <Ionicons name="person-outline" size={48} color="#9CA3AF" />
+          <Text style={{ color: '#374151', fontWeight: '700', fontSize: 18, marginTop: 16 }}>
+            Yazar bulunamadı
+          </Text>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16 }}>
+            <Text style={{ color: COLORS.primary, fontWeight: '600' }}>← Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -46,12 +49,13 @@ export default function AuthorDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+      <DetailPageHeader title="Yazar Profili" />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Header card */}
         <View
           style={{
             backgroundColor: '#fff',
-            paddingTop: 80,
+            paddingTop: 24,
             paddingBottom: 24,
             paddingHorizontal: 24,
             alignItems: 'center',
@@ -104,8 +108,6 @@ export default function AuthorDetailScreen() {
           )}
         </View>
       </ScrollView>
-
-      <DetailHeader transparent />
     </View>
   );
 }

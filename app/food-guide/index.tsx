@@ -70,6 +70,14 @@ export default function FoodGuideScreen() {
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Ek Gıda Rehberi 🥣</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.replace('/(tabs)' as never)}
+            style={styles.backBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="home-outline" size={22} color="#fff" />
+          </TouchableOpacity>
         </View>
         {activeChild ? (
           <Text style={styles.headerSub}>
@@ -436,7 +444,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    marginRight: 12,
+    width: 32,
+    alignItems: 'center',
     padding: 4,
   },
   headerTitle: {
@@ -444,11 +453,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     flex: 1,
+    textAlign: 'center',
   },
   headerSub: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: 13,
-    marginLeft: 38,
+    textAlign: 'center',
+    marginHorizontal: 40,
   },
 
   scrollContent: {

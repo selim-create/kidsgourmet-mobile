@@ -11,8 +11,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/ui/Avatar';
+import { DetailPageHeader } from '../../../src/components/ui/DetailPageHeader';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { useExpertPublicProfile } from '../../../src/hooks/useExpertProfile';
@@ -85,7 +85,6 @@ const TABS = ['Tarifler', 'Blog Yazıları', 'Cevapları', 'Soruları'] as const
 type Tab = (typeof TABS)[number];
 
 export default function ExpertProfileScreen() {
-  const insets = useSafeAreaInsets();
   const { username } = useLocalSearchParams<{ username: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('Tarifler');
   const [recipesLimit, setRecipesLimit] = useState(PAGE_SIZE);
@@ -98,19 +97,7 @@ export default function ExpertProfileScreen() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-        <View
-          style={{ paddingTop: insets.top }}
-          className="bg-white border-b border-gray-100"
-        >
-          <View className="flex-row items-center px-4 py-3">
-            <TouchableOpacity onPress={() => router.back()} className="mr-3">
-              <Ionicons name="arrow-back" size={24} color="#455A64" />
-            </TouchableOpacity>
-            <Text className="text-dark font-bold text-lg flex-1">
-              Uzman Profili
-            </Text>
-          </View>
-        </View>
+        <DetailPageHeader title="Uzman Profili" />
         <LoadingSpinner />
       </View>
     );
@@ -119,19 +106,7 @@ export default function ExpertProfileScreen() {
   if (error || !profile) {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-        <View
-          style={{ paddingTop: insets.top }}
-          className="bg-white border-b border-gray-100"
-        >
-          <View className="flex-row items-center px-4 py-3">
-            <TouchableOpacity onPress={() => router.back()} className="mr-3">
-              <Ionicons name="arrow-back" size={24} color="#455A64" />
-            </TouchableOpacity>
-            <Text className="text-dark font-bold text-lg flex-1">
-              Uzman Profili
-            </Text>
-          </View>
-        </View>
+        <DetailPageHeader title="Uzman Profili" />
         <EmptyState
           icon="person-outline"
           title="Kullanıcı Bulunamadı"
@@ -169,20 +144,7 @@ export default function ExpertProfileScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
-      {/* Header */}
-      <View
-        style={{ paddingTop: insets.top }}
-        className="absolute top-0 left-0 right-0 z-10"
-      >
-        <View className="flex-row items-center px-4 py-3">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-9 h-9 rounded-full bg-black/20 items-center justify-center mr-3"
-          >
-            <Ionicons name="arrow-back" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <DetailPageHeader title="Uzman Profili" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero */}
@@ -190,7 +152,7 @@ export default function ExpertProfileScreen() {
           colors={['#9333EA', '#6366F1']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{ paddingTop: insets.top + 56, paddingBottom: 48 }}
+          style={{ paddingTop: 24, paddingBottom: 48 }}
         >
           <View className="items-center px-5">
             {/* Avatar with verified badge */}

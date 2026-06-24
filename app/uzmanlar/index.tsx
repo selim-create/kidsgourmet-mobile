@@ -211,9 +211,12 @@ export default function ExpertsListScreen() {
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
             <Ionicons name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
-          <Text className="text-dark font-bold text-lg flex-1">
+          <Text className="text-dark font-bold text-lg flex-1 text-center">
             Uzmanlarımız
           </Text>
+          <TouchableOpacity onPress={() => router.replace('/(tabs)' as never)}>
+            <Ionicons name="home-outline" size={22} color="#455A64" />
+          </TouchableOpacity>
         </View>
       </View>
 

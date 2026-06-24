@@ -41,6 +41,11 @@ export function DiscussionCard({
   const timeAgo = formatRelativeTime(discussion.created_at);
   const commentCount = discussion.answer_count ?? discussion.comment_count ?? 0;
   const circleColor = discussion.circle?.color_code ?? discussion.circle?.color ?? COLORS.primary;
+  const authorSlug = (discussion.author as { slug?: string } | undefined)?.slug
+    ?? String(discussion.author?.id ?? '');
+  const authorProfileHref = discussion.author?.is_expert
+    ? `/uzman/${authorSlug}`
+    : `/authors/${authorSlug}`;
 
   const handlePress = () => {
     router.push(`/topluluk/${discussion.slug}` as never);
@@ -50,6 +55,11 @@ export function DiscussionCard({
     if (discussion.circle?.slug) {
       router.push(`/topluluk/odak/${discussion.circle.slug}` as never);
     }
+  };
+
+  const handleAuthorPress = () => {
+    if (!authorSlug) return;
+    router.push(authorProfileHref as never);
   };
 
   const handleFavorite = () => {
@@ -89,13 +99,24 @@ export function DiscussionCard({
       onPress={handlePress}
     >
       <View style={styles.cardHeader}>
-        <View style={styles.cardAuthorRow}>
+        <TouchableOpacity
+          style={styles.cardAuthorRow}
+          onPress={handleAuthorPress}
+          activeOpacity={0.75}
+        >
           <Avatar uri={discussion.author?.avatar_url} name={authorName} size={36} />
           <View style={styles.cardAuthorInfo}>
-            <Text style={styles.cardAuthorName}>{authorName}</Text>
+            <View style={styles.cardAuthorNameRow}>
+              <Text style={styles.cardAuthorName}>{authorName}</Text>
+              {discussion.author?.is_expert ? (
+                <TouchableOpacity style={styles.authorExpertBadge} onPress={handleAuthorPress} activeOpacity={0.75}>
+                  <Text style={styles.authorExpertBadgeText}>Uzman</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
             <Text style={styles.cardTime}>{timeAgo}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleMoreMenu} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
         </TouchableOpacity>
@@ -215,6 +236,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#374151',
+  },
+  cardAuthorNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  authorExpertBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: '#DCFCE7',
+  },
+  authorExpertBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#16A34A',
   },
   cardTime: {
     fontSize: 11,

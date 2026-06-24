@@ -13,7 +13,7 @@ function toAbsoluteUrl(value?: string | null): string | null | undefined {
 function normalizeChild(child: Child): Child {
   return {
     ...child,
-    avatar_url: toAbsoluteUrl(child.avatar_url ?? child.avatar_path ?? null) ?? null,
+    avatar_url: toAbsoluteUrl(child.avatar_url ?? child.avatar_path ?? null),
   };
 }
 

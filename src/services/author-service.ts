@@ -3,6 +3,8 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { Author, PaginatedResponse, Recipe } from '../lib/types';
 import { getRecipes } from './recipe-service';
 
+const MAX_AUTHOR_FALLBACK_PAGES = 10;
+
 interface WPUser {
   id: number;
   name: string;
@@ -50,7 +52,11 @@ export async function getAuthorRecipes(
     let currentPage = 1;
     let hasNext = true;
 
-    while (hasNext && fallbackItems.length < perPage * page) {
+    while (
+      hasNext &&
+      fallbackItems.length < perPage * page &&
+      currentPage <= MAX_AUTHOR_FALLBACK_PAGES
+    ) {
       const response = await getRecipes({ page: currentPage, per_page: 50 });
       const matches = (response.items ?? []).filter((recipe) => recipe.author?.id === authorId);
       fallbackItems.push(...matches);

@@ -74,10 +74,10 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
     child?.kvkk_consent ?? false,
   );
   const [sensitiveDataConsent, setSensitiveDataConsent] = useState(
-    child?.kvkk_consent ?? false,
+    child?.sensitive_data_consent ?? child?.kvkk_consent ?? false,
   );
   const [guardianDeclaration, setGuardianDeclaration] = useState(
-    child?.kvkk_consent ?? false,
+    child?.guardian_declaration ?? false,
   );
 
   const [step, setStep] = useState(1);

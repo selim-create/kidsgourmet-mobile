@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/contexts/AuthContext';
+import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useMealPlan } from '../../src/hooks/useMealPlan';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
@@ -38,12 +39,14 @@ function getISOWeek(date: Date): { year: number; week: number } {
 
 export default function MealPlanScreen() {
   const { isAuthenticated } = useAuth();
+  const { activeChild } = useActiveChild();
   const now = new Date();
   const { year, week } = getISOWeek(now);
   const [weekOffset, setWeekOffset] = useState(0);
 
   const currentWeek = week + weekOffset;
-  const { mealPlan, isLoading, mutate } = useMealPlan(year, currentWeek);
+  const childId = activeChild?.id ? String(activeChild.id) : undefined;
+  const { mealPlan, isLoading, mutate } = useMealPlan(childId, year, currentWeek);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -227,4 +230,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

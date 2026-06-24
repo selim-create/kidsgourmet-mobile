@@ -35,7 +35,7 @@ import { FoodIntroductionGuideWidget } from '../../src/components/dashboard/Food
 import { QuickToolsWidget } from '../../src/components/dashboard/QuickToolsWidget';
 
 // Services
-import { getCurrentMealPlan } from '../../src/services/meal-plan-service';
+import { getActiveMealPlan } from '../../src/services/meal-plan-service';
 import { getNutritionSummary, getMissingNutrients } from '../../src/services/nutrition-service';
 import { getGrowthData } from '../../src/services/growth-service';
 import { getBLWTestResults } from '../../src/services/blw-service';
@@ -61,9 +61,9 @@ export default function DashboardScreen() {
   const childIdStr = childId != null ? String(childId) : null;
 
   // ── Meal plan (current week)
-  const { data: mealPlan, isLoading: loadingMealPlan } = useSWR<MealPlan>(
+  const { data: mealPlan, isLoading: loadingMealPlan } = useSWR<MealPlan | null>(
     childId != null ? ['dashboard-mealplan', childId] : null,
-    () => getCurrentMealPlan(),
+    () => getActiveMealPlan(String(childId)),
   );
 
   // ── Nutrition summary

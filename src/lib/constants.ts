@@ -41,24 +41,34 @@ export const API_ENDPOINTS = {
   USER_FAVORITES_TOGGLE: '/kg/v1/user/favorites/toggle',
   USER_FAVORITES_COLLECTIONS: '/kg/v1/user/favorites/collections',
 
-  // Meal Plan
-  MEAL_PLAN: '/kg/v1/meal-plan',
-  MEAL_PLAN_CURRENT: '/kg/v1/meal-plan/current',
-  MEAL_PLAN_GENERATE: '/kg/v1/meal-plan/generate',
-  MEAL_PLAN_WEEK: (year: number, week: number) => `/kg/v1/meal-plan/${year}/${week}`,
-  MEAL_PLANS_GENERATE: '/kg/v1/meal-plans/generate',
-  MEAL_PLANS_ACTIVE: (childId: string) => `/kg/v1/meal-plans/active?child_id=${childId}`,
+  // Meal Plans (plural — verified backend path)
+  MEAL_PLANS_ACTIVE: (childId: string, weekStart?: string) => {
+    const params = new URLSearchParams({ child_id: childId });
+    if (weekStart) params.set('week_start', weekStart);
+    return `/kg/v1/meal-plans/active?${params.toString()}`;
+  },
   MEAL_PLAN_BY_ID: (id: string) => `/kg/v1/meal-plans/${id}`,
+  MEAL_PLANS_GENERATE: '/kg/v1/meal-plans/generate',
   MEAL_PLAN_REFRESH_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/refresh`,
   MEAL_PLAN_SKIP_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/skip`,
   MEAL_PLAN_ASSIGN_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/assign`,
   MEAL_PLAN_SHOPPING_LIST: (planId: string) => `/kg/v1/meal-plans/${planId}/shopping-list`,
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
+  MEAL_PLAN: '/kg/v1/meal-plans',
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
+  MEAL_PLAN_CURRENT: '/kg/v1/meal-plans/active',
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
+  MEAL_PLAN_GENERATE: '/kg/v1/meal-plans/generate',
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
+  MEAL_PLAN_WEEK: (_year: number, _week: number) => '/kg/v1/meal-plans/active',
 
-  // Shopping List
-  SHOPPING_LIST: '/kg/v1/shopping-list',
-  SHOPPING_LIST_ITEM: (id: string | number) => `/kg/v1/shopping-list/${id}`,
-  SHOPPING_LIST_ITEM_TOGGLE: (id: string | number) => `/kg/v1/shopping-list/${id}/toggle`,
-  SHOPPING_LIST_GENERATE: '/kg/v1/shopping-list/generate',
+  // Shopping List (user-scoped — live backend path)
+  SHOPPING_LIST: '/kg/v1/user/shopping-list',
+  SHOPPING_LIST_ITEM: (id: string | number) => `/kg/v1/user/shopping-list/${id}`,
+  SHOPPING_LIST_ITEM_TOGGLE: (id: string | number) => `/kg/v1/user/shopping-list/${id}/toggle`,
+  SHOPPING_LIST_GENERATE: '/kg/v1/user/shopping-list/generate',
+  /** @deprecated kept as alias — same value as SHOPPING_LIST */
+  USER_SHOPPING_LIST: '/kg/v1/user/shopping-list',
 
   // Blog (WordPress native)
   BLOG: '/wp/v2/posts',
@@ -230,7 +240,6 @@ export const API_ENDPOINTS = {
   USER_COLLECTIONS: '/kg/v1/user/collections',
   USER_COLLECTION_BY_ID: (id: string) => `/kg/v1/user/collections/${id}`,
   USER_COLLECTION_ITEMS: (id: string) => `/kg/v1/user/collections/${id}/items`,
-  USER_SHOPPING_LIST: '/kg/v1/user/shopping-list',
 
   // Public Profiles (no auth)
   USER_PUBLIC: (username: string) => `/kg/v1/user/public/${username}`,

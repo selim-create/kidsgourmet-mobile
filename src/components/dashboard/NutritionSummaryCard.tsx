@@ -39,8 +39,7 @@ export function NutritionSummaryCard({ summary, isLoading }: NutritionSummaryCar
         shadowRadius: 4,
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: '#1F2937' }}>Haftalık Beslenme</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 14 }}>
         <Badge variant="info" size="sm">Bu Hafta</Badge>
       </View>
 

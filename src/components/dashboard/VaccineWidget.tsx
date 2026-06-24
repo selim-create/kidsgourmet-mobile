@@ -43,9 +43,6 @@ export function VaccineWidget({ vaccines, isLoading }: VaccineWidgetProps) {
         <Ionicons name="medical-outline" size={22} color="#059669" />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#065F46' }}>
-          Aşı Takvimi
-        </Text>
         {isLoading ? (
           <Text style={{ fontSize: 12, color: '#6EE7B7' }}>Yükleniyor...</Text>
         ) : (

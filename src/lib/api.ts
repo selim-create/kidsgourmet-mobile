@@ -129,8 +129,8 @@ export async function apiRequestWithHeaders<T>(
     throw new ApiError(errorMessage, response.status);
   }
 
-  const contentType2 = response.headers.get('content-type');
-  if (contentType2 && contentType2.includes('application/json')) {
+  const contentTypeHeader = response.headers.get('content-type');
+  if (contentTypeHeader && contentTypeHeader.includes('application/json')) {
     const data = (await response.json()) as T;
     const headers: Record<string, string> = {};
     response.headers.forEach((value: string, key: string) => {

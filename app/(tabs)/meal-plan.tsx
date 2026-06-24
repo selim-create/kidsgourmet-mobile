@@ -147,15 +147,17 @@ export default function MealPlanScreen() {
 
           {/* Days */}
           {days.length > 0 ? (
-            days.map((day) => (
+            days.map((day) => {
+              const dayMeals = day.meals ?? [];
+              return (
               <Card key={day.date} className="mb-3">
                 <View className="flex-row items-center justify-between mb-3">
                   <Text className="text-dark font-bold">{day.day_name}</Text>
                   <Text className="text-gray-400 text-xs">{day.date}</Text>
                 </View>
 
-                {(day.meals ?? []).length > 0 ? (
-                  (day.meals ?? []).map((meal, idx) => (
+                {dayMeals.length > 0 ? (
+                  dayMeals.map((meal, idx) => (
                     <View
                       key={idx}
                       className="flex-row items-center py-2 border-b border-gray-50 last:border-0"
@@ -194,7 +196,8 @@ export default function MealPlanScreen() {
                   </View>
                 )}
               </Card>
-            ))
+              );
+            })
           ) : (
             <EmptyState
               icon="calendar-outline"

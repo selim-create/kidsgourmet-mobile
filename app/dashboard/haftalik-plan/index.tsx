@@ -175,6 +175,14 @@ export default function HaftalikPlanScreen() {
     );
   }
 
+  const days = mealPlan?.days ?? [];
+
+  // __DEV__-only response dump so Metro logs show the actual backend shape.
+  // Intentional per project convention — gated by __DEV__ so it is stripped in production builds.
+  if (__DEV__) {
+    console.log('[KG-DEBUG] meal plan response', mealPlan);
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       {/* Header */}
@@ -269,7 +277,7 @@ export default function HaftalikPlanScreen() {
       >
         {isLoading ? (
           <LoadingSpinner label="Plan yükleniyor..." />
-        ) : !mealPlan || mealPlan.days.length === 0 ? (
+        ) : days.length === 0 ? (
           <EmptyState
             icon="calendar-outline"
             title="Bu hafta için plan yok"
@@ -277,12 +285,13 @@ export default function HaftalikPlanScreen() {
           />
         ) : (
           <View style={{ gap: 16 }}>
-            {mealPlan.days.map((day, dayIdx) => {
+            {days.map((day, dayIdx) => {
               const dayDate = new Date(day.date);
               const dow = dayDate.getDay();
               const dayName = DAYS_TR_FULL[dow === 0 ? 6 : dow - 1];
               const shortDay = DAYS_TR_SHORT[dow === 0 ? 6 : dow - 1];
               const isToday = day.date === new Date().toISOString().split('T')[0];
+              const meals = day.meals ?? [];
 
               return (
                 <View
@@ -318,18 +327,18 @@ export default function HaftalikPlanScreen() {
                       <Text style={{ fontSize: 11, color: '#9CA3AF' }}>{formatDateDisplay(day.date)}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                      <Text style={{ fontSize: 11, color: '#9CA3AF' }}>{day.meals.length} öğün</Text>
+                      <Text style={{ fontSize: 11, color: '#9CA3AF' }}>{meals.length} öğün</Text>
                     </View>
                   </View>
 
                   {/* Meals */}
-                  {day.meals.length === 0 ? (
+                  {meals.length === 0 ? (
                     <View style={{ padding: 16, alignItems: 'center' }}>
                       <Text style={{ color: '#9CA3AF', fontSize: 13 }}>Öğün eklenmemiş</Text>
                     </View>
                   ) : (
                     <View>
-                      {day.meals.map((meal, mealIdx) => (
+                      {meals.map((meal, mealIdx) => (
                         <View
                           key={meal.id ?? mealIdx}
                           style={{

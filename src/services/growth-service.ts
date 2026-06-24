@@ -7,7 +7,7 @@ export async function getGrowthData(childId: number): Promise<GrowthData | null>
     return await api.get<GrowthData>(API_ENDPOINTS.GROWTH_RECORD(childId));
   } catch (err) {
     if (__DEV__) {
-      console.warn('[KG] getGrowthData: endpoint not available on backend', String(err));
+      console.info('[KG] getGrowthData: endpoint not available on backend', String(err));
     }
     return null;
   }

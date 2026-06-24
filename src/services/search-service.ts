@@ -47,7 +47,7 @@ export const searchService = {
         `${API_ENDPOINTS.SEARCH}?${queryParams.toString()}`,
       );
     } catch (error) {
-      console.error('Search API error:', error);
+      console.error('Search API error:', { q, type, age_group, error });
       return {
         success: false,
         query: q,

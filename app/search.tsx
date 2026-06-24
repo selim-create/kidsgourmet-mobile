@@ -68,14 +68,20 @@ export default function SearchScreen() {
     [],
   );
 
-  // Run search when URL param changes (e.g. navigating from modal)
+  // Keep a ref so the URL-change effect can read the latest age groups
+  // without needing to re-register the effect each time they change.
+  const selectedAgeGroupsRef = useRef(selectedAgeGroups);
+  useEffect(() => {
+    selectedAgeGroupsRef.current = selectedAgeGroups;
+  }, [selectedAgeGroups]);
+
+  // Run search when the URL query param changes (e.g. navigating from SearchModal)
   useEffect(() => {
     if (params.q) {
       setSearchTerm(params.q);
-      doSearch(params.q, selectedAgeGroups);
+      doSearch(params.q, selectedAgeGroupsRef.current);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.q]);
+  }, [params.q, doSearch]);
 
   const handleChangeText = (text: string) => {
     setSearchTerm(text);

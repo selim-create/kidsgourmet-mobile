@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from 'react';
-import useSWR from 'swr';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -18,15 +19,19 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
-import { API_ENDPOINTS } from '../../src/lib/constants';
 import {
   calculatePercentile,
   savePercentileResult,
 } from '../../src/services/tool-service';
-import { getGrowthChartData } from '../../src/services/growth-service';
+import {
+  addGrowthRecord,
+  deleteGrowthRecord,
+  updateGrowthRecord,
+} from '../../src/services/growth-service';
 import { setToken } from '../../src/lib/api';
-import type { GrowthChartData, GrowthChartType, PercentileResult } from '../../src/lib/types';
+import type { GrowthChartType, GrowthRecord, PercentileResult } from '../../src/lib/types';
 import { GrowthChart } from '../../src/components/growth/GrowthChart';
+import { useGrowthChartData, useGrowthData } from '../../src/hooks/useGrowthData';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -40,6 +45,25 @@ function formatDate(date: Date): string {
 function displayDate(isoDate: string): string {
   const [y, m, d] = isoDate.split('-');
   return `${d}.${m}.${y}`;
+}
+
+function formatMeasurement(value: number | null): string {
+  if (value == null) return '-';
+  return String(value);
+}
+
+function formatPercentileMeasurement(value?: number | null, fallback?: number | null): string {
+  return formatMeasurement(value ?? fallback ?? null);
+}
+
+function formatRecordMeasurements(record: GrowthRecord): string {
+  return `Kilo: ${formatMeasurement(record.weight_kg)} kg · Boy: ${formatMeasurement(record.height_cm)} cm · Baş Çevresi: ${formatMeasurement(record.head_circumference_cm)} cm`;
+}
+
+function formatRecordPercentiles(
+  record: GrowthRecord,
+): string {
+  return `Persentil → Kilo: ${formatPercentileMeasurement(record.weight_percentile)} · Boy: ${formatPercentileMeasurement(record.height_percentile)} · Baş: ${formatPercentileMeasurement(record.head_circumference_percentile)}`;
 }
 
 function getAgeYears(birthDate: string, measurementDate: string): number {
@@ -617,6 +641,7 @@ const DEFAULT_BIRTH_DATE_PLACEHOLDER = (() => {
   d.setFullYear(d.getFullYear() - 1);
   return d;
 })();
+const MAX_VISIBLE_RECORDS = 10;
 
 export default function PercentileCalculatorScreen() {
   const { isAuthenticated, refreshUser } = useAuth();
@@ -635,21 +660,36 @@ export default function PercentileCalculatorScreen() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedChartType, setSelectedChartType] = useState<GrowthChartType>('weight_for_age');
+  const [editingRecord, setEditingRecord] = useState<GrowthRecord | null>(null);
+  const [isUpdatingRecord, setIsUpdatingRecord] = useState(false);
+  const [editWeightKg, setEditWeightKg] = useState('');
+  const [editHeightCm, setEditHeightCm] = useState('');
+  const [editHeadCm, setEditHeadCm] = useState('');
+  const [editNotes, setEditNotes] = useState('');
 
   // Modal state
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
 
-  const activeChildId = activeChild ? String(activeChild.id) : null;
+  const activeChildId = activeChild?.id ?? null;
+  const { growthData, mutate: mutateGrowthData } = useGrowthData();
+  const {
+    chartData: growthChartData,
+    isLoading: isGrowthChartLoading,
+    mutate: mutateGrowthChartData,
+  } = useGrowthChartData(selectedChartType);
 
-  const growthChartKey = isAuthenticated && activeChildId
-    ? API_ENDPOINTS.GROWTH_CHART_DATA(activeChildId, selectedChartType)
-    : null;
+  const records = useMemo(() => growthData?.records ?? [], [growthData?.records]);
 
-  const { data: growthChartData, isLoading: isGrowthChartLoading } = useSWR<GrowthChartData | null>(
-    growthChartKey,
-    () => getGrowthChartData(activeChildId!, selectedChartType),
-  );
+  useEffect(() => {
+    if (!activeChild?.birth_date) return;
+    const initial = new Date(activeChild.birth_date);
+    if (isNaN(initial.getTime())) return;
+    setBirthDate(initial);
+    if (activeChild.gender === 'male' || activeChild.gender === 'female') {
+      setGender(activeChild.gender);
+    }
+  }, [activeChild?.id, activeChild?.birth_date, activeChild?.gender]);
 
   const handleCalculate = useCallback(async () => {
     if (!gender) {
@@ -693,6 +733,26 @@ export default function PercentileCalculatorScreen() {
         head_circumference_cm: hc,
       });
       setResult(res);
+
+      if (isAuthenticated && activeChildId) {
+        try {
+          await addGrowthRecord({
+            child_id: activeChildId,
+            date: measStr,
+            weight_kg: w ?? null,
+            height_cm: h ?? null,
+            head_circumference_cm: hc ?? null,
+          });
+          await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
+        } catch (err) {
+          Toast.show({
+            type: 'error',
+            text1: 'Ölçüm kaydı eklenemedi',
+            text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+          });
+        }
+      }
+
       Toast.show({
         type: 'info',
         text1: 'WHO büyüme standartları 0-5 yaş için geçerlidir',
@@ -702,7 +762,18 @@ export default function PercentileCalculatorScreen() {
     } finally {
       setIsCalculating(false);
     }
-  }, [gender, birthDate, measurementDate, weightKg, heightCm, headCm]);
+  }, [
+    gender,
+    birthDate,
+    measurementDate,
+    weightKg,
+    heightCm,
+    headCm,
+    isAuthenticated,
+    activeChildId,
+    mutateGrowthData,
+    mutateGrowthChartData,
+  ]);
 
   const doSave = useCallback(
     async (childId: number | undefined) => {
@@ -767,6 +838,83 @@ export default function PercentileCalculatorScreen() {
     },
     [result, refreshUser, reloadChildren],
   );
+
+  const openEditModal = useCallback((record: GrowthRecord) => {
+    setEditingRecord(record);
+    setEditWeightKg(record.weight_kg != null ? String(record.weight_kg) : '');
+    setEditHeightCm(record.height_cm != null ? String(record.height_cm) : '');
+    setEditHeadCm(record.head_circumference_cm != null ? String(record.head_circumference_cm) : '');
+    setEditNotes(record.notes ?? '');
+  }, []);
+
+  const closeEditModal = useCallback(() => {
+    setEditingRecord(null);
+    setEditWeightKg('');
+    setEditHeightCm('');
+    setEditHeadCm('');
+    setEditNotes('');
+  }, []);
+
+  const handleUpdateRecord = useCallback(async () => {
+    if (!editingRecord) return;
+    setIsUpdatingRecord(true);
+    try {
+      await updateGrowthRecord(editingRecord.id, {
+        weight_kg: editWeightKg ? parseFloat(editWeightKg) : null,
+        height_cm: editHeightCm ? parseFloat(editHeightCm) : null,
+        head_circumference_cm: editHeadCm ? parseFloat(editHeadCm) : null,
+        notes: editNotes.trim() || undefined,
+      });
+      await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
+      closeEditModal();
+      Toast.show({ type: 'success', text1: 'Ölçüm güncellendi' });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Ölçüm güncellenemedi',
+        text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+      });
+    } finally {
+      setIsUpdatingRecord(false);
+    }
+  }, [
+    editingRecord,
+    editWeightKg,
+    editHeightCm,
+    editHeadCm,
+    editNotes,
+    mutateGrowthData,
+    mutateGrowthChartData,
+    closeEditModal,
+  ]);
+
+  const handleDeleteRecord = useCallback((record: GrowthRecord) => {
+    Alert.alert(
+      'Ölçümü sil',
+      'Bu ölçüm kaydını silmek istediğinize emin misiniz?',
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteGrowthRecord(record.id);
+              await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
+              Toast.show({ type: 'success', text1: 'Ölçüm silindi' });
+            } catch (err) {
+              Toast.show({
+                type: 'error',
+                text1: 'Ölçüm silinemedi',
+                text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+              });
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  }, [mutateGrowthData, mutateGrowthChartData]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#EFF6FF' }}>
@@ -1148,6 +1296,74 @@ export default function PercentileCalculatorScreen() {
             </View>
           )}
 
+          {isAuthenticated && activeChild && (
+            <View
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: 14,
+                padding: 14,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: '#E5E7EB',
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937', marginBottom: 10 }}>
+                Son Ölçümler
+              </Text>
+
+              {records.length === 0 ? (
+                <Text style={{ fontSize: 13, color: '#6B7280' }}>
+                  Henüz ölçüm kaydı yok. Yukarıdaki formu kullanarak ölçüm ekleyin.
+                </Text>
+              ) : (
+                <FlatList
+                  data={records.slice(0, MAX_VISIBLE_RECORDS)}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                  ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                  renderItem={({ item }) => {
+                    return (
+                      <TouchableOpacity
+                        activeOpacity={0.9}
+                        onLongPress={() => handleDeleteRecord(item)}
+                        style={{
+                          backgroundColor: '#F9FAFB',
+                          borderRadius: 10,
+                          padding: 12,
+                          borderWidth: 1,
+                          borderColor: '#E5E7EB',
+                        }}
+                      >
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#1F2937' }}>
+                            {displayDate(item.date)}
+                          </Text>
+                          <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => openEditModal(item)}>
+                              <Text style={{ fontSize: 12, color: '#2563EB', fontWeight: '600' }}>Düzenle</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        <Text style={{ fontSize: 12, color: '#4B5563' }}>
+                          {formatRecordMeasurements(item)}
+                        </Text>
+                        <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                          {formatRecordPercentiles(item)}
+                        </Text>
+                        {item.notes ? (
+                          <Text style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>Not: {item.notes}</Text>
+                        ) : null}
+                        <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                          Silmek için uzun basın
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              )}
+            </View>
+          )}
+
           {/* WHO Disclaimer */}
           <View
             style={{
@@ -1178,6 +1394,66 @@ export default function PercentileCalculatorScreen() {
         onClose={() => setShowChildSelector(false)}
         onSelect={handleChildSelected}
       />
+      <Modal visible={!!editingRecord} transparent animationType="fade" onRequestClose={closeEditModal}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+          }}
+        >
+          <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937', marginBottom: 10 }}>
+              Ölçümü Düzenle
+            </Text>
+            <Text style={fieldLabel}>Ağırlık (kg)</Text>
+            <TextInput value={editWeightKg} onChangeText={setEditWeightKg} keyboardType="decimal-pad" style={inputStyle} />
+            <Text style={fieldLabel}>Boy (cm)</Text>
+            <TextInput value={editHeightCm} onChangeText={setEditHeightCm} keyboardType="decimal-pad" style={inputStyle} />
+            <Text style={fieldLabel}>Baş Çevresi (cm)</Text>
+            <TextInput value={editHeadCm} onChangeText={setEditHeadCm} keyboardType="decimal-pad" style={inputStyle} />
+            <Text style={fieldLabel}>Not</Text>
+            <TextInput value={editNotes} onChangeText={setEditNotes} style={inputStyle} placeholder="Opsiyonel not" />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={closeEditModal}
+                style={{
+                  flex: 1,
+                  minHeight: 44,
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: '#D1D5DB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ color: '#4B5563', fontWeight: '600' }}>İptal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                disabled={isUpdatingRecord}
+                onPress={handleUpdateRecord}
+                style={{
+                  flex: 1,
+                  minHeight: 44,
+                  borderRadius: 10,
+                  backgroundColor: isUpdatingRecord ? '#93C5FD' : '#2563EB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {isUpdatingRecord ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>Kaydet</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

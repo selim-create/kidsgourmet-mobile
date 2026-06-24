@@ -31,11 +31,11 @@ const TYPE_OPTIONS: Array<{ key: GrowthChartType; label: string }> = [
 ];
 
 const CURVE_COLORS: Record<string, string> = {
-  p3: '#FBCFE8',
-  p15: '#FDE68A',
-  p50: '#BFDBFE',
-  p85: '#C4B5FD',
-  p97: '#FCA5A5',
+  p3: '#DC2626',
+  p15: '#F59E0B',
+  p50: '#16A34A',
+  p85: '#F59E0B',
+  p97: '#DC2626',
 };
 
 function unitForType(type: GrowthChartType): string {
@@ -159,7 +159,9 @@ export function GrowthChart({
         </View>
       ) : !chartData || chartData.measurements.length === 0 || !chartModel ? (
         <View style={{ minHeight: 120, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#6B7280', fontSize: 13 }}>Henüz ölçüm kaydedilmemiş</Text>
+          <Text style={{ color: '#6B7280', fontSize: 13, textAlign: 'center' }}>
+            Henüz ölçüm kaydı yok. Yukarıdaki formu kullanarak ölçüm ekleyin.
+          </Text>
         </View>
       ) : (
         <>
@@ -188,6 +190,7 @@ export function GrowthChart({
                 fill="none"
                 stroke={CURVE_COLORS[key]}
                 strokeWidth={1.4}
+                strokeDasharray={key === 'p50' ? undefined : '4 3'}
               />
             ))}
 

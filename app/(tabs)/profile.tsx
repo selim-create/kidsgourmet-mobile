@@ -12,6 +12,7 @@ import useSWR from 'swr';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { getChildren } from '../../src/services/user-service';
+import { deleteAccount } from '../../src/services/auth-service';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Card } from '../../src/components/ui/Card';
 import { Button } from '../../src/components/ui/Button';
@@ -55,6 +56,39 @@ export default function ProfileScreen() {
           },
         },
       ],
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Hesabınızı silmek istediğinize emin misiniz?',
+      'Hesabınız 30 gün içinde kalıcı olarak silinecektir. Bu süre içinde giriş yaparak hesabınızı geri yükleyebilirsiniz.',
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Hesabımı Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const appleRefreshToken =
+                user?.registered_via === 'apple' ? user.apple_refresh_token : undefined;
+              await deleteAccount(appleRefreshToken);
+              await logout();
+              router.replace('/(auth)/login');
+              setTimeout(() => {
+                Toast.show({ type: 'success', text1: 'Hesabınız silme sürecine alındı' });
+              }, 120);
+            } catch (err) {
+              Toast.show({
+                type: 'error',
+                text1: 'Hesap silinirken bir hata oluştu',
+                text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+              });
+            }
+          },
+        },
+      ],
+      { cancelable: true },
     );
   };
 
@@ -298,11 +332,11 @@ export default function ProfileScreen() {
           </Card>
 
           <TouchableOpacity
-            onPress={() => router.push('/profile/delete-account')}
+            onPress={handleDeleteAccount}
             className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
           >
             <Text className="text-center text-sm font-semibold text-red-600">
-              Hesabı Sil
+              Hesabımı Sil
             </Text>
           </TouchableOpacity>
 

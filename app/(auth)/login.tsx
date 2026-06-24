@@ -110,10 +110,14 @@ export default function LoginScreen() {
         throw new Error('Apple kimlik tokenı alınamadı.');
       }
 
-      const result = await signInWithApple(credential.identityToken, {
-        givenName: credential.fullName?.givenName,
-        familyName: credential.fullName?.familyName,
-      });
+      const result = await signInWithApple(
+        credential.identityToken,
+        {
+          givenName: credential.fullName?.givenName,
+          familyName: credential.fullName?.familyName,
+        },
+        credential.authorizationCode,
+      );
 
       if (result.token) {
         await refreshUser();

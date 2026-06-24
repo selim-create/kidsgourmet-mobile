@@ -47,7 +47,7 @@ export function GrowthTrackingWidget({ growthData, isLoading }: GrowthTrackingWi
             {latest.weight_kg ? `${latest.weight_kg} kg` : ''}
             {latest.weight_kg && latest.height_cm ? ' · ' : ''}
             {latest.height_cm ? `${latest.height_cm} cm` : ''}
-            {percentile?.weight_percentile
+            {percentile?.weight_percentile != null
               ? ` · %${percentile.weight_percentile} persentil`
               : ''}
           </Text>

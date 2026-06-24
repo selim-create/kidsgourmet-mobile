@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -52,6 +52,25 @@ export default function RegisterScreen() {
     AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
   }, []);
 
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+    try {
+      setIsLoading(true);
+      const result = await signInWithGoogle(idToken);
+      if (result.token) {
+        await refreshUser();
+        router.replace('/(tabs)');
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Google ile kayıt başarısız',
+        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshUser]);
+
   useEffect(() => {
     if (googleResponse?.type === 'success') {
       const idToken =
@@ -61,7 +80,7 @@ export default function RegisterScreen() {
         handleGoogleSuccess(idToken);
       }
     }
-  }, [googleResponse]);
+  }, [googleResponse, handleGoogleSuccess]);
 
   const update = (key: keyof typeof form) => (val: string | boolean) =>
     setForm((f) => ({ ...f, [key]: val }));
@@ -109,25 +128,6 @@ export default function RegisterScreen() {
       const message =
         err instanceof Error ? err.message : 'Kayıt oluşturulamadı.';
       Toast.show({ type: 'error', text1: 'Hata', text2: message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSuccess = async (idToken: string) => {
-    try {
-      setIsLoading(true);
-      const result = await signInWithGoogle(idToken);
-      if (result.token) {
-        await refreshUser();
-        router.replace('/(tabs)');
-      }
-    } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Google ile kayıt başarısız',
-        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
-      });
     } finally {
       setIsLoading(false);
     }

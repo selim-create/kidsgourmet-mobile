@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -47,7 +47,7 @@ export default function LoginScreen() {
         handleGoogleSuccess(idToken);
       }
     }
-  }, [googleResponse]);
+  }, [googleResponse, handleGoogleSuccess]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -72,7 +72,7 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogleSuccess = async (idToken: string) => {
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
     try {
       setIsLoading(true);
       const result = await signInWithGoogle(idToken);
@@ -89,7 +89,7 @@ export default function LoginScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [refreshUser]);
 
   const handleGooglePress = () => {
     if (!googleRequest) return;

@@ -2,17 +2,19 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import useSWR from 'swr';
-import { getChild } from '../../../../src/services/user-service';
+import { API_ENDPOINTS } from '../../../../src/lib/constants';
+import { getChildren } from '../../../../src/services/user-service';
 import { LoadingSpinner } from '../../../../src/components/ui/LoadingSpinner';
 import { ChildWizard } from '../../../../src/components/profile/ChildWizard';
 
 export default function EditChildScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: child, isLoading } = useSWR(
-    id ? `child-${id}` : null,
-    () => getChild(id),
+  const { data: children, isLoading } = useSWR(
+    id ? API_ENDPOINTS.CHILDREN : null,
+    () => getChildren(),
   );
+  const child = children?.find((item) => item.id === id);
 
   if (isLoading) {
     return (
@@ -47,4 +49,3 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-

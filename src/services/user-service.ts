@@ -21,6 +21,7 @@ export function normalizeUserProfile(user: User): User {
   const raw = user as User & {
     avatar?: string | { url?: string | null; full?: string | null } | null;
     profile_image?: string | null;
+    user_avatar?: string | null;
   };
   const avatarObject = typeof raw.avatar === 'object' && raw.avatar !== null ? raw.avatar : null;
   const avatarString = typeof raw.avatar === 'string' ? raw.avatar : null;
@@ -34,6 +35,7 @@ export function normalizeUserProfile(user: User): User {
         ?? avatarString
         ?? avatarObject?.url
         ?? avatarObject?.full
+        ?? raw.user_avatar
         ?? raw.profile_image
         ?? null,
       ) ?? null,
@@ -73,17 +75,32 @@ function unwrapUserResponse(
 }
 
 export async function getUserProfile(): Promise<User> {
-  const response = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.PROFILE);
-  const profile = unwrapUserResponse(response, 'Profil getirilemedi');
+  const response = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.USER_ME);
+  let profile = unwrapUserResponse(response, 'Profil getirilemedi');
+
+  const rawProfile = profile as User & { avatar?: unknown };
+  if (!rawProfile.avatar_url && !rawProfile.avatar) {
+    try {
+      const richerResponse = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.USER_PROFILE);
+      const richerProfile = unwrapUserResponse(richerResponse, 'Profil getirilemedi');
+      profile = { ...profile, ...richerProfile };
+    } catch {
+      // /user/me data is still usable
+    }
+  }
+
   return normalizeUserProfile(profile);
 }
 
 export async function updateUserProfile(data: Partial<User>): Promise<User> {
   const response = await api.put<User | { success?: boolean; message?: string; data?: User; user?: User }>(
-    API_ENDPOINTS.PROFILE,
+    API_ENDPOINTS.USER_PROFILE,
     data,
   );
   const profile = unwrapUserResponse(response, 'Profil güncellenemedi');
+  if (!profile || typeof profile !== 'object' || !('id' in profile)) {
+    return getUserProfile();
+  }
   return normalizeUserProfile(profile);
 }
 
@@ -124,9 +141,10 @@ export async function getChildren(): Promise<Child[]> {
   return children.map(normalizeChild);
 }
 
-export async function getChild(uuid: string): Promise<Child> {
-  const child = await api.get<Child>(API_ENDPOINTS.CHILD_PROFILE(uuid));
-  return normalizeChild(child);
+export async function getChild(uuid: string): Promise<Child | null> {
+  const children = await getChildren();
+  const child = children.find((item) => item.id === uuid);
+  return child ?? null;
 }
 
 export async function createChild(data: ChildUpsertPayload): Promise<Child> {

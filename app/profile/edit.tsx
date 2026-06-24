@@ -157,7 +157,7 @@ export default function ProfileEditScreen() {
       const updatedProfile = await updateUserProfile(payload as Parameters<typeof updateUserProfile>[0]);
       setAvatarUrl(updatedProfile.avatar_url ?? avatarUrl);
       await refreshUser();
-      await mutate(API_ENDPOINTS.PROFILE);
+      await mutate(API_ENDPOINTS.USER_ME);
       Toast.show({ type: 'success', text1: 'Profil güncellendi' });
       router.back();
     } catch {

@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
@@ -26,12 +26,20 @@ export function DetailPageHeader({
   showHomeButton = true,
 }: DetailPageHeaderProps) {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const handleBack = onBack ?? (() => {
+    if (navigation.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.replace('/(tabs)');
+  });
 
   return (
     <View style={[styles.container, { backgroundColor, paddingTop: insets.top }]}>
       <View style={styles.row}>
         <TouchableOpacity
-          onPress={onBack ?? (() => router.back())}
+          onPress={handleBack}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           style={styles.iconButton}
           activeOpacity={0.7}

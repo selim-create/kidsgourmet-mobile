@@ -234,7 +234,7 @@ export default function IngredientBySlugScreen() {
           backgroundColor: '#FFFBE6',
         }}
       >
-        <DetailPageHeader title="Besin Detayı" />
+        <DetailPageHeader title="Malzeme Detayı" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
           <Ionicons name="nutrition-outline" size={56} color="#9CA3AF" />
           <Text

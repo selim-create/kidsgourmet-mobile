@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   AUTH_REGISTER: '/kg/v1/auth/register',
   AUTH_ME: '/kg/v1/auth/me',
   AUTH_GOOGLE: '/kg/v1/auth/google',
+  AUTH_APPLE: '/kg/v1/auth/apple',
   AUTH_FORGOT_PASSWORD: '/kg/v1/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/kg/v1/auth/reset-password',
 

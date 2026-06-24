@@ -162,7 +162,7 @@ export default function RegisterScreen() {
         router.replace('/(tabs)');
       }
     } catch (err: unknown) {
-      if (err instanceof Error && (err as { code?: string }).code === 'ERR_REQUEST_CANCELED') return;
+      if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'ERR_REQUEST_CANCELED') return;
       Toast.show({
         type: 'error',
         text1: 'Apple ile kayıt başarısız',

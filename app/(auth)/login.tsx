@@ -33,6 +33,25 @@ export default function LoginScreen() {
     webClientId: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
   });
 
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+    try {
+      setIsLoading(true);
+      const result = await signInWithGoogle(idToken);
+      if (result.token) {
+        await refreshUser();
+        router.replace('/(tabs)');
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Google ile giriş başarısız',
+        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshUser]);
+
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
     AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
@@ -72,25 +91,6 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogleSuccess = useCallback(async (idToken: string) => {
-    try {
-      setIsLoading(true);
-      const result = await signInWithGoogle(idToken);
-      if (result.token) {
-        await refreshUser();
-        router.replace('/(tabs)');
-      }
-    } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Google ile giriş başarısız',
-        text2: err instanceof Error ? err.message : 'Bir hata oluştu.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshUser]);
-
   const handleGooglePress = () => {
     if (!googleRequest) return;
     promptGoogleAsync();
@@ -120,7 +120,7 @@ export default function LoginScreen() {
         router.replace('/(tabs)');
       }
     } catch (err: unknown) {
-      if (err instanceof Error && (err as { code?: string }).code === 'ERR_REQUEST_CANCELED') return;
+      if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'ERR_REQUEST_CANCELED') return;
       Toast.show({
         type: 'error',
         text1: 'Apple ile giriş başarısız',

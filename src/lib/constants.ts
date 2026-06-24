@@ -221,7 +221,10 @@ export const API_ENDPOINTS = {
   GROWTH_DATA: '/kg/v1/health/growth',
   GROWTH_RECORD: (childId: number | string) => `/kg/v1/health/growth?child_id=${childId}`,
   GROWTH_ADD: '/kg/v1/health/growth',
-  GROWTH_CHART_DATA: (childId: string, type?: string) => {
+  GROWTH_CHART_DATA: (
+    childId: string,
+    type?: 'weight_for_age' | 'height_for_age' | 'head_for_age',
+  ) => {
     const params = new URLSearchParams({ child_id: childId });
     if (type) params.set('type', type);
     return `/kg/v1/health/growth/chart-data?${params.toString()}`;

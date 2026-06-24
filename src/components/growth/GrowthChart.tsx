@@ -1,5 +1,11 @@
 import React, { useMemo } from 'react';
-import { ActivityIndicator, Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
 import type { GrowthChartData, GrowthChartType } from '../../lib/types';
 
@@ -43,7 +49,11 @@ export function GrowthChart({
   selectedType,
   onTypeChange,
 }: GrowthChartProps) {
-  const chartWidth = Math.max(260, Math.min(Dimensions.get('window').width - 76, 340));
+  const { width: windowWidth } = useWindowDimensions();
+  const chartWidth = useMemo(
+    () => Math.max(260, Math.min(windowWidth - 76, 340)),
+    [windowWidth],
+  );
 
   const chartModel = useMemo(() => {
     if (!chartData) return null;

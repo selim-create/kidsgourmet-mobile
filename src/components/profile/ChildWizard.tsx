@@ -43,6 +43,7 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
 ];
 
 const TOTAL_STEPS = 3;
+const LEGAL_INFO_ROUTE = '/aydinlatma-metni' as const;
 
 export function ChildWizard({ mode, child }: ChildWizardProps) {
   const insets = useSafeAreaInsets();
@@ -317,7 +318,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push('/aydinlatma-metni')}
+          onPress={() => router.push(LEGAL_INFO_ROUTE)}
           activeOpacity={0.7}
           className="mb-3 ml-8"
         >

@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from '../lib/constants';
 import type { Author, PaginatedResponse, Recipe } from '../lib/types';
 import { getRecipes } from './recipe-service';
 
-const MAX_AUTHOR_FALLBACK_PAGES = 10;
+const MAX_AUTHOR_FALLBACK_PAGES = 5;
 
 interface WPUser {
   id: number;

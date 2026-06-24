@@ -21,7 +21,6 @@ export async function updateConsent(type: ConsentType, value: boolean): Promise<
     {
       value,
       accepted: value,
-      updated_at: new Date().toISOString(),
     },
   );
   if (typeof response === 'object' && response !== null && 'consent' in response && response.consent) {

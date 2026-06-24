@@ -34,7 +34,8 @@ export default function HomeScreen() {
 
   const { data: recipesData, isLoading: loadingRecipes } = useSWR(
     'home-recipes',
-    () => getRecipes({ per_page: 8 }),
+    // 6 tarif yeterli — tek sütun tam kart daha uzun yer kaplar
+    () => getRecipes({ per_page: 6 }),
   );
   const { posts: blogPosts, isLoading: loadingBlog } = useBlog(1, 6);
 
@@ -49,12 +50,6 @@ export default function HomeScreen() {
   if (authLoading) {
     return <LoadingSpinner fullScreen label="Yükleniyor..." />;
   }
-
-  // Build recipe grid rows (2 per row)
-  const recipeRows = Array.from(
-    { length: Math.ceil(recipes.length / 2) },
-    (_, i) => recipes.slice(i * 2, i * 2 + 2),
-  );
 
   return (
     <View style={styles.root}>
@@ -122,16 +117,9 @@ export default function HomeScreen() {
               <LoadingSpinner size="small" />
             </View>
           ) : (
-            recipeRows.map((row, rowIdx) => (
-              <View key={rowIdx} style={styles.recipeRow}>
-                {row.map((recipe) => (
-                  <View key={recipe.id} style={styles.recipeCol}>
-                    <RecipeCard recipe={recipe} compact />
-                  </View>
-                ))}
-                {/* Fill empty slot in last row */}
-                {row.length === 1 && <View style={styles.recipeCol} />}
-              </View>
+            // Tek sütun tam kart — web görünümüyle aynı
+            recipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
             ))
           )}
         </View>
@@ -227,14 +215,6 @@ const styles = StyleSheet.create({
   loadingWrap: {
     paddingVertical: 24,
     alignItems: 'center',
-  },
-  recipeRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 4,
-  },
-  recipeCol: {
-    flex: 1,
   },
   // Auth CTA
   authCard: {

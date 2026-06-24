@@ -14,19 +14,19 @@ export const API_ENDPOINTS = {
   AUTH_RESET_PASSWORD: '/kg/v1/auth/reset-password',
 
   // User
-  PROFILE: '/kg/v1/user/profile',
+  PROFILE: '/kg/v1/user/me',
   USER_AVATAR: '/kg/v1/user/avatar',
   CHILDREN: '/kg/v1/user/children',
   /** @deprecated Use CHILD_PROFILE(uuid) instead */
-  CHILD: (id: number) => `/kg/v1/user/children/${id}`,
+  CHILD: (id: string | number) => `/kg/v1/user/children/${id}`,
   /** @deprecated Use CHILD_PROFILE_AVATAR(uuid) instead */
-  AVATAR: (id: number) => `/kg/v1/user/children/${id}/avatar`,
+  AVATAR: (id: string | number) => `/kg/v1/user/children/${id}/avatar`,
   USER_ME: '/kg/v1/user/me',
 
   // Child Profiles (NEW — correct UUID-based)
-  CHILD_PROFILES: '/kg/v1/child-profiles',
-  CHILD_PROFILE: (uuid: string) => `/kg/v1/child-profiles/${uuid}`,
-  CHILD_PROFILE_AVATAR: (uuid: string) => `/kg/v1/child-profiles/${uuid}/avatar`,
+  CHILD_PROFILES: '/kg/v1/user/children',
+  CHILD_PROFILE: (uuid: string) => `/kg/v1/user/children/${uuid}`,
+  CHILD_PROFILE_AVATAR: (uuid: string) => `/kg/v1/user/children/${uuid}/avatar`,
 
   // Recipes
   RECIPES: '/kg/v1/recipes',

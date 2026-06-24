@@ -19,14 +19,24 @@ function normalizeChild(child: Child): Child {
 
 export function normalizeUserProfile(user: User): User {
   const raw = user as User & {
-    avatar?: string | null;
+    avatar?: string | { url?: string | null; full?: string | null } | null;
     profile_image?: string | null;
   };
+  const avatarObject = typeof raw.avatar === 'object' && raw.avatar !== null ? raw.avatar : null;
+  const avatarString = typeof raw.avatar === 'string' ? raw.avatar : null;
 
   return {
     ...user,
     name: user.name ?? user.display_name ?? '',
-    avatar_url: toAbsoluteUrl(user.avatar_url ?? raw.avatar ?? raw.profile_image ?? null) ?? null,
+    avatar_url:
+      toAbsoluteUrl(
+        user.avatar_url
+        ?? avatarString
+        ?? avatarObject?.url
+        ?? avatarObject?.full
+        ?? raw.profile_image
+        ?? null,
+      ) ?? null,
     children: Array.isArray(user.children) ? user.children.map(normalizeChild) : user.children,
   };
 }
@@ -46,13 +56,34 @@ export interface ChildUpsertPayload {
   terms_accepted_at?: string | null;
 }
 
+function unwrapUserResponse(
+  response: User | { success?: boolean; message?: string; data?: User; user?: User },
+  fallbackError: string,
+): User {
+  const raw = response as Record<string, unknown>;
+
+  if (typeof raw.success === 'boolean') {
+    if (!raw.success) {
+      throw new Error((raw.message as string | undefined) ?? fallbackError);
+    }
+    return (raw.data as User | undefined) ?? (raw.user as User | undefined) ?? (response as User);
+  }
+
+  return ((raw.data as User | undefined) ?? (raw.user as User | undefined) ?? (response as User));
+}
+
 export async function getUserProfile(): Promise<User> {
-  const profile = await api.get<User>(API_ENDPOINTS.PROFILE);
+  const response = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.PROFILE);
+  const profile = unwrapUserResponse(response, 'Profil getirilemedi');
   return normalizeUserProfile(profile);
 }
 
 export async function updateUserProfile(data: Partial<User>): Promise<User> {
-  const profile = await api.put<User>(API_ENDPOINTS.PROFILE, data);
+  const response = await api.put<User | { success?: boolean; message?: string; data?: User; user?: User }>(
+    API_ENDPOINTS.PROFILE,
+    data,
+  );
+  const profile = unwrapUserResponse(response, 'Profil güncellenemedi');
   return normalizeUserProfile(profile);
 }
 

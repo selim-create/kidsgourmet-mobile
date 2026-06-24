@@ -16,6 +16,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSWRConfig } from 'swr';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Avatar } from '../../src/components/ui/Avatar';
@@ -26,6 +27,7 @@ import {
 } from '../../src/services/user-service';
 import type { ComponentProps } from 'react';
 import type { SocialLinks } from '../../src/lib/types';
+import { API_ENDPOINTS } from '../../src/lib/constants';
 
 type Gender = 'male' | 'female' | 'other';
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -48,6 +50,7 @@ const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: strin
 export default function ProfileEditScreen() {
   const insets = useSafeAreaInsets();
   const { user, refreshUser } = useAuth();
+  const { mutate } = useSWRConfig();
 
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
@@ -154,6 +157,7 @@ export default function ProfileEditScreen() {
       const updatedProfile = await updateUserProfile(payload as Parameters<typeof updateUserProfile>[0]);
       setAvatarUrl(updatedProfile.avatar_url ?? avatarUrl);
       await refreshUser();
+      await mutate(API_ENDPOINTS.PROFILE);
       Toast.show({ type: 'success', text1: 'Profil güncellendi' });
       router.back();
     } catch {

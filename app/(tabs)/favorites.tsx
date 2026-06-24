@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   FlatList,
   RefreshControl,
-  useWindowDimensions,
 } from 'react-native';
 import { useFavorites } from '../../src/contexts/FavoritesContext';
 import { useAuth } from '../../src/contexts/AuthContext';
@@ -13,22 +12,16 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
 import { AppHeader } from '../../src/components/ui/AppHeader';
+import { FavoriteTabs } from '../../src/components/ui/FavoriteTabs';
+import type { FavoriteTabKey } from '../../src/components/ui/FavoriteTabs';
 import { router } from 'expo-router';
-
-const GRID_COLUMNS = 2;
-const GRID_GAP = 12;
-const SCREEN_PADDING = 16;
 
 export default function FavoritesScreen() {
   const { isAuthenticated } = useAuth();
   const { favorites, isLoading, reload } = useFavorites();
-  const { width } = useWindowDimensions();
   const [refreshing, setRefreshing] = React.useState(false);
-
-  const cardWidth = useMemo(
-    () => (width - SCREEN_PADDING * 2 - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS,
-    [width],
-  );
+  // Aktif tab durumu — varsayılan olarak "Tümü"
+  const [activeTab, setActiveTab] = React.useState<FavoriteTabKey>('all');
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -54,29 +47,38 @@ export default function FavoritesScreen() {
     );
   }
 
+  // Tab tanımları — şimdilik yalnızca tarifler aktif, diğerleri yakında
+  // 'all' ve 'recipe' aynı sayıyı gösteriyor çünkü şu an yalnızca tarif tipi favori destekleniyor;
+  // ilerleyen PR'larda diğer içerik tipleri eklendikçe bu sayılar ayrışacak.
+  const tabs = [
+    { key: 'all' as FavoriteTabKey, label: 'Tümü', count: favorites.length },
+    { key: 'recipe' as FavoriteTabKey, label: 'Tarifler', count: favorites.length },
+    { key: 'ingredient' as FavoriteTabKey, label: 'Beslenme Rehberi', count: 0 },
+    { key: 'post' as FavoriteTabKey, label: 'Blog & Rehber', count: 0 },
+    { key: 'discussion' as FavoriteTabKey, label: 'Topluluk', count: 0 },
+  ];
+
+  // Aktif tab'a göre gösterilecek liste
+  const showRecipes = activeTab === 'all' || activeTab === 'recipe';
+
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       <AppHeader />
-      {favorites.length > 0 ? (
-        <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 2 }}>
-          <Text style={{ color: '#9CA3AF', fontSize: 13 }}>
-            {favorites.length} tarif kaydedildi
-          </Text>
-        </View>
-      ) : null}
+
+      {/* İçerik tipi tab chip'leri */}
+      <FavoriteTabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
 
       {isLoading ? (
         <LoadingSpinner fullScreen label="Favoriler yükleniyor..." />
-      ) : (
+      ) : showRecipes ? (
+        // Tarif listesi — tek sütun, avatar clip olmaz
         <FlatList
           data={favorites}
           keyExtractor={(item) => String(item.id)}
-          numColumns={GRID_COLUMNS}
           contentContainerStyle={{
-            padding: SCREEN_PADDING,
+            padding: 16,
             flexGrow: 1,
           }}
-          columnWrapperStyle={{ gap: GRID_GAP }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -84,6 +86,13 @@ export default function FavoritesScreen() {
               onRefresh={onRefresh}
               tintColor="#FF8A65"
             />
+          }
+          ListHeaderComponent={
+            favorites.length > 0 ? (
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8 }}>
+                {favorites.length} tarif kaydedildi
+              </Text>
+            ) : null
           }
           ListEmptyComponent={
             <EmptyState
@@ -94,13 +103,18 @@ export default function FavoritesScreen() {
               onAction={() => router.push('/(tabs)/recipes')}
             />
           }
-          renderItem={({ item }) => (
-            <View style={{ width: cardWidth }}>
-              <RecipeCard recipe={item} compact />
-            </View>
-          )}
+          // compact prop kaldırıldı — tam kart kullanılıyor
+          renderItem={({ item }) => <RecipeCard recipe={item} />}
         />
+      ) : (
+        // Diğer tab'lar için placeholder
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#9CA3AF', textAlign: 'center' }}>
+            Bu içerik tipi yakında eklenecek
+          </Text>
+        </View>
       )}
     </View>
   );
 }
+

@@ -71,7 +71,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
       onPress={handlePress}
       style={({ pressed }) => ({
         backgroundColor: '#fff',
-        borderRadius: 16,
+        borderRadius: 24,
         marginBottom: 16,
         elevation: 3,
         shadowColor: '#000',
@@ -92,8 +92,8 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
         {/* Inner image container — clips photo to rounded top corners only */}
         <View
           style={{
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
             overflow: 'hidden',
           }}
         >
@@ -212,8 +212,8 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
       {/* ── Content area ────────────────────────────────────────────────────────── */}
       <View
         style={{
-          borderBottomLeftRadius: 16,
-          borderBottomRightRadius: 16,
+          borderBottomLeftRadius: 24,
+          borderBottomRightRadius: 24,
           backgroundColor: '#fff',
           paddingHorizontal: 16,
           paddingBottom: 14,

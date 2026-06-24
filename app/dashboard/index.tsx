@@ -30,7 +30,6 @@ import { BLWReadinessWidget } from '../../src/components/dashboard/BLWReadinessW
 import { GrowthTrackingWidget } from '../../src/components/dashboard/GrowthTrackingWidget';
 import { VaccineWidget } from '../../src/components/dashboard/VaccineWidget';
 import { ShoppingListWidget } from '../../src/components/dashboard/ShoppingListWidget';
-import { FoodIntroductionCard } from '../../src/components/dashboard/FoodIntroductionCard';
 import { DailyRecommendations } from '../../src/components/dashboard/DailyRecommendations';
 import { FoodIntroductionGuideWidget } from '../../src/components/dashboard/FoodIntroductionGuideWidget';
 import { QuickToolsWidget } from '../../src/components/dashboard/QuickToolsWidget';
@@ -42,7 +41,6 @@ import { getGrowthData } from '../../src/services/growth-service';
 import { getBLWTestResults } from '../../src/services/blw-service';
 import { getVaccinesByChild } from '../../src/services/vaccine-service';
 import { getShoppingList } from '../../src/services/shopping-list-service';
-import { getFoodIntroductionItems } from '../../src/services/food-introduction-service';
 import { getDashboardRecommendations } from '../../src/services/recommendation-service';
 
 import { formatAge } from '../../src/utils/ageFormatter';
@@ -104,12 +102,6 @@ export default function DashboardScreen() {
     () => getShoppingList(),
   );
 
-  // ── Food introduction
-  const { data: foodIntroItems, isLoading: loadingFoodIntro } = useSWR(
-    childId != null ? ['dashboard-food-intro', childId] : null,
-    () => getFoodIntroductionItems(childId as number),
-  );
-
   // ── Daily recommendations
   const { data: recommendations, isLoading: loadingRecommendations } = useSWR(
     childId != null ? ['dashboard-recommendations', childId] : null,
@@ -129,7 +121,8 @@ export default function DashboardScreen() {
   // Derive vaccine lists
   const allVaccines = Array.isArray(vaccines) ? vaccines : [];
   const overdueVaccines = allVaccines.filter((v) => v.is_overdue === true);
-  const missingNutrients: string[] = missingNutrientsData?.missing_nutrients ?? [];
+  // missing_nutrients ham veriyi doğrudan bileşene geçir — normalleştirme MissingNutrientsAlert içinde yapılıyor
+  const missingNutrients = missingNutrientsData?.missing_nutrients;
 
   const ageMonths = activeChild?.birth_date
     ? calculateAgeInMonths(activeChild.birth_date)
@@ -236,28 +229,6 @@ export default function DashboardScreen() {
               </View>
             )}
 
-            {/* ── Section: Sana Özel Öneriler ───────────────────────────────── */}
-            {activeChild && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sana Özel Öneriler ✨</Text>
-                <DailyRecommendations
-                  recommendations={recommendations ?? []}
-                  isLoading={loadingRecommendations}
-                />
-              </View>
-            )}
-
-            {/* ── Section: Bu Hafta Denenebilir ─────────────────────────────── */}
-            {activeChild && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Bu Hafta Denenebilir 🍎</Text>
-                <FoodIntroductionCard
-                  items={foodIntroItems ?? []}
-                  isLoading={loadingFoodIntro}
-                />
-              </View>
-            )}
-
             {/* ── Section: Beslenme Durumu ──────────────────────────────────── */}
             {activeChild && (
               <View style={styles.section}>
@@ -268,6 +239,11 @@ export default function DashboardScreen() {
                 />
               </View>
             )}
+
+            {/* ── Section: Hızlı Araçlar ────────────────────────────────────── */}
+            <View style={styles.section}>
+              <QuickToolsWidget />
+            </View>
 
             {/* ── Section: Aşı Takvimi ─────────────────────────────────────── */}
             {activeChild && (
@@ -308,6 +284,17 @@ export default function DashboardScreen() {
               </View>
             )}
 
+            {/* ── Section: Sana Özel Öneriler ───────────────────────────────── */}
+            {activeChild && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Sana Özel Öneriler ✨</Text>
+                <DailyRecommendations
+                  recommendations={recommendations ?? []}
+                  isLoading={loadingRecommendations}
+                />
+              </View>
+            )}
+
             {/* ── Section: Yaş Rehberi ──────────────────────────────────────── */}
             {activeChild && (
               <View style={styles.section}>
@@ -323,11 +310,6 @@ export default function DashboardScreen() {
                 items={shoppingItems ?? []}
                 isLoading={loadingShoppingList}
               />
-            </View>
-
-            {/* ── Section: Hızlı Araçlar ────────────────────────────────────── */}
-            <View style={styles.section}>
-              <QuickToolsWidget />
             </View>
 
             {/* ── No active child empty state ───────────────────────────────── */}

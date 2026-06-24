@@ -146,8 +146,13 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
         text1: mode === 'edit' ? 'Çocuk güncellendi' : 'Çocuk eklendi',
       });
       router.back();
-    } catch {
-      Toast.show({ type: 'error', text1: 'İşlem başarısız, tekrar deneyin' });
+    } catch (err: unknown) {
+      // Hata detayını konsola yaz — hangi API hatasının geldiğini görmeye yarar
+      console.error('[ChildWizard] Submit error:', err);
+      const apiErr = err as { response?: { data?: { message?: string } }; message?: string };
+      const message =
+        apiErr?.response?.data?.message ?? apiErr?.message ?? 'İşlem başarısız, tekrar deneyin';
+      Toast.show({ type: 'error', text1: 'Hata', text2: message });
     } finally {
       setSubmitting(false);
     }

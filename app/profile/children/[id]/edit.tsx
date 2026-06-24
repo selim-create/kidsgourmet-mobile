@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import useSWR from 'swr';
 import { getChild } from '../../../../src/services/user-service';
@@ -22,6 +22,15 @@ export default function EditChildScreen() {
     );
   }
 
+  // Çocuk bulunamazsa fallback göster
+  if (!child) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.notFoundText}>Çocuk bulunamadı</Text>
+      </View>
+    );
+  }
+
   return <ChildWizard mode="edit" child={child} />;
 }
 
@@ -31,6 +40,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFBE6',
+  },
+  notFoundText: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontWeight: '500',
   },
 });
 

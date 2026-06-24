@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
+import { SearchModal } from './SearchModal';
 
 function buildSuggestions(childName?: string, ageMonths?: number): string[] {
   const name = childName ?? 'Minik';
@@ -19,6 +19,7 @@ function buildSuggestions(childName?: string, ageMonths?: number): string[] {
 export function SmartSearchPill() {
   const { activeChild } = useActiveChild();
   const [index, setIndex] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
 
   let ageMonths: number | undefined;
   if (activeChild?.birth_date) {
@@ -44,20 +45,24 @@ export function SmartSearchPill() {
   }, [suggestions]);
 
   return (
-    <TouchableOpacity
-      style={styles.pill}
-      activeOpacity={0.75}
-      onPress={() => router.push('/search')}
-    >
-      <Ionicons name="search-outline" size={16} color={COLORS.gray[400]} style={styles.searchIcon} />
-      <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
-        {suggestions[index]}
-      </Text>
-      {/* TODO: implement voice search */}
-      <View style={styles.micWrap}>
-        <Ionicons name="mic-outline" size={15} color={COLORS.gray[400]} />
-      </View>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        style={styles.pill}
+        activeOpacity={0.75}
+        onPress={() => setModalVisible(true)}
+      >
+        <Ionicons name="search-outline" size={16} color={COLORS.gray[400]} style={styles.searchIcon} />
+        <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
+          {suggestions[index]}
+        </Text>
+        {/* TODO: implement voice search */}
+        <View style={styles.micWrap}>
+          <Ionicons name="mic-outline" size={15} color={COLORS.gray[400]} />
+        </View>
+      </TouchableOpacity>
+
+      <SearchModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+    </>
   );
 }
 

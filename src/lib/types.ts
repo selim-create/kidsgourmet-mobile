@@ -421,6 +421,79 @@ export interface SearchFilters {
   per_page?: number;
 }
 
+// ─── Search (categorized, web parity) ────────────────────────────────────────
+
+export interface RecipeSearchResult {
+  id: number;
+  title: string;
+  slug: string;
+  image: string;
+  age_group: string;
+  prep_time: string;
+  excerpt?: string;
+}
+
+export interface IngredientSearchResult {
+  id: number;
+  title: string;
+  slug: string;
+  image: string;
+  age_group: string;
+  excerpt: string;
+  allergen_level?: string;
+  season?: string;
+}
+
+export interface PostSearchResult {
+  id: number;
+  title: string;
+  slug: string;
+  image: string;
+  excerpt: string;
+  date?: string;
+}
+
+export interface DiscussionSearchResult {
+  id: number;
+  title: string;
+  slug: string;
+  author: string;
+  date: string;
+  comment_count: number;
+}
+
+export interface SearchCategorized {
+  recipes: RecipeSearchResult[];
+  ingredients: IngredientSearchResult[];
+  posts: PostSearchResult[];
+  discussions: DiscussionSearchResult[];
+}
+
+export interface SearchCounts {
+  total: number;
+  recipes: number;
+  ingredients: number;
+  posts: number;
+  discussions: number;
+}
+
+export interface SearchResponse {
+  success: boolean;
+  query: string;
+  type: string;
+  results: Array<RecipeSearchResult | IngredientSearchResult | PostSearchResult | DiscussionSearchResult>;
+  categorized: SearchCategorized;
+  counts: SearchCounts;
+  total: number;
+}
+
+export interface SearchParams {
+  q: string;
+  type?: 'all' | 'recipe' | 'ingredient' | 'post' | 'discussion';
+  age_group?: string;
+  per_page?: number;
+}
+
 // ─── Nutrition Types ───────────────────────────────────────────────────────────
 
 export interface NutritionSummary {

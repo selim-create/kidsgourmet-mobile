@@ -15,6 +15,7 @@ export async function getConsents(): Promise<UserConsent[]> {
 }
 
 export async function updateConsent(type: ConsentType, value: boolean): Promise<UserConsent> {
+  // Some backend variants accept `value`, while web-aligned handlers expect `accepted`.
   const response = await api.put<UserConsent | { consent?: UserConsent }>(
     API_ENDPOINTS.USER_CONSENT_UPDATE(type),
     {

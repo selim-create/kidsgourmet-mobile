@@ -132,6 +132,8 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
         allergies: selectedAllergens,
         diet_types: selectedDietTypes,
         notes: notes.trim() || undefined,
+        // Keep both fields aligned: child-profile payloads still use kvkk_consent,
+        // while shared consent handling expects terms_accepted semantics.
         kvkk_consent: termsAccepted,
         terms_accepted: termsAccepted,
         terms_accepted_at: termsAccepted ? now : null,
@@ -312,6 +314,15 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           />
           <Text className="flex-1 text-dark text-sm">
             Çocuğa ait verilerin işlenmesi için KVKK aydınlatma metnini okudum ve kabul ediyorum.
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push('/aydinlatma-metni')}
+          activeOpacity={0.7}
+          className="mb-3 ml-8"
+        >
+          <Text className="text-primary text-xs font-medium">
+            Aydınlatma metnini görüntüle →
           </Text>
         </TouchableOpacity>
 

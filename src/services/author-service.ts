@@ -57,7 +57,7 @@ export async function getAuthorRecipes(
       fallbackItems.length < perPage * page &&
       currentPage <= MAX_AUTHOR_FALLBACK_PAGES
     ) {
-      const response = await getRecipes({ page: currentPage, per_page: 50 });
+      const response = await getRecipes({ page: currentPage, per_page: 100 });
       const matches = (response.items ?? []).filter((recipe) => recipe.author?.id === authorId);
       fallbackItems.push(...matches);
       hasNext = response.has_next ?? currentPage < (response.total_pages ?? currentPage);

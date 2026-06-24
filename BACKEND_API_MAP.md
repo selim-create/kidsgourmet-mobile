@@ -3,7 +3,7 @@
 > Source of truth for mobile ↔ backend API contract.
 > Derived from `src/lib/constants.ts` and `src/services/*` code audit, cross-referenced with `TOOLS_PORT_AUDIT.md`.
 > Note: `kg-core` and `kidsgourmet-web` repos are private; backend paths are confirmed via prior PR fixes and user-verified flows.
-> Last updated: 2026-06-24 (PR #86 — systematic API audit)
+> Last updated: 2026-06-24 (endpoint alignment: shopping-list + meal-plans active)
 
 ## Status Legend
 
@@ -14,6 +14,17 @@
 | 🆕 | Backend likely has it; mobile doesn't actively call it yet |
 | ⚠️ | Verification needed — path unconfirmed against backend source |
 | 🗑️ | Mobile constant exists but endpoint is deprecated/dead |
+
+---
+
+## Production-Verified Endpoints (2026-06-24)
+
+Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp-json` by network capture from the production web app:
+
+| Endpoint | Method | Required Params |
+|---|---|---|
+| `/kg/v1/user/shopping-list` | GET | — (auth via Bearer) |
+| `/kg/v1/meal-plans/active` | GET | `child_id` (UUID), `week_start` (YYYY-MM-DD) |
 
 ---
 
@@ -202,25 +213,28 @@
 - **Mobile usage:** `recipe-service.ts:getRelatedRecipes()`
 
 ### `POST /kg/v1/recipes/{id}/rate`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅
 - **Mobile constant:** `RECIPE_RATING(recipeId)` (`src/lib/constants.ts:75`)
 - **Auth:** Required
 - **Body:** `{ rating: number }`
 - **Response:** `{ rating: number, rating_count: number }`
 - **Mobile usage:** `recipe-service.ts:rateRecipe()`
+- **Notes:** UI wiring verified in `app/(tabs)/recipes/[slug].tsx` (`handleRate` → `rateRecipe`)
 
 ### `GET /kg/v1/recipes/{id}/comments`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅
 - **Mobile constant:** `RECIPE_COMMENTS(recipeId)` (`src/lib/constants.ts:117`)
 - **Auth:** Not required (GET)
 - **Mobile usage:** `comment-service.ts:getRecipeComments()`
+- **Notes:** UI wiring verified in `app/(tabs)/recipes/[slug].tsx` (SWR comments fetch)
 
 ### `POST /kg/v1/recipes/{id}/comments`
-- **Status:** ⚠️ Verification needed
+- **Status:** ✅
 - **Mobile constant:** `RECIPE_COMMENTS(recipeId)` (`src/lib/constants.ts:117`)
 - **Auth:** Required
 - **Body:** `{ content: string }`
 - **Mobile usage:** `comment-service.ts:addComment()`
+- **Notes:** UI wiring verified in `app/(tabs)/recipes/[slug].tsx` (`handleAddComment` → `addComment`)
 
 ### `GET /kg/v1/featured/recipes`
 - **Status:** ⚠️ Verification needed
@@ -272,107 +286,131 @@
 
 ## 6. Meal Plans
 
-### `GET /kg/v1/meal-plan/current`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `MEAL_PLAN_CURRENT` (`src/lib/constants.ts:46`)
+### `GET /kg/v1/meal-plans/active`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLANS_ACTIVE(childId, weekStart?)` (`src/lib/constants.ts`)
 - **Auth:** Required
-- **Mobile usage:** `meal-plan-service.ts:getCurrentMealPlan()`
+- **Query params:** `child_id`, `week_start`
+- **Mobile usage:** `meal-plan-service.ts:getActiveMealPlan()`, `meal-plan-service.ts:getMealPlan()`
+- **Notes:** `week_start` is required as `YYYY-MM-DD` and should be Monday of requested week.
 
-### `POST /kg/v1/meal-plan/generate`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `MEAL_PLAN_GENERATE` (`src/lib/constants.ts:47`)
+### `POST /kg/v1/meal-plans/generate`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLANS_GENERATE` (`src/lib/constants.ts`)
 - **Auth:** Required
-- **Body:** `{ child_id?, week?, year? }`
+- **Body:** `{ child_id: string, week_start: string }`
 - **Mobile usage:** `meal-plan-service.ts:generateMealPlan()`
 
-### `GET /kg/v1/meal-plan/{year}/{week}`
-- **Status:** ⚠️ Verification needed — unusual URL pattern (year/week in path)
-- **Mobile constant:** `MEAL_PLAN_WEEK(year, week)` (`src/lib/constants.ts:48`)
+### `GET /kg/v1/meal-plans/{id}`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLAN_BY_ID(id)` (`src/lib/constants.ts`)
 - **Auth:** Required
-- **Mobile usage:** `meal-plan-service.ts:getMealPlan()`
+- **Mobile usage:** `meal-plan-service.ts:getMealPlanById()`
 
-### `POST /kg/v1/meal-plan`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `MEAL_PLAN` (`src/lib/constants.ts:45`)
+### `POST /kg/v1/meal-plans/{plan}/slots/{slot}/refresh`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLAN_REFRESH_SLOT(planId, slotId)` (`src/lib/constants.ts`)
 - **Auth:** Required
-- **Body:** `{ recipe_id: number, meal_type_id: number, date: string }`
-- **Mobile usage:** `meal-plan-service.ts:addRecipeToMealPlan()`
+- **Mobile usage:** `meal-plan-service.ts:refreshMealPlanSlot()`
 
-### `DELETE /kg/v1/meal-plan/{id}`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** inline `${MEAL_PLAN}/${entryId}`
-- **Mobile usage:** `meal-plan-service.ts:removeFromMealPlan()`
+### `POST /kg/v1/meal-plans/{plan}/slots/{slot}/skip`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLAN_SKIP_SLOT(planId, slotId)` (`src/lib/constants.ts`)
+- **Auth:** Required
+- **Mobile usage:** `meal-plan-service.ts:skipMealPlanSlot()`
 
-### `PATCH /kg/v1/meal-plan/{id}/complete`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** inline `${MEAL_PLAN}/${entryId}/complete`
-- **Mobile usage:** `meal-plan-service.ts:markMealComplete()`
+### `POST /kg/v1/meal-plans/{plan}/slots/{slot}/assign`
+- **Status:** ✅
+- **Mobile constant:** `MEAL_PLAN_ASSIGN_SLOT(planId, slotId)` (`src/lib/constants.ts`)
+- **Auth:** Required
+- **Body:** `{ recipe_id: number }`
+- **Mobile usage:** `meal-plan-service.ts:assignMealPlanSlot()`
 
-### Plural-path alternatives (⚠️ possible inconsistency)
-The following constants use `/meal-plans/` (plural) vs the service which uses `/meal-plan/` (singular). Only the plural variants appear in constants but are NOT used by the current `meal-plan-service.ts`:
-
-| Constant | Path | Status |
-|---|---|---|
-| `MEAL_PLANS_GENERATE` | `/kg/v1/meal-plans/generate` | 🗑️ Unused — service uses `MEAL_PLAN_GENERATE` |
-| `MEAL_PLANS_ACTIVE(childId)` | `/kg/v1/meal-plans/active?child_id=...` | 🆕 Unused |
-| `MEAL_PLAN_BY_ID(id)` | `/kg/v1/meal-plans/{id}` | 🆕 Unused |
-| `MEAL_PLAN_REFRESH_SLOT` | `/kg/v1/meal-plans/{plan}/slots/{slot}/refresh` | 🆕 Unused |
-| `MEAL_PLAN_SKIP_SLOT` | `/kg/v1/meal-plans/{plan}/slots/{slot}/skip` | 🆕 Unused |
-| `MEAL_PLAN_ASSIGN_SLOT` | `/kg/v1/meal-plans/{plan}/slots/{slot}/assign` | 🆕 Unused |
-| `MEAL_PLAN_SHOPPING_LIST(planId)` | `/kg/v1/meal-plans/{plan}/shopping-list` | 🆕 Unused |
+### Deprecated singular `/meal-plan/*` paths
+- **Status:** 🗑️
+- **Mobile constants:** `MEAL_PLAN`, `MEAL_PLAN_CURRENT`, `MEAL_PLAN_GENERATE`, `MEAL_PLAN_WEEK`
+- **Notes:** Backend returns `rest_no_route` 404 for singular `/meal-plan/*` routes.
 
 ---
 
 ## 7. Shopping List
 
 ### `GET /kg/v1/shopping-list`
-- **Status:** ✅
+- **Status:** 🗑️
 - **Mobile constant:** `SHOPPING_LIST` (`src/lib/constants.ts:58`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list`.
+
+### `POST /kg/v1/shopping-list`
+- **Status:** 🗑️
+- **Mobile constant:** `SHOPPING_LIST` (`src/lib/constants.ts:58`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list`.
+
+### `DELETE /kg/v1/shopping-list/{id}`
+- **Status:** 🗑️
+- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts:59`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list/{id}`.
+
+### `PATCH /kg/v1/shopping-list/{id}/toggle`
+- **Status:** 🗑️
+- **Mobile constant:** `SHOPPING_LIST_ITEM_TOGGLE(id)` (`src/lib/constants.ts:60`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list/{id}/toggle`.
+
+### `PATCH /kg/v1/shopping-list/{id}`
+- **Status:** 🗑️
+- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts:59`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list/{id}`.
+
+### `POST /kg/v1/shopping-list/generate`
+- **Status:** 🗑️
+- **Mobile constant:** `SHOPPING_LIST_GENERATE` (`src/lib/constants.ts:61`)
+- **Auth:** Required
+- **Notes:** Deprecated old path; backend route is user-scoped under `/user/shopping-list/generate`.
+
+### `GET /kg/v1/user/shopping-list`
+- **Status:** ✅
+- **Mobile constants:** `SHOPPING_LIST`, `USER_SHOPPING_LIST` alias (`src/lib/constants.ts`)
 - **Auth:** Required
 - **Response:** `BackendShoppingListItem[]` or `{ items: [] }` (both handled)
 - **Mobile usage:** `shopping-list-service.ts:getShoppingList()`
-- **Notes:** Backend field names: `item` (not `ingredient`), `quantity` (not `amount`); service maps these
 
-### `POST /kg/v1/shopping-list`
+### `POST /kg/v1/user/shopping-list`
 - **Status:** ✅
-- **Mobile constant:** `SHOPPING_LIST` (`src/lib/constants.ts:58`)
+- **Mobile constant:** `SHOPPING_LIST` (`src/lib/constants.ts`)
 - **Auth:** Required
-- **Body:** `{ item: string, quantity: string, category?, recipe_id?, recipe_title? }` ← note `item` and `quantity` (backend names)
-- **Response:** Created `BackendShoppingListItem`
+- **Body:** `{ item: string, quantity: string, category?, recipe_id?, recipe_title? }`
 - **Mobile usage:** `shopping-list-service.ts:addShoppingListItem()`
-- **Notes:** Service translates `ingredient`→`item`, `amount`→`quantity` before sending
 
-### `DELETE /kg/v1/shopping-list/{id}`
+### `DELETE /kg/v1/user/shopping-list/{id}`
 - **Status:** ✅
-- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts:59`)
+- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts`)
 - **Auth:** Required
 - **Mobile usage:** `shopping-list-service.ts:removeShoppingListItem()`
 
-### `PATCH /kg/v1/shopping-list/{id}/toggle`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `SHOPPING_LIST_ITEM_TOGGLE(id)` (`src/lib/constants.ts:60`)
+### `PATCH /kg/v1/user/shopping-list/{id}/toggle`
+- **Status:** ✅
+- **Mobile constant:** `SHOPPING_LIST_ITEM_TOGGLE(id)` (`src/lib/constants.ts`)
 - **Auth:** Required
 - **Body:** `{ checked: boolean }`
 - **Mobile usage:** `shopping-list-service.ts:toggleShoppingListItem()`
 
-### `PATCH /kg/v1/shopping-list/{id}`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts:59`)
+### `PATCH /kg/v1/user/shopping-list/{id}`
+- **Status:** ✅
+- **Mobile constant:** `SHOPPING_LIST_ITEM(id)` (`src/lib/constants.ts`)
 - **Auth:** Required
 - **Body:** `{ item?, quantity?, category? }`
 - **Mobile usage:** `shopping-list-service.ts:updateShoppingListItem()`
 
-### `POST /kg/v1/shopping-list/generate`
-- **Status:** ⚠️ Verification needed
-- **Mobile constant:** `SHOPPING_LIST_GENERATE` (`src/lib/constants.ts:61`)
+### `POST /kg/v1/user/shopping-list/generate`
+- **Status:** ✅
+- **Mobile constant:** `SHOPPING_LIST_GENERATE` (`src/lib/constants.ts`)
 - **Auth:** Required
 - **Body:** `{ meal_plan_id?, week?, child_id? }`
 - **Mobile usage:** `shopping-list-service.ts:generateShoppingList()`
-
-### `GET /kg/v1/user/shopping-list`
-- **Status:** 🗑️ Constant defined but unused by any service
-- **Mobile constant:** `USER_SHOPPING_LIST` (`src/lib/constants.ts:232`)
-- **Notes:** Duplicate of `SHOPPING_LIST`? Different path.
 
 ---
 
@@ -983,5 +1021,4 @@ The following constants use `/meal-plans/` (plural) vs the service which uses `/
 | `GET /kg/v1/recommendations/recipes` | `RECOMMENDATIONS_RECIPES` | Recipe recommendation widget |
 | `POST /kg/v1/auth/forgot-password` | `AUTH_FORGOT_PASSWORD` | Password reset flow |
 | `GET /kg/v1/expert/dashboard` | `EXPERT_DASHBOARD` | Expert-only dashboard screen |
-| `GET /kg/v1/meal-plans/active` | `MEAL_PLANS_ACTIVE(childId)` | Active meal plan per-child query |
 | `POST /kg/v1/meal-plans/{id}/slots/{slot}/refresh` | `MEAL_PLAN_REFRESH_SLOT` | Meal plan slot regeneration |

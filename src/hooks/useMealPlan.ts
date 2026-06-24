@@ -4,22 +4,24 @@ import { getCurrentMealPlan, getMealPlan } from '../services/meal-plan-service';
 import type { MealPlan } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
 
-export function useMealPlan(year?: number, week?: number) {
+export function useMealPlan(childId?: string, year?: number, week?: number) {
   const { isAuthenticated } = useAuth();
 
   const key =
-    isAuthenticated
+    isAuthenticated && childId
       ? year !== undefined && week !== undefined
-        ? `${API_ENDPOINTS.MEAL_PLAN}/${year}/${week}`
-        : API_ENDPOINTS.MEAL_PLAN_CURRENT
+        ? ['meal-plan', childId, year, week]
+        : API_ENDPOINTS.MEAL_PLANS_ACTIVE(childId)
       : null;
 
   const fetcher = () =>
-    year !== undefined && week !== undefined
-      ? getMealPlan(year, week)
-      : getCurrentMealPlan();
+    childId
+      ? year !== undefined && week !== undefined
+        ? getMealPlan(childId, year, week)
+        : getCurrentMealPlan(childId)
+      : null;
 
-  const { data, error, isLoading, mutate } = useSWR<MealPlan>(key, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<MealPlan | null>(key, fetcher);
 
   return {
     mealPlan: data,

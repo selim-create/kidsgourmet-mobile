@@ -69,9 +69,12 @@ export default function HaftalikPlanScreen() {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
-  const { data: mealPlan, isLoading, mutate } = useSWR<MealPlan>(
-    isAuthenticated ? ['haftalik-plan', year, week] : null,
-    () => getMealPlan(year, week),
+  const childId = activeChild?.id ? String(activeChild.id) : null;
+  const weekStart = monday.toISOString().split('T')[0];
+
+  const { data: mealPlan, isLoading, mutate } = useSWR<MealPlan | null>(
+    isAuthenticated && childId ? ['haftalik-plan', childId, year, week] : null,
+    () => getMealPlan(childId!, year, week),
   );
 
   const goToPrevWeek = () => {
@@ -103,10 +106,10 @@ export default function HaftalikPlanScreen() {
           onPress: async () => {
             setGenerating(true);
             try {
-              await generateMealPlan({
-                child_id: activeChild?.id ? Number(activeChild.id) : undefined,
-                year,
-                week,
+            if (!childId) return;
+            await generateMealPlan({
+              child_id: childId,
+              week_start: weekStart,
               });
               await mutate();
               Toast.show({ type: 'success', text1: 'Plan oluşturuldu!' });

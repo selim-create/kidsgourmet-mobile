@@ -22,9 +22,7 @@ export function TodaysMeals({ selectedDate, mealPlanDays, isLoading }: TodaysMea
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937' }}>
-          {isToday ? "Bugünün Menüsü 🍽️" : "Seçilen Günün Menüsü"}
-        </Text>
+        <View />
         <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/(tabs)/meal-plan')}>
           <Text style={{ fontSize: 13, color: '#FF8A65', fontWeight: '500' }}>
             Planı Düzenle

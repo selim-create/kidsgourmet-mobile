@@ -51,9 +51,6 @@ export function BLWReadinessWidget({ blwResult, isLoading, ageMonths }: BLWReadi
         <Ionicons name="nutrition-outline" size={22} color="#EA580C" />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#7C2D12' }}>
-          BLW Hazırlık Testi
-        </Text>
         {isLoading ? (
           <Text style={{ fontSize: 12, color: '#FDBA74' }}>Yükleniyor...</Text>
         ) : readiness ? (

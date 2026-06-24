@@ -58,9 +58,6 @@ export function WeeklyOverview({ selectedDate, onSelectDate, mealPlanDays }: Wee
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={{ fontSize: 16, fontWeight: '700', color: '#1F2937', marginBottom: 10 }}>
-        Haftalık Bakış 📅
-      </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -41,9 +41,6 @@ export function ShoppingListWidget({ items, isLoading }: ShoppingListWidgetProps
         <Ionicons name="cart-outline" size={22} color="#16A34A" />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#14532D' }}>
-          Alışveriş Listesi
-        </Text>
         {isLoading ? (
           <Text style={{ fontSize: 12, color: '#86EFAC' }}>Yükleniyor...</Text>
         ) : totalCount > 0 ? (

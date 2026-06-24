@@ -81,16 +81,11 @@ export function FoodIntroductionGuideWidget({ ageMonths }: FoodIntroductionGuide
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 22, marginRight: 8 }}>{guidance.emoji}</Text>
-          <View>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#7C2D12' }}>
-              Yaş Rehberi
+          {ageMonths !== undefined && (
+            <Text style={{ fontSize: 11, color: '#C2410C', marginTop: 1 }}>
+              {ageMonths} ay için öneri
             </Text>
-            {ageMonths !== undefined && (
-              <Text style={{ fontSize: 11, color: '#C2410C', marginTop: 1 }}>
-                {ageMonths} ay için öneri
-              </Text>
-            )}
-          </View>
+          )}
         </View>
         <TouchableOpacity
           activeOpacity={0.8}

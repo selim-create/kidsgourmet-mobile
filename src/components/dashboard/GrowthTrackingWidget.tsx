@@ -40,9 +40,6 @@ export function GrowthTrackingWidget({ growthData, isLoading }: GrowthTrackingWi
         <Ionicons name="trending-up-outline" size={22} color="#2563EB" />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#1E3A8A' }}>
-          Büyüme Takibi
-        </Text>
         {isLoading ? (
           <Text style={{ fontSize: 12, color: '#93C5FD' }}>Yükleniyor...</Text>
         ) : latest ? (

@@ -29,8 +29,8 @@ export default function LoginScreen() {
   const [appleAvailable, setAppleAvailable] = useState(false);
 
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    iosClientId: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
-    webClientId: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
+    iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
+    webClientId: Constants.expoConfig?.extra?.googleWebClientId,
   });
 
   const handleGoogleSuccess = useCallback(async (idToken: string) => {

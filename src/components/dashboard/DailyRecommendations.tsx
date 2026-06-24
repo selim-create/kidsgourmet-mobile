@@ -25,8 +25,7 @@ export function DailyRecommendations({ recommendations, isLoading }: DailyRecomm
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <View />
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 10 }}>
         <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/(tabs)/recipes')}>
           <Text style={{ fontSize: 13, color: '#FF8A65', fontWeight: '500' }}>
             Tümünü Gör

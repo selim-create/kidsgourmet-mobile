@@ -6,7 +6,7 @@ import type { MealPlan } from '../lib/types';
 function getWeekStart(date: Date = new Date()): string {
   const d = new Date(date);
   const day = d.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  const diff = day === 0 ? -6 : 1 - day; // shift to Monday
+  const diff = day === 0 ? -6 : 1 - day; // move to Monday
   d.setDate(d.getDate() + diff);
   return d.toISOString().split('T')[0];
 }

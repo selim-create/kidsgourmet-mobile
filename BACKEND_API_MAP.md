@@ -292,7 +292,7 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 - **Auth:** Required
 - **Query params:** `child_id`, `week_start`
 - **Mobile usage:** `meal-plan-service.ts:getActiveMealPlan()`, `meal-plan-service.ts:getMealPlan()`
-- **Notes:** `week_start` is required as `YYYY-MM-DD` and should be Monday of requested week.
+- **Notes:** `week_start` is required as `YYYY-MM-DD` and should be Monday of requested week; mobile service always sends it.
 
 ### `POST /kg/v1/meal-plans/generate`
 - **Status:** ✅
@@ -329,7 +329,7 @@ Endpoints below are confirmed working against `https://api.kidsgourmet.com.tr/wp
 ### Deprecated singular `/meal-plan/*` paths
 - **Status:** 🗑️
 - **Mobile constants:** `MEAL_PLAN`, `MEAL_PLAN_CURRENT`, `MEAL_PLAN_GENERATE`, `MEAL_PLAN_WEEK`
-- **Notes:** Backend returns `rest_no_route` 404 for singular `/meal-plan/*` routes.
+- **Notes:** Legacy compatibility names kept in constants; old singular `/meal-plan/*` routes return `rest_no_route` 404.
 
 ---
 

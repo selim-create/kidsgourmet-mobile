@@ -53,13 +53,13 @@ export const API_ENDPOINTS = {
   MEAL_PLAN_SKIP_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/skip`,
   MEAL_PLAN_ASSIGN_SLOT: (planId: string, slotId: string) => `/kg/v1/meal-plans/${planId}/slots/${slotId}/assign`,
   MEAL_PLAN_SHOPPING_LIST: (planId: string) => `/kg/v1/meal-plans/${planId}/shopping-list`,
-  /** @deprecated singular path — backend returns rest_no_route 404 */
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
   MEAL_PLAN: '/kg/v1/meal-plans',
-  /** @deprecated singular path — backend returns rest_no_route 404 */
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
   MEAL_PLAN_CURRENT: '/kg/v1/meal-plans/active',
-  /** @deprecated singular path — backend returns rest_no_route 404 */
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
   MEAL_PLAN_GENERATE: '/kg/v1/meal-plans/generate',
-  /** @deprecated singular path — backend returns rest_no_route 404 */
+  /** @deprecated legacy alias from old singular /meal-plan pattern */
   MEAL_PLAN_WEEK: (_year: number, _week: number) => '/kg/v1/meal-plans/active',
 
   // Shopping List (user-scoped — live backend path)

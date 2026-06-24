@@ -21,8 +21,7 @@ export function TodaysMeals({ selectedDate, mealPlanDays, isLoading }: TodaysMea
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <View />
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 10 }}>
         <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/(tabs)/meal-plan')}>
           <Text style={{ fontSize: 13, color: '#FF8A65', fontWeight: '500' }}>
             Planı Düzenle

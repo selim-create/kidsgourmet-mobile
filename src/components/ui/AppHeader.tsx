@@ -204,7 +204,7 @@ export function AppHeader({
             delayLongPress={500}
           >
             {isAuthenticated && user ? (
-              <Avatar name={user.name} size={30} />
+              <Avatar uri={user.avatar_url} name={user.name} size={30} />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Ionicons name="person-outline" size={18} color={COLORS.gray[400]} />

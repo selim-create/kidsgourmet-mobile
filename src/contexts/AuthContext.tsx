@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   // no-op
                 }
                 setUser(null);
-                reject(new Error('Hesap silme sürecinde. Giriş iptal edildi.'));
+                reject(new Error('Hesap geri yükleme talebi iptal edildi, oturum kapatıldı.'));
               },
             },
             {

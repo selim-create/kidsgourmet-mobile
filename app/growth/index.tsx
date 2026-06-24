@@ -52,6 +52,20 @@ function formatMeasurement(value: number | null): string {
   return String(value);
 }
 
+function formatPercentileMeasurement(value?: number | null, fallback?: number | null): string {
+  return formatMeasurement(value ?? fallback ?? null);
+}
+
+function formatRecordMeasurements(record: GrowthRecord): string {
+  return `Kilo: ${formatMeasurement(record.weight_kg)} kg · Boy: ${formatMeasurement(record.height_cm)} cm · Baş Çevresi: ${formatMeasurement(record.head_circumference_cm)} cm`;
+}
+
+function formatRecordPercentiles(
+  record: GrowthRecord,
+): string {
+  return `Persentil → Kilo: ${formatPercentileMeasurement(record.weight_percentile)} · Boy: ${formatPercentileMeasurement(record.height_percentile)} · Baş: ${formatPercentileMeasurement(record.head_circumference_percentile)}`;
+}
+
 function getAgeYears(birthDate: string, measurementDate: string): number {
   const birth = new Date(birthDate);
   const meas = new Date(measurementDate);
@@ -627,6 +641,7 @@ const DEFAULT_BIRTH_DATE_PLACEHOLDER = (() => {
   d.setFullYear(d.getFullYear() - 1);
   return d;
 })();
+const MAX_VISIBLE_RECORDS = 10;
 
 export default function PercentileCalculatorScreen() {
   const { isAuthenticated, refreshUser } = useAuth();
@@ -669,7 +684,7 @@ export default function PercentileCalculatorScreen() {
   useEffect(() => {
     if (!activeChild?.birth_date) return;
     const initial = new Date(activeChild.birth_date);
-    if (Number.isNaN(initial.getTime())) return;
+    if (isNaN(initial.getTime())) return;
     setBirthDate(initial);
     if (activeChild.gender === 'male' || activeChild.gender === 'female') {
       setGender(activeChild.gender);
@@ -720,14 +735,22 @@ export default function PercentileCalculatorScreen() {
       setResult(res);
 
       if (isAuthenticated && activeChildId) {
-        await addGrowthRecord({
-          child_id: activeChildId,
-          date: measStr,
-          weight_kg: w ?? null,
-          height_cm: h ?? null,
-          head_circumference_cm: hc ?? null,
-        });
-        await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
+        try {
+          await addGrowthRecord({
+            child_id: activeChildId,
+            date: measStr,
+            weight_kg: w ?? null,
+            height_cm: h ?? null,
+            head_circumference_cm: hc ?? null,
+          });
+          await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
+        } catch (err) {
+          Toast.show({
+            type: 'error',
+            text1: 'Ölçüm kaydı eklenemedi',
+            text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+          });
+        }
       }
 
       Toast.show({
@@ -845,8 +868,12 @@ export default function PercentileCalculatorScreen() {
       await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
       closeEditModal();
       Toast.show({ type: 'success', text1: 'Ölçüm güncellendi' });
-    } catch {
-      Toast.show({ type: 'error', text1: 'Ölçüm güncellenemedi' });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Ölçüm güncellenemedi',
+        text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+      });
     } finally {
       setIsUpdatingRecord(false);
     }
@@ -875,8 +902,12 @@ export default function PercentileCalculatorScreen() {
               await deleteGrowthRecord(record.id);
               await Promise.all([mutateGrowthData(), mutateGrowthChartData()]);
               Toast.show({ type: 'success', text1: 'Ölçüm silindi' });
-            } catch {
-              Toast.show({ type: 'error', text1: 'Ölçüm silinemedi' });
+            } catch (err) {
+              Toast.show({
+                type: 'error',
+                text1: 'Ölçüm silinemedi',
+                text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+              });
             }
           },
         },
@@ -1286,17 +1317,11 @@ export default function PercentileCalculatorScreen() {
                 </Text>
               ) : (
                 <FlatList
-                  data={records.slice(0, 10)}
+                  data={records.slice(0, MAX_VISIBLE_RECORDS)}
                   keyExtractor={(item) => item.id}
                   scrollEnabled={false}
                   ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
                   renderItem={({ item }) => {
-                    const extended = item as GrowthRecord & {
-                      weight_percentile?: number | null;
-                      height_percentile?: number | null;
-                      head_circumference_percentile?: number | null;
-                    };
-
                     return (
                       <TouchableOpacity
                         activeOpacity={0.9}
@@ -1313,24 +1338,24 @@ export default function PercentileCalculatorScreen() {
                           <Text style={{ fontSize: 13, fontWeight: '600', color: '#1F2937' }}>
                             {displayDate(item.date)}
                           </Text>
-                          <View style={{ flexDirection: 'row', gap: 8 }}>
+                          <View style={{ flexDirection: 'row' }}>
                             <TouchableOpacity activeOpacity={0.8} onPress={() => openEditModal(item)}>
                               <Text style={{ fontSize: 12, color: '#2563EB', fontWeight: '600' }}>Düzenle</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleDeleteRecord(item)}>
-                              <Text style={{ fontSize: 12, color: '#DC2626', fontWeight: '600' }}>Sil</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
                         <Text style={{ fontSize: 12, color: '#4B5563' }}>
-                          Kilo: {formatMeasurement(item.weight_kg)} kg · Boy: {formatMeasurement(item.height_cm)} cm · Baş çevresi: {formatMeasurement(item.head_circumference_cm)} cm
+                          {formatRecordMeasurements(item)}
                         </Text>
                         <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                          Persentil → Kilo: {formatMeasurement(extended.weight_percentile ?? growthData?.percentile?.weight_percentile ?? null)} · Boy: {formatMeasurement(extended.height_percentile ?? growthData?.percentile?.height_percentile ?? null)} · Baş: {formatMeasurement(extended.head_circumference_percentile ?? growthData?.percentile?.head_circumference_percentile ?? null)}
+                          {formatRecordPercentiles(item)}
                         </Text>
                         {item.notes ? (
-                          <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>Not: {item.notes}</Text>
+                          <Text style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>Not: {item.notes}</Text>
                         ) : null}
+                        <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                          Silmek için uzun basın
+                        </Text>
                       </TouchableOpacity>
                     );
                   }}

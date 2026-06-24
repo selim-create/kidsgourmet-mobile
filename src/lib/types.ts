@@ -803,6 +803,9 @@ export interface GrowthRecord {
   weight_kg: number | null;
   height_cm: number | null;
   head_circumference_cm: number | null;
+  weight_percentile?: number | null;
+  height_percentile?: number | null;
+  head_circumference_percentile?: number | null;
   notes?: string;
 }
 

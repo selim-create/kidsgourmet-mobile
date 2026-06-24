@@ -22,14 +22,26 @@ export async function getGrowthData(childId: string): Promise<GrowthData | null>
 export async function addGrowthRecord(
   record: Omit<GrowthRecord, 'id'>,
 ): Promise<GrowthRecord> {
-  return api.post<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_ADD, record).then((r) => r.record);
+  try {
+    const response = await api.post<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_ADD, record);
+    return response.record;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    throw new Error(`Failed to add growth record: ${message}`);
+  }
 }
 
 export async function updateGrowthRecord(
   id: string,
   data: Partial<Omit<GrowthRecord, 'id' | 'child_id'>>,
 ): Promise<GrowthRecord> {
-  return api.put<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_UPDATE(id), data).then((r) => r.record);
+  try {
+    const response = await api.put<{ record: GrowthRecord }>(API_ENDPOINTS.GROWTH_UPDATE(id), data);
+    return response.record;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    throw new Error(`Failed to update growth record: ${message}`);
+  }
 }
 
 export async function deleteGrowthRecord(id: string): Promise<void> {

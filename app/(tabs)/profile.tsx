@@ -78,8 +78,12 @@ export default function ProfileScreen() {
               setTimeout(() => {
                 Toast.show({ type: 'success', text1: 'Hesabınız silme sürecine alındı' });
               }, 120);
-            } catch {
-              Toast.show({ type: 'error', text1: 'Hesap silinirken bir hata oluştu' });
+            } catch (err) {
+              Toast.show({
+                type: 'error',
+                text1: 'Hesap silinirken bir hata oluştu',
+                text2: err instanceof Error ? err.message : 'Lütfen tekrar deneyin.',
+              });
             }
           },
         },

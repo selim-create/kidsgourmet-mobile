@@ -2,8 +2,15 @@ import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type { GrowthData, GrowthRecord, PercentileResult } from '../lib/types';
 
-export async function getGrowthData(childId: number): Promise<GrowthData> {
-  return api.get<GrowthData>(API_ENDPOINTS.GROWTH_RECORD(childId));
+export async function getGrowthData(childId: number): Promise<GrowthData | null> {
+  try {
+    return await api.get<GrowthData>(API_ENDPOINTS.GROWTH_RECORD(childId));
+  } catch (err) {
+    if (__DEV__) {
+      console.warn('[KG] getGrowthData: endpoint not available on backend', String(err));
+    }
+    return null;
+  }
 }
 
 export async function addGrowthRecord(

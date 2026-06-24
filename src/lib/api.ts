@@ -76,7 +76,12 @@ export async function apiRequest<T>(
     let errorMessage = `HTTP error ${response.status}`;
     try {
       const errorData = await response.json();
-      errorMessage = errorData.message ?? errorData.error ?? errorMessage;
+      const rawMessage = errorData.message ?? errorData.error ?? errorMessage;
+      if (response.status === 404 && errorData.code === 'rest_no_route') {
+        errorMessage = `[404 rest_no_route] ${endpoint} — ${rawMessage}`;
+      } else {
+        errorMessage = rawMessage;
+      }
     } catch {
       // ignore parse errors
     }
@@ -112,15 +117,20 @@ export async function apiRequestWithHeaders<T>(
     let errorMessage = `HTTP error ${response.status}`;
     try {
       const errorData = await response.json();
-      errorMessage = errorData.message ?? errorData.error ?? errorMessage;
+      const rawMessage = errorData.message ?? errorData.error ?? errorMessage;
+      if (response.status === 404 && errorData.code === 'rest_no_route') {
+        errorMessage = `[404 rest_no_route] ${endpoint} — ${rawMessage}`;
+      } else {
+        errorMessage = rawMessage;
+      }
     } catch {
       // ignore parse errors
     }
     throw new ApiError(errorMessage, response.status);
   }
 
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
+  const contentTypeHeader = response.headers.get('content-type');
+  if (contentTypeHeader && contentTypeHeader.includes('application/json')) {
     const data = (await response.json()) as T;
     const headers: Record<string, string> = {};
     response.headers.forEach((value: string, key: string) => {

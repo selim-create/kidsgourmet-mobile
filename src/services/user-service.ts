@@ -19,14 +19,24 @@ function normalizeChild(child: Child): Child {
 
 export function normalizeUserProfile(user: User): User {
   const raw = user as User & {
-    avatar?: string | null;
+    avatar?: string | { url?: string | null; full?: string | null } | null;
     profile_image?: string | null;
   };
+  const avatarObject = typeof raw.avatar === 'object' && raw.avatar !== null ? raw.avatar : null;
+  const avatarString = typeof raw.avatar === 'string' ? raw.avatar : null;
 
   return {
     ...user,
     name: user.name ?? user.display_name ?? '',
-    avatar_url: toAbsoluteUrl(user.avatar_url ?? raw.avatar ?? raw.profile_image ?? null) ?? null,
+    avatar_url:
+      toAbsoluteUrl(
+        user.avatar_url
+        ?? avatarString
+        ?? avatarObject?.url
+        ?? avatarObject?.full
+        ?? raw.profile_image
+        ?? null,
+      ) ?? null,
     children: Array.isArray(user.children) ? user.children.map(normalizeChild) : user.children,
   };
 }
@@ -47,13 +57,29 @@ export interface ChildUpsertPayload {
 }
 
 export async function getUserProfile(): Promise<User> {
-  const profile = await api.get<User>(API_ENDPOINTS.PROFILE);
-  return normalizeUserProfile(profile);
+  const response = await api.get<User | { success?: boolean; data?: User; user?: User }>(API_ENDPOINTS.PROFILE);
+  const wrapped = response as { data?: User; user?: User };
+  const profile =
+    typeof response === 'object' && response !== null && !Array.isArray(response)
+      ? (wrapped.data ?? wrapped.user ?? response)
+      : response;
+  return normalizeUserProfile(profile as User);
 }
 
 export async function updateUserProfile(data: Partial<User>): Promise<User> {
-  const profile = await api.put<User>(API_ENDPOINTS.PROFILE, data);
-  return normalizeUserProfile(profile);
+  const response = await api.put<User | { success?: boolean; message?: string; data?: User; user?: User }>(
+    API_ENDPOINTS.PROFILE,
+    data,
+  );
+  if (typeof response === 'object' && response !== null && 'success' in response && response.success === false) {
+    throw new Error(response.message ?? 'Profil güncellenemedi');
+  }
+  const wrapped = response as { data?: User; user?: User };
+  const profile =
+    typeof response === 'object' && response !== null && !Array.isArray(response)
+      ? (wrapped.data ?? wrapped.user ?? response)
+      : response;
+  return normalizeUserProfile(profile as User);
 }
 
 /** Upload current user's avatar (uses fetch directly to handle FormData properly in RN) */

@@ -1211,33 +1211,50 @@ export interface MealPlanSlot {
 // ─── Consent Types ────────────────────────────────────────────────────────────
 
 export type ConsentType =
-  | 'terms_accepted'
-  | 'marketing_consent'
-  | 'sensitive_data_consent'
-  | 'guardian_declaration'
+  | 'terms'
+  | 'marketing'
+  | 'sensitive_data'
+  | 'guardian_declaration';
+
+export type CookieConsentType =
   | 'cookie_pazarlama'
   | 'cookie_analitik';
 
 export interface UserConsent {
-  type: ConsentType;
-  value: boolean;
+  id?: number;
+  consent_type: ConsentType;
+  consented: boolean;
+  consented_at?: string | null;
+  revoked_at?: string | null;
+  version?: string | null;
+  created_at?: string;
   updated_at?: string;
 }
 
 export interface UserConsentHistoryEntry {
-  type: ConsentType;
-  value: boolean;
-  changed_at: string;
+  id?: number;
+  consent_type: ConsentType;
+  consented: boolean;
+  changed_at?: string;
+  consented_at?: string | null;
+  revoked_at?: string | null;
+  version?: string | null;
+  created_at?: string;
+  updated_at?: string;
   ip?: string;
   user_agent?: string;
 }
 
 export interface UserConsentsResponse {
-  consents: UserConsent[];
+  success?: boolean;
+  data?: UserConsent[];
+  consents?: UserConsent[];
 }
 
 export interface UserConsentHistoryResponse {
-  history: UserConsentHistoryEntry[];
+  success?: boolean;
+  data?: UserConsentHistoryEntry[];
+  history?: UserConsentHistoryEntry[];
 }
 
 // ─── Public Profile Types ──────────────────────────────────────────────────────

@@ -30,21 +30,21 @@ interface ConsentMeta {
 
 const CONSENT_META: ConsentMeta[] = [
   {
-    type: 'terms_accepted',
+    type: 'terms',
     label: 'Kullanım Koşulları',
     description: 'KidsGourmet kullanım koşullarını ve hizmet şartlarını kabul ettiğinizi gösterir.',
     icon: 'reader-outline',
     canToggle: false,
   },
   {
-    type: 'marketing_consent',
+    type: 'marketing',
     label: 'Pazarlama İzni',
     description: 'Yeni tarifler, öneriler ve kampanyalar hakkında e-posta ve bildirim almak istediğinizi gösterir.',
     icon: 'mail-outline',
     canToggle: true,
   },
   {
-    type: 'sensitive_data_consent',
+    type: 'sensitive_data',
     label: 'Hassas Veri İzni',
     description: 'Sağlık ve beslenme bilgilerinizin kişiselleştirilmiş öneriler için işlenmesine izin verdiğinizi gösterir.',
     icon: 'medical-outline',
@@ -56,20 +56,6 @@ const CONSENT_META: ConsentMeta[] = [
     description: 'Çocuk adına giriş yapan veli veya yasal temsilci olduğunuzu beyan ettiğinizi gösterir.',
     icon: 'people-outline',
     canToggle: false,
-  },
-  {
-    type: 'cookie_pazarlama',
-    label: 'Pazarlama Çerezleri',
-    description: 'Reklamların kişiselleştirilmesi ve platformların arası takip için çerez kullanımına izin verdiğinizi gösterir.',
-    icon: 'analytics-outline',
-    canToggle: true,
-  },
-  {
-    type: 'cookie_analitik',
-    label: 'Analitik Çerezler',
-    description: 'Uygulama kullanımınızın analiz edilmesi ve iyileştirilmesi için çerez kullanımına izin verdiğinizi gösterir.',
-    icon: 'bar-chart-outline',
-    canToggle: true,
   },
 ];
 
@@ -86,7 +72,7 @@ function ConsentHistorySection() {
   if (history.length === 0) {
     return (
       <Text style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', paddingVertical: 12 }}>
-        Henüz değişiklik geçmişi yok.
+        Değişiklik geçmişi yakında.
       </Text>
     );
   }
@@ -105,17 +91,18 @@ function ConsentHistorySection() {
           }}
         >
           <Ionicons
-            name={entry.value ? 'checkmark-circle-outline' : 'close-circle-outline'}
+            name={entry.consented ? 'checkmark-circle-outline' : 'close-circle-outline'}
             size={16}
-            color={entry.value ? '#16A34A' : '#DC2626'}
+            color={entry.consented ? '#16A34A' : '#DC2626'}
             style={{ marginRight: 8 }}
           />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 12, fontWeight: '600', color: '#374151' }}>
-              {getConsentLabel(entry.type)}
+              {getConsentLabel(entry.consent_type)}
             </Text>
             <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 1 }}>
-              {entry.value ? 'Onaylandı' : 'İptal edildi'} · {new Date(entry.changed_at).toLocaleDateString('tr-TR')}
+              {entry.consented ? 'Onaylandı' : 'İptal edildi'}
+              {entry.changed_at ? ` · ${new Date(entry.changed_at).toLocaleDateString('tr-TR')}` : ''}
             </Text>
           </View>
         </View>
@@ -128,7 +115,7 @@ function ConsentHistorySection() {
 
 export default function RizalarimScreen() {
   const { isAuthenticated } = useAuth();
-  const { consents, isLoading, toggle, getConsentValue } = useConsents();
+  const { isLoading, toggle, getConsentValue } = useConsents();
   const [toggling, setToggling] = useState<ConsentType | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -152,10 +139,10 @@ export default function RizalarimScreen() {
     );
   }
 
-  const handleToggle = async (type: ConsentType, value: boolean) => {
+  const handleToggle = async (type: ConsentType, consented: boolean) => {
     setToggling(type);
     try {
-      await toggle(type, value);
+      await toggle(type, consented);
       Toast.show({ type: 'success', text1: 'Rıza güncellendi.' });
     } catch {
       Toast.show({ type: 'error', text1: 'Güncelleme başarısız.' });

@@ -174,7 +174,7 @@ export async function getSolidFoodReadinessConfig(): Promise<SolidFoodReadinessC
 
 export async function submitSolidFoodReadiness(
   answers: Record<string, boolean>,
-  childId?: number,
+  childId?: string | number,
 ): Promise<SolidFoodReadinessResult> {
   return api.post<SolidFoodReadinessResult>(API_ENDPOINTS.SOLID_FOOD_READINESS_SUBMIT, {
     answers,
@@ -183,7 +183,7 @@ export async function submitSolidFoodReadiness(
 }
 
 export async function getSolidFoodReadiness(
-  childId: number,
+  childId: string | number,
 ): Promise<SolidFoodReadinessResult | null> {
   try {
     return await api.get<SolidFoodReadinessResult>(

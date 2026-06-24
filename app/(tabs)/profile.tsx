@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -187,51 +188,41 @@ export default function ProfileScreen() {
     },
   ];
 
+  const openLegalPage = (path: string) => {
+    Linking.openURL(`https://kidsgourmet.com.tr${path}`).catch(() => {
+      Toast.show({
+        type: 'error',
+        text1: 'Sayfa açılamadı',
+        text2: 'Lütfen daha sonra tekrar deneyin.',
+      });
+    });
+  };
+
   const legalItems = [
     {
-      icon: 'document-text-outline' as const,
-      label: 'KVKK Aydınlatma Metni',
-      onPress: () => router.push('/kvkk'),
+      icon: 'reader-outline' as const,
+      label: 'Kullanım Koşulları',
+      onPress: () => openLegalPage('/kullanim-kosullari'),
     },
     {
       icon: 'lock-closed-outline' as const,
       label: 'Gizlilik Politikası',
-      onPress: () => router.push('/gizlilik-politikasi'),
-    },
-    {
-      icon: 'document-outline' as const,
-      label: 'Aydınlatma Metni',
-      onPress: () => router.push('/aydinlatma-metni'),
+      onPress: () => openLegalPage('/gizlilik-politikasi'),
     },
     {
       icon: 'analytics-outline' as const,
       label: 'Çerez Politikası',
-      onPress: () => router.push('/cerez-politikasi'),
+      onPress: () => openLegalPage('/cerez-politikasi'),
     },
     {
-      icon: 'reader-outline' as const,
-      label: 'Kullanım Koşulları',
-      onPress: () => router.push('/kullanim-kosullari'),
+      icon: 'shield-checkmark-outline' as const,
+      label: 'KVKK',
+      onPress: () => openLegalPage('/kvkk'),
     },
     {
-      icon: 'checkmark-circle-outline' as const,
-      label: 'Açık Rıza Metni',
-      onPress: () => router.push('/acik-riza-metni'),
-    },
-    {
-      icon: 'people-outline' as const,
-      label: 'Veli Beyanı',
-      onPress: () => router.push('/veli-beyani'),
-    },
-    {
-      icon: 'medkit-outline' as const,
-      label: 'Hassas Veri İşleme İzni',
-      onPress: () => router.push('/hassas-veri-isleme-izni'),
-    },
-    {
-      icon: 'mail-outline' as const,
-      label: 'KVKK Başvuru Formu',
-      onPress: () => router.push('/basvuru-formu'),
+      icon: 'document-outline' as const,
+      label: 'Aydınlatma Metni',
+      onPress: () => openLegalPage('/aydinlatma-metni'),
     },
   ];
 

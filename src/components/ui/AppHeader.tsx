@@ -215,7 +215,7 @@ export function AppHeader({
 
         {/* ── Bottom row (collapsible, ~48px) ─────────────────────────────── */}
         {showBottomRow && (
-          <Animated.View style={[styles.bottomRow, animatedBottomRowStyle]}>
+          <Animated.View style={[styles.bottomRow, animatedBottomRowStyle as any]}>
             {children.length > 0 ? (
               <ChildSwitcherPill />
             ) : (

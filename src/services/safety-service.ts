@@ -6,7 +6,7 @@ const SAFE_FALLBACK: SafetyCheckResult = { is_safe: true, alerts: [] };
 
 export async function checkRecipeSafety(
   recipeId: number,
-  childId: number,
+  childId: string | number,
 ): Promise<SafetyCheckResult> {
   try {
     return await api.post<SafetyCheckResult>(API_ENDPOINTS.SAFETY_CHECK_RECIPE, {
@@ -21,7 +21,7 @@ export async function checkRecipeSafety(
 
 export async function checkIngredientSafety(
   ingredientId: number | string,
-  childId: number,
+  childId: string | number,
 ): Promise<SafetyCheckResult> {
   try {
     return await api.post<SafetyCheckResult>(API_ENDPOINTS.SAFETY_CHECK_INGREDIENT, {
@@ -36,7 +36,7 @@ export async function checkIngredientSafety(
 
 export async function batchCheckSafety(
   recipeIds: number[],
-  childId: number,
+  childId: string | number,
 ): Promise<BatchSafetyResult[]> {
   try {
     return await api.post<BatchSafetyResult[]>(API_ENDPOINTS.SAFETY_BATCH_CHECK, {

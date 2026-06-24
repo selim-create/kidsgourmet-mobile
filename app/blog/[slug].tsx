@@ -221,7 +221,7 @@ export default function BlogDetailScreen() {
               <Text style={styles.miniAuthorLabel}>Yazar: </Text>
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => router.push(`/authors/${encodeURIComponent(post.author.id)}`)}
+                onPress={() => router.push(`/authors/${encodeURIComponent(post.author?.id ?? '')}`)}
               >
                 <Text style={styles.miniAuthorName}>{post.author.name}</Text>
               </TouchableOpacity>
@@ -727,4 +727,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

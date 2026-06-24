@@ -515,7 +515,7 @@ export default function RecipesScreen() {
                     {ageGroups.map((ag) => (
                       <FilterChip
                         key={ag.slug}
-                        label={ag.name}
+                        label={ag.name ?? ag.slug}
                         selected={tempFilters.age_group === ag.slug}
                         color={getAgeGroupColor(ag.slug, ag.color)}
                         onPress={() =>

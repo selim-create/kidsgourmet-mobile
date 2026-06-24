@@ -170,7 +170,7 @@ function FoodTrialCard({
 interface FormModalProps {
   visible: boolean;
   trial: FoodTrial | null; // null = create mode
-  childId?: number;
+  childId?: string | number;
   onClose: () => void;
   onSaved: () => void;
 }

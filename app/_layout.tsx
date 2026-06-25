@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import Toast from 'react-native-toast-message';
-import { useFonts } from 'expo-font';
+import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
@@ -15,7 +15,6 @@ import { ErrorBoundary } from '../src/components/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
-// react-native-render-html v6 + React 18.3 incompatibility (harmless defaultProps deprecation warnings)
 LogBox.ignoreLogs([
   'Support for defaultProps will be removed from function components',
   'Support for defaultProps will be removed from memo components',
@@ -25,19 +24,29 @@ LogBox.ignoreLogs([
 ]);
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    ...Ionicons.font,
-  });
-
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+    let mounted = true;
 
-  if (!fontsLoaded) {
-    return null;
-  }
+    async function prepareApp() {
+      try {
+        await Font.loadAsync({
+          ...Ionicons.font,
+        });
+      } catch {
+        // Font loading should never block app startup on Android.
+      } finally {
+        if (mounted) {
+          await SplashScreen.hideAsync();
+        }
+      }
+    }
+
+    prepareApp();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <ErrorBoundary>

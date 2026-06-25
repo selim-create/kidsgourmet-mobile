@@ -15,12 +15,17 @@
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "ios": {
+        "image": "macos-tahoe-26.4-xcode-26.4"
+      }
     }
   },
   "submit": {
     "production": {
-      "ios": {},
+      "ios": {
+        "ascAppId": "6784156670"
+      },
       "android": {}
     }
   }

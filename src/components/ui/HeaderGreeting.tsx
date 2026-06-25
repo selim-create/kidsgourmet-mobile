@@ -5,10 +5,10 @@ import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
 
 export function HeaderGreeting() {
-  const { text, emoji } = useGreeting();
+  const { text } = useGreeting();
   const { activeChild } = useActiveChild();
 
-  const firstLine = `${text} ${emoji}`;
+  const firstLine = text;
   const secondLine = activeChild
     ? `${activeChild.name} için bugün ne pişirelim?`
     : "KidsGourmet'e hoş geldin!";
@@ -38,3 +38,4 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 });
+

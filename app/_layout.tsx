@@ -5,6 +5,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import Toast from 'react-native-toast-message';
+import { useFonts } from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
 import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { ActiveChildProvider } from '../src/contexts/ActiveChildContext';
@@ -23,9 +25,19 @@ LogBox.ignoreLogs([
 ]);
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    ...Ionicons.font,
+  });
+
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <ErrorBoundary>
@@ -47,3 +59,4 @@ export default function RootLayout() {
     </ErrorBoundary>
   );
 }
+

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
@@ -55,10 +55,6 @@ export function SmartSearchPill() {
         <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
           {suggestions[index]}
         </Text>
-        {/* TODO: implement voice search */}
-        <View style={styles.micWrap}>
-          <Ionicons name="mic-outline" size={15} color={COLORS.gray[400]} />
-        </View>
       </TouchableOpacity>
 
       <SearchModal visible={modalVisible} onClose={() => setModalVisible(false)} />
@@ -74,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     borderRadius: 22,
     height: 38,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     marginHorizontal: 8,
   },
   searchIcon: {
@@ -85,7 +81,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.gray[400],
   },
-  micWrap: {
-    marginLeft: 4,
-  },
 });
+

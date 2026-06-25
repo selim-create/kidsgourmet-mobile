@@ -35,10 +35,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFBE6"
       },
-      "package": "com.kidsgourmet.mobile",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "package": "com.kidsgourmet.mobile"
     },
     "web": {
       "bundler": "metro",

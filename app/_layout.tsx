@@ -1,11 +1,10 @@
 import '../src/global.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import Toast from 'react-native-toast-message';
-import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
@@ -23,21 +22,37 @@ LogBox.ignoreLogs([
   'TNodeChildrenRenderer: Support for defaultProps',
 ]);
 
+const ICON_FONT_TIMEOUT_MS = 2000;
+
 export default function RootLayout() {
+  const [iconFontReady, setIconFontReady] = useState(false);
+
   useEffect(() => {
     let mounted = true;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    async function finishStartup() {
+      if (!mounted) return;
+      setIconFontReady(true);
+      try {
+        await SplashScreen.hideAsync();
+      } catch {
+        // Splash may already be hidden.
+      }
+    }
 
     async function prepareApp() {
+      timeout = setTimeout(() => {
+        finishStartup();
+      }, ICON_FONT_TIMEOUT_MS);
+
       try {
-        await Font.loadAsync({
-          ...Ionicons.font,
-        });
+        await Ionicons.loadFont();
       } catch {
-        // Font loading should never block app startup on Android.
+        // Icon font loading should not block app startup.
       } finally {
-        if (mounted) {
-          await SplashScreen.hideAsync();
-        }
+        if (timeout) clearTimeout(timeout);
+        await finishStartup();
       }
     }
 
@@ -45,11 +60,12 @@ export default function RootLayout() {
 
     return () => {
       mounted = false;
+      if (timeout) clearTimeout(timeout);
     };
   }, []);
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary key={iconFontReady ? 'icons-ready' : 'icons-loading'}>
       <SWRProvider>
         <AuthProvider>
           <ActiveChildProvider>

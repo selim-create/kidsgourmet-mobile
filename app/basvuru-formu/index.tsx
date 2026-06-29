@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { sendContactForm } from '../../src/services/contact-service';
 import { COLORS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Request Types ─────────────────────────────────────────────────────────────
 
 const REQUEST_TYPES = [
@@ -130,13 +130,13 @@ export default function BasvuruFormuScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.primary }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Başvuru Formu</Text>
         </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: '#DCFCE7', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-            <Ionicons name="checkmark-circle" size={40} color="#16A34A" />
+            <AppIcon name="checkmark-circle" size={40} color="#16A34A" />
           </View>
           <Text style={{ fontSize: 20, fontWeight: '800', color: '#1F2937', marginBottom: 10, textAlign: 'center' }}>
             Başvurunuz Alındı!
@@ -162,7 +162,7 @@ export default function BasvuruFormuScreen() {
       <View style={{ backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <View>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>KVKK Başvuru Formu</Text>
@@ -180,7 +180,7 @@ export default function BasvuruFormuScreen() {
       >
         {/* Info */}
         <View style={{ backgroundColor: '#EFF6FF', borderRadius: 12, padding: 14, marginBottom: 20, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-          <Ionicons name="information-circle-outline" size={18} color="#2563EB" style={{ marginTop: 1 }} />
+          <AppIcon name="information-circle-outline" size={18} color="#2563EB" style={{ marginTop: 1 }} />
           <Text style={{ fontSize: 13, color: '#1E40AF', lineHeight: 19, flex: 1 }}>
             6698 sayılı KVKK kapsamındaki haklarınızı kullanmak için bu formu doldurun. Başvurunuz 30 gün içinde yanıtlanacaktır.
           </Text>
@@ -206,7 +206,7 @@ export default function BasvuruFormuScreen() {
               <Text style={{ flex: 1, fontSize: 14, color: selectedType ? '#1F2937' : '#9CA3AF' }} numberOfLines={1}>
                 {selectedType?.label ?? 'Talep türünü seçin...'}
               </Text>
-              <Ionicons name={showTypeSelector ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
+              <AppIcon name={showTypeSelector ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
             </TouchableOpacity>
             {showTypeSelector && (
               <View style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 10, marginTop: 4, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6 }}>

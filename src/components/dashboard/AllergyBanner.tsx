@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { Child } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface AllergyBannerProps {
   child: Child;
 }
@@ -27,7 +27,7 @@ export function AllergyBanner({ child }: AllergyBannerProps) {
         borderLeftColor: '#F59E0B',
       }}
     >
-      <Ionicons name="warning-outline" size={18} color="#D97706" />
+      <AppIcon name="warning-outline" size={18} color="#D97706" />
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text style={{ fontSize: 13, fontWeight: '700', color: '#92400E' }}>
           Alerjen Uyarısı
@@ -36,7 +36,7 @@ export function AllergyBanner({ child }: AllergyBannerProps) {
           {child.name} için: {allergies.join(', ')}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color="#D97706" />
+      <AppIcon name="chevron-forward" size={16} color="#D97706" />
     </TouchableOpacity>
   );
 }

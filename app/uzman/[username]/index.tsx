@@ -8,7 +8,6 @@ import {
   Pressable,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { Avatar } from '../../../src/components/ui/Avatar';
@@ -19,6 +18,7 @@ import { useExpertPublicProfile } from '../../../src/hooks/useExpertProfile';
 import { faToIonicon } from '../../../src/utils/iconHelpers';
 import type { SocialLinks } from '../../../src/lib/types';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 const PAGE_SIZE = 6;
 
 function SocialButton({
@@ -26,7 +26,7 @@ function SocialButton({
   color,
   url,
 }: {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
   color: string;
   url?: string;
 }) {
@@ -45,7 +45,7 @@ function SocialButton({
       }}
       activeOpacity={0.7}
     >
-      <Ionicons name={icon} size={18} color={color} />
+      <AppIcon name={String(icon)} size={18} color={color} />
     </TouchableOpacity>
   );
 }
@@ -177,7 +177,7 @@ export default function ExpertProfileScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="checkmark" size={14} color="#fff" />
+                <AppIcon name="checkmark" size={14} color="#fff" />
               </View>
             </View>
 
@@ -348,7 +348,7 @@ export default function ExpertProfileScreen() {
                         </Text>
                         {recipe.prep_time ? (
                           <View className="flex-row items-center mt-1 gap-1">
-                            <Ionicons
+                            <AppIcon
                               name="time-outline"
                               size={12}
                               color="#9CA3AF"
@@ -375,7 +375,7 @@ export default function ExpertProfileScreen() {
                 </>
               ) : (
                 <View className="py-8 items-center">
-                  <Ionicons
+                  <AppIcon
                     name="restaurant-outline"
                     size={32}
                     color="#D1D5DB"
@@ -424,7 +424,7 @@ export default function ExpertProfileScreen() {
                           </Text>
                           {post.read_time ? (
                             <View className="flex-row items-center mt-1 gap-1">
-                              <Ionicons
+                              <AppIcon
                                 name="time-outline"
                                 size={12}
                                 color="#9CA3AF"
@@ -452,7 +452,7 @@ export default function ExpertProfileScreen() {
                 </>
               ) : (
                 <View className="py-8 items-center">
-                  <Ionicons name="document-outline" size={32} color="#D1D5DB" />
+                  <AppIcon name="document-outline" size={32} color="#D1D5DB" />
                   <Text className="text-gray-400 text-sm mt-2">
                     Blog yazısı bulunamadı
                   </Text>
@@ -506,7 +506,7 @@ export default function ExpertProfileScreen() {
                 </>
               ) : (
                 <View className="py-8 items-center">
-                  <Ionicons
+                  <AppIcon
                     name="chatbubble-outline"
                     size={32}
                     color="#D1D5DB"
@@ -544,8 +544,8 @@ export default function ExpertProfileScreen() {
                               marginRight: 6,
                             }}
                           >
-                            <Ionicons
-                              name={faToIonicon(q.circle.icon)}
+                            <AppIcon
+                              name={String(faToIonicon(q.circle.icon))}
                               size={12}
                               color={q.circle.color_code}
                             />
@@ -572,7 +572,7 @@ export default function ExpertProfileScreen() {
                       </Text>
                       <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-1">
-                          <Ionicons
+                          <AppIcon
                             name="chatbubble-outline"
                             size={12}
                             color="#9CA3AF"
@@ -603,7 +603,7 @@ export default function ExpertProfileScreen() {
                 </>
               ) : (
                 <View className="py-8 items-center">
-                  <Ionicons
+                  <AppIcon
                     name="help-circle-outline"
                     size={32}
                     color="#D1D5DB"

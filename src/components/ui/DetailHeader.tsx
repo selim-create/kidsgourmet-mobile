@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 interface DetailHeaderProps {
   onShare?: () => void;
   onFavorite?: () => void;
@@ -46,7 +46,7 @@ export function DetailHeader({
         style={[styles.button, { backgroundColor: buttonBg }]}
         activeOpacity={0.8}
       >
-        <Ionicons name="arrow-back" size={22} color={iconColor} />
+        <AppIcon name="arrow-back" size={22} color={iconColor} />
       </TouchableOpacity>
 
       {/* Right buttons */}
@@ -58,7 +58,7 @@ export function DetailHeader({
               style={[styles.button, { backgroundColor: buttonBg }]}
               activeOpacity={0.8}
             >
-              <Ionicons
+              <AppIcon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={22}
                 color={isFavorited ? '#EF4444' : iconColor}
@@ -71,7 +71,7 @@ export function DetailHeader({
               style={[styles.button, { backgroundColor: buttonBg }]}
               activeOpacity={0.8}
             >
-              <Ionicons name="share-outline" size={22} color={iconColor} />
+              <AppIcon name="share-outline" size={22} color={iconColor} />
             </TouchableOpacity>
           )}
         </View>

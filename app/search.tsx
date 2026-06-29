@@ -9,12 +9,12 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { searchService } from '../src/services/search-service';
 import { useAgeGroups } from '../src/hooks/useAgeGroups';
 import { COLORS } from '../src/lib/constants';
 import type {
+
   SearchResponse,
   RecipeSearchResult,
   IngredientSearchResult,
@@ -22,6 +22,7 @@ import type {
   DiscussionSearchResult,
 } from '../src/lib/types';
 
+import { AppIcon } from '../src/components/ui/AppIcon';
 type TabKey = 'all' | 'recipes' | 'ingredients' | 'posts' | 'discussions';
 
 const POPULAR_SEARCHES = [
@@ -142,14 +143,14 @@ export default function SearchScreen() {
       <View className="bg-white px-4 pt-4 pb-3 border-b border-gray-100">
         <View className="flex-row items-center gap-3 mb-3">
           <TouchableOpacity onPress={() => router.back()} activeOpacity={0.8}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.dark} />
+            <AppIcon name="arrow-back" size={24} color={COLORS.dark} />
           </TouchableOpacity>
           <Text className="text-dark text-xl font-bold flex-1">Arama</Text>
         </View>
 
         {/* Search Input */}
         <View className="flex-row items-center bg-gray-50 rounded-2xl px-4 border border-gray-100">
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+          <AppIcon name="search-outline" size={18} color="#9CA3AF" />
           <TextInput
             value={searchTerm}
             onChangeText={handleChangeText}
@@ -162,7 +163,7 @@ export default function SearchScreen() {
           />
           {searchTerm.length > 0 && (
             <TouchableOpacity onPress={handleClear} activeOpacity={0.8}>
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <AppIcon name="close-circle" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           )}
         </View>
@@ -240,7 +241,7 @@ export default function SearchScreen() {
         {/* No results state */}
         {hasQuery && !loading && searchData && !hasResults && (
           <View className="items-center py-12">
-            <Ionicons name="search-outline" size={48} color="#D1D5DB" />
+            <AppIcon name="search-outline" size={48} color="#D1D5DB" />
             <Text className="text-dark font-bold text-lg mt-4">Sonuç bulunamadı</Text>
             <Text className="text-gray-400 text-sm text-center mt-2">
               "{searchTerm}" için sonuç bulunamadı.{'\n'}Başka bir terim deneyin.
@@ -325,7 +326,7 @@ export default function SearchScreen() {
                         className="bg-gray-100 rounded-xl items-center justify-center"
                         style={{ width: 56, height: 56 }}
                       >
-                        <Ionicons name="leaf-outline" size={24} color="#9CA3AF" />
+                        <AppIcon name="leaf-outline" size={24} color="#9CA3AF" />
                       </View>
                     )}
                     <View className="flex-1 ml-3">
@@ -341,7 +342,7 @@ export default function SearchScreen() {
                         <Text className="text-primary text-xs mt-1">{item.age_group}</Text>
                       ) : null}
                     </View>
-                    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                    <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -372,7 +373,7 @@ export default function SearchScreen() {
                         className="bg-gray-100 rounded-xl items-center justify-center"
                         style={{ width: 56, height: 56 }}
                       >
-                        <Ionicons name="restaurant-outline" size={24} color="#9CA3AF" />
+                        <AppIcon name="restaurant-outline" size={24} color="#9CA3AF" />
                       </View>
                     )}
                     <View className="flex-1 ml-3">
@@ -384,11 +385,11 @@ export default function SearchScreen() {
                       ) : null}
                       {item.prep_time ? (
                         <Text className="text-gray-400 text-xs mt-0.5">
-                          <Ionicons name="time-outline" size={10} color="#9CA3AF" /> {item.prep_time}
+                          <AppIcon name="time-outline" size={10} color="#9CA3AF" /> {item.prep_time}
                         </Text>
                       ) : null}
                     </View>
-                    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                    <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -419,7 +420,7 @@ export default function SearchScreen() {
                         className="bg-gray-100 rounded-xl items-center justify-center"
                         style={{ width: 56, height: 56 }}
                       >
-                        <Ionicons name="document-text-outline" size={24} color="#9CA3AF" />
+                        <AppIcon name="document-text-outline" size={24} color="#9CA3AF" />
                       </View>
                     )}
                     <View className="flex-1 ml-3">
@@ -432,7 +433,7 @@ export default function SearchScreen() {
                         </Text>
                       ) : null}
                     </View>
-                    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                    <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -459,7 +460,7 @@ export default function SearchScreen() {
                       <Text className="text-gray-400 text-xs">{item.author}</Text>
                       <Text className="text-gray-300 text-xs">•</Text>
                       <View className="flex-row items-center gap-1">
-                        <Ionicons name="chatbubble-outline" size={10} color="#9CA3AF" />
+                        <AppIcon name="chatbubble-outline" size={10} color="#9CA3AF" />
                         <Text className="text-gray-400 text-xs">{item.comment_count}</Text>
                       </View>
                     </View>

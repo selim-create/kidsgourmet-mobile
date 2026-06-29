@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
+import { AppIcon } from '../ui/AppIcon';
 // Backend string[] veya {name, percent, deficiency}[] döndürebilir
 type NutrientItem = string | { name: string; percent?: number; deficiency?: string };
 
@@ -36,7 +36,7 @@ export function MissingNutrientsAlert({ missingNutrients }: MissingNutrientsAler
         borderLeftColor: '#8B5CF6',
       }}
     >
-      <Ionicons name="nutrition-outline" size={18} color="#7C3AED" />
+      <AppIcon name="nutrition-outline" size={18} color="#7C3AED" />
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text style={{ fontSize: 13, fontWeight: '700', color: '#4C1D95' }}>
           Eksik Besinler
@@ -45,7 +45,7 @@ export function MissingNutrientsAlert({ missingNutrients }: MissingNutrientsAler
           Bu hafta: {nutrientNames.join(', ')}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color="#7C3AED" />
+      <AppIcon name="chevron-forward" size={16} color="#7C3AED" />
     </TouchableOpacity>
   );
 }

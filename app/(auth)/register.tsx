@@ -9,7 +9,6 @@ import {
   Switch,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
@@ -20,6 +19,7 @@ import { Input } from '../../src/components/ui/Input';
 import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function RegisterScreen() {
   const { register, refreshUser } = useAuth();
   const [form, setForm] = useState({
@@ -210,7 +210,7 @@ export default function RegisterScreen() {
               onChangeText={update('name')}
               autoCapitalize="words"
               error={errors.name}
-              leftIcon={<Ionicons name="person-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="person-outline" size={18} color="#9CA3AF" />}
             />
 
             <Input
@@ -222,7 +222,7 @@ export default function RegisterScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               error={errors.email}
-              leftIcon={<Ionicons name="mail-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="mail-outline" size={18} color="#9CA3AF" />}
             />
 
             <Input
@@ -232,10 +232,10 @@ export default function RegisterScreen() {
               onChangeText={update('password')}
               secureTextEntry={!showPassword}
               error={errors.password}
-              leftIcon={<Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="lock-closed-outline" size={18} color="#9CA3AF" />}
               rightIcon={
                 <TouchableOpacity onPress={() => setShowPassword((p) => !p)}>
-                  <Ionicons
+                  <AppIcon
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={18}
                     color="#9CA3AF"
@@ -251,7 +251,7 @@ export default function RegisterScreen() {
               onChangeText={update('username')}
               autoCapitalize="none"
               autoCorrect={false}
-              leftIcon={<Ionicons name="at-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="at-outline" size={18} color="#9CA3AF" />}
             />
 
             {/* Child Info */}
@@ -277,14 +277,14 @@ export default function RegisterScreen() {
                     value={form.childName}
                     onChangeText={update('childName')}
                     autoCapitalize="words"
-                    leftIcon={<Ionicons name="happy-outline" size={18} color="#9CA3AF" />}
+                    leftIcon={<AppIcon name="happy-outline" size={18} color="#9CA3AF" />}
                   />
                   <Input
                     label="Doğum Tarihi"
                     placeholder="YYYY-MM-DD"
                     value={form.childBirthDate}
                     onChangeText={update('childBirthDate')}
-                    leftIcon={<Ionicons name="calendar-outline" size={18} color="#9CA3AF" />}
+                    leftIcon={<AppIcon name="calendar-outline" size={18} color="#9CA3AF" />}
                   />
                 </>
               )}
@@ -299,7 +299,7 @@ export default function RegisterScreen() {
                 onPress={() => setConsents((c) => ({ ...c, terms: !c.terms }))}
                 activeOpacity={0.7}
               >
-                <Ionicons
+                <AppIcon
                   name={consents.terms ? 'checkbox' : 'square-outline'}
                   size={20}
                   color={consents.terms ? '#FF8A65' : '#9CA3AF'}
@@ -320,7 +320,7 @@ export default function RegisterScreen() {
                 onPress={() => setConsents((c) => ({ ...c, marketing: !c.marketing }))}
                 activeOpacity={0.7}
               >
-                <Ionicons
+                <AppIcon
                   name={consents.marketing ? 'checkbox' : 'square-outline'}
                   size={20}
                   color={consents.marketing ? '#FF8A65' : '#9CA3AF'}
@@ -335,7 +335,7 @@ export default function RegisterScreen() {
                 onPress={() => setConsents((c) => ({ ...c, sensitiveData: !c.sensitiveData }))}
                 activeOpacity={0.7}
               >
-                <Ionicons
+                <AppIcon
                   name={consents.sensitiveData ? 'checkbox' : 'square-outline'}
                   size={20}
                   color={consents.sensitiveData ? '#FF8A65' : '#9CA3AF'}
@@ -350,7 +350,7 @@ export default function RegisterScreen() {
                 onPress={() => setConsents((c) => ({ ...c, guardian: !c.guardian }))}
                 activeOpacity={0.7}
               >
-                <Ionicons
+                <AppIcon
                   name={consents.guardian ? 'checkbox' : 'square-outline'}
                   size={20}
                   color={consents.guardian ? '#FF8A65' : '#9CA3AF'}
@@ -382,7 +382,7 @@ export default function RegisterScreen() {
                 onPress={handleGooglePress}
                 disabled={!googleRequest || isLoading}
               >
-                <Ionicons name="logo-google" size={18} color="#EA4335" />
+                <AppIcon name="logo-google" size={18} color="#EA4335" />
                 <Text className="text-dark text-sm font-medium ml-2 flex-1">
                   Google ile Kayıt Ol
                 </Text>
@@ -395,7 +395,7 @@ export default function RegisterScreen() {
                   onPress={handleApplePress}
                   disabled={isLoading}
                 >
-                  <Ionicons name="logo-apple" size={18} color="#fff" />
+                  <AppIcon name="logo-apple" size={18} color="#fff" />
                   <Text className="text-white text-sm font-medium ml-2 flex-1">
                     Apple ile Kayıt Ol
                   </Text>

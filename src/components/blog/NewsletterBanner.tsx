@@ -9,9 +9,9 @@ import {
   Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { subscribeNewsletter } from '../../services/newsletter-service';
 
+import { AppIcon } from '../ui/AppIcon';
 interface NewsletterBannerProps {
   source: string;
 }
@@ -57,7 +57,7 @@ export function NewsletterBanner({ source }: NewsletterBannerProps) {
       {/* Icon + Title */}
       <View style={styles.header}>
         <View style={styles.iconCircle}>
-          <Ionicons name="mail-outline" size={24} color="#F97316" />
+          <AppIcon name="mail-outline" size={24} color="#F97316" />
         </View>
         <Text style={styles.title}>K&G Bülten</Text>
       </View>
@@ -86,7 +86,7 @@ export function NewsletterBanner({ source }: NewsletterBannerProps) {
         activeOpacity={0.8}
       >
         <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-          {agreed ? <Ionicons name="checkmark" size={14} color="#fff" /> : null}
+          {agreed ? <AppIcon name="checkmark" size={14} color="#fff" /> : null}
         </View>
         <Text style={styles.consentText}>
           {'Bültene üye olarak '}

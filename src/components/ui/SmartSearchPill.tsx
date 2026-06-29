@@ -3,8 +3,8 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
 import { SearchModal } from './SearchModal';
-import { AppIcon } from './AppIcon';
 
+import { AppIcon } from './AppIcon';
 function buildSuggestions(childName?: string, ageMonths?: number): string[] {
   const name = childName ?? 'Minik';
   const age = ageMonths !== undefined ? `${ageMonths} ay` : '';

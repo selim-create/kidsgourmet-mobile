@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
@@ -36,6 +35,7 @@ import {
   voteDiscussion,
 } from '../../src/services/community-service';
 import {
+
   decodeHtmlEntities,
   ensureCommentDefaults,
   ensureDiscussionDefaults,
@@ -43,6 +43,7 @@ import {
   stripHtml,
 } from '../../src/utils/helpers';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 type VoteKind = 'up' | 'down';
 
 function getVoteUpdate(currentVote: VoteKind | null | undefined, nextVote: VoteKind) {
@@ -390,7 +391,7 @@ export default function DiscussionDetailScreen() {
                 <Text style={styles.commentAuthorName}>{authorName}</Text>
                 {isExpert && (
                   <View style={styles.commentExpertBadge}>
-                    <Ionicons name="checkmark-circle" size={12} color="#16A34A" />
+                    <AppIcon name="checkmark-circle" size={12} color="#16A34A" />
                     <Text style={styles.commentExpertBadgeText}>Uzman Cevabı</Text>
                   </View>
                 )}
@@ -402,7 +403,7 @@ export default function DiscussionDetailScreen() {
             onPress={() => showReportAlert('comment', comment.id)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="ellipsis-horizontal" size={18} color={COLORS.gray[400]} />
+            <AppIcon name="ellipsis-horizontal" size={18} color={COLORS.gray[400]} />
           </TouchableOpacity>
         </View>
 
@@ -414,7 +415,7 @@ export default function DiscussionDetailScreen() {
             onPress={() => handleCommentVote(comment.id, 'up')}
             activeOpacity={0.7}
           >
-            <Ionicons
+            <AppIcon
               name={comment.user_vote === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
               size={15}
               color={comment.user_vote === 'up' ? COLORS.primary : COLORS.gray[400]}
@@ -431,7 +432,7 @@ export default function DiscussionDetailScreen() {
             onPress={() => handleCommentVote(comment.id, 'down')}
             activeOpacity={0.7}
           >
-            <Ionicons
+            <AppIcon
               name={comment.user_vote === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
               size={15}
               color={comment.user_vote === 'down' ? '#EF4444' : COLORS.gray[400]}
@@ -454,7 +455,7 @@ export default function DiscussionDetailScreen() {
               setReplyText('');
             }}
           >
-            <Ionicons name="return-down-back-outline" size={15} color={COLORS.gray[500]} />
+            <AppIcon name="return-down-back-outline" size={15} color={COLORS.gray[500]} />
             <Text style={styles.replyButtonText}>Yanıtla</Text>
           </TouchableOpacity>
         </View>
@@ -588,7 +589,7 @@ export default function DiscussionDetailScreen() {
                 onPress={() => discussion && showReportAlert('discussion', discussion.id)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Ionicons name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
+                <AppIcon name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
               </TouchableOpacity>
             </View>
 
@@ -612,7 +613,7 @@ export default function DiscussionDetailScreen() {
                 style={[styles.voteChip, discussion?.user_vote === 'up' && styles.voteChipUpActive]}
                 onPress={() => discussion && handleDiscussionVote(discussion.id, 'up')}
               >
-                <Ionicons
+                <AppIcon
                   name={discussion?.user_vote === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
                   size={16}
                   color={discussion?.user_vote === 'up' ? COLORS.primary : COLORS.gray[400]}
@@ -628,7 +629,7 @@ export default function DiscussionDetailScreen() {
                 style={[styles.voteChip, discussion?.user_vote === 'down' && styles.voteChipDownActive]}
                 onPress={() => discussion && handleDiscussionVote(discussion.id, 'down')}
               >
-                <Ionicons
+                <AppIcon
                   name={discussion?.user_vote === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
                   size={16}
                   color={discussion?.user_vote === 'down' ? '#EF4444' : COLORS.gray[400]}
@@ -641,7 +642,7 @@ export default function DiscussionDetailScreen() {
               </TouchableOpacity>
 
               <View style={styles.answerCountChip}>
-                <Ionicons name="chatbubble-outline" size={16} color={COLORS.gray[400]} />
+                <AppIcon name="chatbubble-outline" size={16} color={COLORS.gray[400]} />
                 <Text style={styles.answerCountText}>{answerCount}</Text>
               </View>
 
@@ -649,7 +650,7 @@ export default function DiscussionDetailScreen() {
                 style={styles.favoriteAction}
                 onPress={() => discussion && handleFavoriteToggle(discussion.id, discussion.is_favorite ?? false)}
               >
-                <Ionicons
+                <AppIcon
                   name={discussion?.is_favorite ? 'heart' : 'heart-outline'}
                   size={19}
                   color={discussion?.is_favorite ? '#EF4444' : COLORS.gray[400]}
@@ -727,7 +728,7 @@ export default function DiscussionDetailScreen() {
           onPress={handleSubmitComment}
           disabled={!commentText.trim() || submittingComment}
         >
-          <Ionicons name="send" size={18} color="#fff" />
+          <AppIcon name="send" size={18} color="#fff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

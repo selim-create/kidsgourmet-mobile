@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useConsents, useConsentHistory } from '../../../src/hooks/useConsents';
 import { useAuth } from '../../../src/contexts/AuthContext';
 import { EmptyState } from '../../../src/components/ui/EmptyState';
@@ -18,13 +17,14 @@ import { COLORS } from '../../../src/lib/constants';
 import type { ConsentType, UserConsent } from '../../../src/lib/types';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 // ─── Consent metadata ─────────────────────────────────────────────────────────
 
 interface ConsentMeta {
   type: ConsentType;
   label: string;
   description: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   canToggle: boolean;
 }
 
@@ -90,7 +90,7 @@ function ConsentHistorySection() {
             padding: 10,
           }}
         >
-          <Ionicons
+          <AppIcon
             name={entry.consented ? 'checkmark-circle-outline' : 'close-circle-outline'}
             size={16}
             color={entry.consented ? '#16A34A' : '#DC2626'}
@@ -124,7 +124,7 @@ export default function RizalarimScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.primary }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Rızalarım</Text>
         </View>
@@ -157,7 +157,7 @@ export default function RizalarimScreen() {
       <View style={{ backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <View>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Rızalarım</Text>
@@ -171,7 +171,7 @@ export default function RizalarimScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
         {/* Info Card */}
         <View style={{ backgroundColor: '#EFF6FF', borderRadius: 12, padding: 14, marginBottom: 20, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-          <Ionicons name="information-circle-outline" size={20} color="#2563EB" style={{ marginTop: 1 }} />
+          <AppIcon name="information-circle-outline" size={20} color="#2563EB" style={{ marginTop: 1 }} />
           <Text style={{ fontSize: 13, color: '#1E40AF', lineHeight: 19, flex: 1 }}>
             KVKK kapsamında verdiğiniz rızaları buradan yönetebilirsiniz. Kısıtlanamayan bazı işlemler gri gösterilir.
           </Text>
@@ -202,7 +202,7 @@ export default function RizalarimScreen() {
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                      <Ionicons name={meta.icon} size={18} color={COLORS.primary} />
+                      <AppIcon name={meta.icon} size={18} color={COLORS.primary} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 14, fontWeight: '700', color: '#1F2937' }}>
@@ -241,7 +241,7 @@ export default function RizalarimScreen() {
           onPress={() => router.push('/kvkk')}
           style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF7ED', borderRadius: 12, padding: 14, marginBottom: 16, borderWidth: 1, borderColor: '#FED7AA' }}
         >
-          <Ionicons name="document-text-outline" size={20} color={COLORS.primary} style={{ marginRight: 10 }} />
+          <AppIcon name="document-text-outline" size={20} color={COLORS.primary} style={{ marginRight: 10 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 13, fontWeight: '600', color: '#7C2D12' }}>
               KVKK Aydınlatma Metni
@@ -250,7 +250,7 @@ export default function RizalarimScreen() {
               Verilerinizin nasıl işlendiğini öğrenin
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
+          <AppIcon name="chevron-forward" size={16} color={COLORS.primary} />
         </TouchableOpacity>
 
         {/* Consent History Toggle */}
@@ -259,9 +259,9 @@ export default function RizalarimScreen() {
           onPress={() => setShowHistory((v) => !v)}
           style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3 }}
         >
-          <Ionicons name="time-outline" size={18} color="#6B7280" style={{ marginRight: 10 }} />
+          <AppIcon name="time-outline" size={18} color="#6B7280" style={{ marginRight: 10 }} />
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#374151', flex: 1 }}>Değişiklik Geçmişi</Text>
-          <Ionicons name={showHistory ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
+          <AppIcon name={showHistory ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
         </TouchableOpacity>
 
         {showHistory && (

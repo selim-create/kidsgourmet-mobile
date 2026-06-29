@@ -7,7 +7,6 @@ import {
   Linking,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '../../src/components/ui/Avatar';
@@ -15,12 +14,13 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { useExperts } from '../../src/hooks/useExperts';
 import type { ExpertPublicProfile, SocialLinks } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 function SocialIconButton({
   icon,
   color,
   url,
 }: {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
   color: string;
   url?: string;
 }) {
@@ -42,7 +42,7 @@ function SocialIconButton({
       }}
       activeOpacity={0.7}
     >
-      <Ionicons name={icon} size={15} color={color} />
+      <AppIcon name={String(icon)} size={15} color={color} />
     </TouchableOpacity>
   );
 }
@@ -107,7 +107,7 @@ function ExpertCard({ expert }: { expert: ExpertPublicProfile }) {
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="checkmark" size={11} color="#fff" />
+            <AppIcon name="checkmark" size={11} color="#fff" />
           </View>
         </View>
         <Text className="text-dark font-bold text-base text-center">
@@ -189,7 +189,7 @@ function ExpertCard({ expert }: { expert: ExpertPublicProfile }) {
           <Text className="text-green-600 font-semibold text-sm mr-1">
             Profili Görüntüle
           </Text>
-          <Ionicons name="arrow-forward" size={14} color="#16A34A" />
+          <AppIcon name="arrow-forward" size={14} color="#16A34A" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -209,13 +209,13 @@ export default function ExpertsListScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1 text-center">
             Uzmanlarımız
           </Text>
           <TouchableOpacity onPress={() => router.replace('/(tabs)' as never)}>
-            <Ionicons name="home-outline" size={22} color="#455A64" />
+            <AppIcon name="home-outline" size={22} color="#455A64" />
           </TouchableOpacity>
         </View>
       </View>
@@ -239,7 +239,7 @@ export default function ExpertsListScreen() {
           ) : error ? (
             <View className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
               <View className="flex-row items-center mb-2">
-                <Ionicons
+                <AppIcon
                   name="alert-circle-outline"
                   size={18}
                   color="#EF4444"
@@ -264,7 +264,7 @@ export default function ExpertsListScreen() {
           ) : (
             <View className="py-12 items-center">
               <View className="w-20 h-20 rounded-full bg-gray-100 items-center justify-center mb-4">
-                <Ionicons name="people-outline" size={36} color="#9CA3AF" />
+                <AppIcon name="people-outline" size={36} color="#9CA3AF" />
               </View>
               <Text className="text-dark text-lg font-semibold text-center mb-1">
                 Henüz uzman eklenmemiş

@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 
@@ -26,6 +25,7 @@ import { useAuth } from '../../src/contexts/AuthContext';
 import { COLORS } from '../../src/lib/constants';
 import type { IngredientGuideItem } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getAllergyBadge(risk?: string) {
@@ -69,7 +69,7 @@ function SectionHeader({
   icon,
   title,
 }: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   title: string;
 }) {
   return (
@@ -85,7 +85,7 @@ function SectionHeader({
           marginRight: 10,
         }}
       >
-        <Ionicons name={icon} size={17} color={COLORS.primary} />
+        <AppIcon name={icon} size={17} color={COLORS.primary} />
       </View>
       <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark }}>{title}</Text>
     </View>
@@ -99,7 +99,7 @@ function TipCard({
   title,
   text,
 }: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   title: string;
   text: string;
 }) {
@@ -152,7 +152,7 @@ function RelatedRecipeRow({ item }: { item: any }) {
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="restaurant-outline" size={28} color="#D1D5DB" />
+          <AppIcon name="restaurant-outline" size={28} color="#D1D5DB" />
         </View>
       )}
       <View style={{ padding: 10 }}>
@@ -236,7 +236,7 @@ export default function IngredientBySlugScreen() {
       >
         <DetailPageHeader title="Malzeme Detayı" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-          <Ionicons name="nutrition-outline" size={56} color="#9CA3AF" />
+          <AppIcon name="nutrition-outline" size={56} color="#9CA3AF" />
           <Text
             style={{
               color: COLORS.dark,
@@ -472,7 +472,7 @@ export default function IngredientBySlugScreen() {
                       key={idx}
                       style={{ flexDirection: 'row', alignItems: 'flex-start' }}
                     >
-                      <Ionicons
+                      <AppIcon
                         name="checkmark-circle"
                         size={16}
                         color="#16A34A"
@@ -658,7 +658,7 @@ export default function IngredientBySlugScreen() {
             gap: 6,
           }}
         >
-          <Ionicons
+          <AppIcon
             name={favorited ? 'heart' : 'heart-outline'}
             size={20}
             color={favorited ? '#EF4444' : '#6B7280'}
@@ -689,7 +689,7 @@ export default function IngredientBySlugScreen() {
             gap: 6,
           }}
         >
-          <Ionicons name="cart-outline" size={20} color="#fff" />
+          <AppIcon name="cart-outline" size={20} color="#fff" />
           <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>
             Listeye Ekle
           </Text>
@@ -711,7 +711,7 @@ export default function IngredientBySlugScreen() {
             paddingVertical: 11,
           }}
         >
-          <Ionicons name="share-social-outline" size={20} color="#6B7280" />
+          <AppIcon name="share-social-outline" size={20} color="#6B7280" />
         </TouchableOpacity>
       </View>
     </View>

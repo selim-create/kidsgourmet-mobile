@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import type { MealPlanEntry } from '../../lib/types';
 
+import { AppIcon } from './AppIcon';
 interface MealCardProps {
   meal: MealPlanEntry;
   onPress?: () => void;
@@ -45,7 +45,7 @@ export function MealCard({ meal, onPress }: MealCardProps) {
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="restaurant-outline" size={20} color="#FF8A65" />
+          <AppIcon name="restaurant-outline" size={20} color="#FF8A65" />
         </View>
       )}
       <View style={{ flex: 1, marginLeft: 12 }}>
@@ -57,7 +57,7 @@ export function MealCard({ meal, onPress }: MealCardProps) {
         </Text>
         {meal.recipe?.total_time ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-            <Ionicons name="time-outline" size={10} color="#9CA3AF" />
+            <AppIcon name="time-outline" size={10} color="#9CA3AF" />
             <Text style={{ fontSize: 10, color: '#9CA3AF', marginLeft: 2 }}>
               {meal.recipe.total_time} dk
             </Text>
@@ -65,9 +65,9 @@ export function MealCard({ meal, onPress }: MealCardProps) {
         ) : null}
       </View>
       {meal.is_completed ? (
-        <Ionicons name="checkmark-circle" size={20} color="#22C55E" />
+        <AppIcon name="checkmark-circle" size={20} color="#22C55E" />
       ) : (
-        <Ionicons name="ellipse-outline" size={20} color="#D1D5DB" />
+        <AppIcon name="ellipse-outline" size={20} color="#D1D5DB" />
       )}
     </TouchableOpacity>
   );

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 const FEATURES = [
   {
     id: 'expert',
@@ -51,7 +51,7 @@ export function FeaturesSection() {
           style={[styles.card, { borderLeftColor: feature.color1 }]}
         >
           <View style={[styles.iconWrap, { backgroundColor: feature.color1 + '18' }]}>
-            <Ionicons name={feature.icon} size={24} color={feature.color1} />
+            <AppIcon name={feature.icon} size={24} color={feature.color1} />
           </View>
           <View style={styles.cardContent}>
             <Text style={styles.cardTitle}>{feature.title}</Text>

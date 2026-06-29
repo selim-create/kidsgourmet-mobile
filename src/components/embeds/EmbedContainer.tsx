@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import type { EmbedData } from '../../lib/types';
 import { EmbedCard } from './EmbedCard';
 
+import { AppIcon } from '../ui/AppIcon';
 // ─── Embed Info (ported from web) ─────────────────────────────────────────────
 
 interface EmbedInfo {
   title: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
   color: string;
 }
 
@@ -39,7 +39,7 @@ export function EmbedContainer({ embed }: EmbedContainerProps) {
       {/* Header */}
       <View style={styles.header}>
         <View style={[styles.iconWrapper, { backgroundColor: info.color + '20' }]}>
-          <Ionicons name={info.icon} size={20} color={info.color} />
+          <AppIcon name={String(info.icon)} size={20} color={info.color} />
         </View>
         <Text style={styles.headerTitle} numberOfLines={1}>{info.title}</Text>
       </View>

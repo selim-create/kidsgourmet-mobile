@@ -14,7 +14,6 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSWRConfig } from 'swr';
 import Toast from 'react-native-toast-message';
@@ -29,8 +28,9 @@ import type { ComponentProps } from 'react';
 import type { SocialLinks } from '../../src/lib/types';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 type Gender = 'male' | 'female' | 'other';
-type IoniconName = ComponentProps<typeof Ionicons>['name'];
+type IoniconName = string;
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'female', label: 'Kadın' },
@@ -179,7 +179,7 @@ export default function ProfileEditScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">
             Profil Düzenle
@@ -216,7 +216,7 @@ export default function ProfileEditScreen() {
                 {uploadingAvatar ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Ionicons name="camera" size={16} color="#fff" />
+                  <AppIcon name="camera" size={16} color="#fff" />
                 )}
               </View>
             </View>
@@ -346,7 +346,7 @@ export default function ProfileEditScreen() {
               className="flex-1 text-dark text-base"
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons
+              <AppIcon
                 name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={20}
                 color="#9CA3AF"
@@ -398,7 +398,7 @@ export default function ProfileEditScreen() {
                   index < SOCIAL_FIELDS.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
-                <Ionicons name={field.icon} size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
+                <AppIcon name={field.icon} size={18} color="#9CA3AF" style={{ marginRight: 10 }} />
                 <TextInput
                   value={socialLinks[field.key] ?? ''}
                   onChangeText={(val) => {

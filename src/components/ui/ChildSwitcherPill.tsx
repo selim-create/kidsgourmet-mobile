@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { calculateAgeInMonths } from '../../utils/ageCalculator';
 import { formatChildAgeFromMonths } from '../../utils/formatChildAge';
@@ -8,6 +7,7 @@ import { COLORS } from '../../lib/constants';
 import { Avatar } from './Avatar';
 import { ChildSwitcherSheet } from './ChildSwitcherSheet';
 
+import { AppIcon } from './AppIcon';
 /** Returns a soft background color based on child's age in months. */
 function getAgeColor(ageMonths: number): string {
   if (ageMonths < 6)  return '#DBEAFE'; // blue-light
@@ -48,7 +48,7 @@ export function ChildSwitcherPill() {
           {firstName} · {formatChildAgeFromMonths(ageMonths)}
         </Text>
 
-        <Ionicons name="chevron-down" size={14} color={COLORS.gray[500]} style={styles.chevron} />
+        <AppIcon name="chevron-down" size={14} color={COLORS.gray[500]} style={styles.chevron} />
       </TouchableOpacity>
 
       <ChildSwitcherSheet

@@ -11,7 +11,6 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useIngredients } from '../../src/hooks/useIngredients';
 import { IngredientCard } from '../../src/components/ingredients/IngredientCard';
@@ -19,9 +18,10 @@ import { EmptyState } from '../../src/components/ui/EmptyState';
 import { COLORS } from '../../src/lib/constants';
 import type { IngredientGuideItem } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Category icon map ─────────────────────────────────────────────────────────
 
-const CATEGORY_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+const CATEGORY_ICONS: Record<string, string> = {
   Sebzeler: 'leaf-outline',
   Meyveler: 'nutrition-outline',
   'Et ve Balık': 'fish-outline',
@@ -33,7 +33,7 @@ const CATEGORY_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name
 
 function getCategoryIcon(
   cat: string,
-): React.ComponentProps<typeof Ionicons>['name'] {
+): string {
   return CATEGORY_ICONS[cat] ?? 'pricetag-outline';
 }
 
@@ -41,7 +41,7 @@ function getCategoryIcon(
 
 const SEASONS = ['İlkbahar', 'Yaz', 'Sonbahar', 'Kış'];
 
-const SEASON_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+const SEASON_ICONS: Record<string, string> = {
   İlkbahar: 'flower-outline',
   Yaz: 'sunny-outline',
   Sonbahar: 'leaf-outline',
@@ -92,7 +92,7 @@ export default function IngredientListScreen() {
 
         {/* Badge */}
         <View style={styles.heroBadge}>
-          <Ionicons name="leaf" size={12} color="#16A34A" />
+          <AppIcon name="leaf" size={12} color="#16A34A" />
           <Text style={styles.heroBadgeText}>GIDALAR</Text>
         </View>
 
@@ -106,7 +106,7 @@ export default function IngredientListScreen() {
 
         {/* Search bar */}
         <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+          <AppIcon name="search-outline" size={18} color="#9CA3AF" />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -117,7 +117,7 @@ export default function IngredientListScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <AppIcon name="close-circle" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           )}
         </View>
@@ -139,7 +139,7 @@ export default function IngredientListScreen() {
               onPress={() => router.push(guide.route as never)}
             >
               <View style={[styles.quickGuideIconWrap, { backgroundColor: guide.color + '22' }]}>
-                <Ionicons name={guide.icon} size={20} color={guide.color} />
+                <AppIcon name={guide.icon} size={20} color={guide.color} />
               </View>
               <Text style={styles.quickGuideText} numberOfLines={2}>
                 {guide.title}
@@ -169,7 +169,7 @@ export default function IngredientListScreen() {
                   active ? styles.chipActive : styles.chipPassive,
                 ]}
               >
-                <Ionicons
+                <AppIcon
                   name={getCategoryIcon(cat)}
                   size={14}
                   color={active ? '#fff' : '#6B7280'}
@@ -195,7 +195,7 @@ export default function IngredientListScreen() {
               activeOpacity={0.8}
               style={[styles.chip, styles.chipPassive, { marginRight: 6 }]}
             >
-              <Ionicons name="close" size={14} color="#6B7280" style={{ marginRight: 2 }} />
+              <AppIcon name="close" size={14} color="#6B7280" style={{ marginRight: 2 }} />
               <Text style={styles.chipText}>Temizle</Text>
             </TouchableOpacity>
           )}
@@ -211,7 +211,7 @@ export default function IngredientListScreen() {
                   active ? styles.chipSeasonActive : styles.chipPassive,
                 ]}
               >
-                <Ionicons
+                <AppIcon
                   name={SEASON_ICONS[s]}
                   size={14}
                   color={active ? '#fff' : '#6B7280'}

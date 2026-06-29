@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
-import { AppIcon } from '../ui/AppIcon';
+
 import { TOOLS, pickRandom, type ToolDefinition } from '../../lib/tools';
 
+import { AppIcon } from '../ui/AppIcon';
 export function ToolsSection() {
   // Pick 4 random tools once per render (useMemo so it's stable during a session)
   const tools = useMemo<ToolDefinition[]>(() => pickRandom(TOOLS, 4), []);

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { IngredientGuideItem, ListIngredient } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 // Accept both the new guide type and the legacy list type
 type IngredientCardItem = IngredientGuideItem | ListIngredient;
 
@@ -111,7 +111,7 @@ export function IngredientCard({ item, onPress }: IngredientCardProps) {
           </View>
         </View>
 
-        <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+        <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
       </View>
     </TouchableOpacity>
   );

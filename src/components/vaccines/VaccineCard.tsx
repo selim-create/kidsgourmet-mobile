@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { formatAgeMonths } from '../../utils/ageFormatter';
 import type { Vaccine } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface VaccineCardProps {
   vaccine: Vaccine;
   /** ISO date string when this vaccine was administered, if any */
@@ -61,7 +61,7 @@ export function VaccineCard({
           className="w-10 h-10 rounded-full items-center justify-center mr-3 mt-0.5"
           style={{ backgroundColor: statusBg }}
         >
-          <Ionicons name={statusIcon} size={20} color={statusColor} />
+          <AppIcon name={statusIcon} size={20} color={statusColor} />
         </View>
 
         {/* Info */}
@@ -85,7 +85,7 @@ export function VaccineCard({
           <View className="flex-row flex-wrap gap-2 mt-2">
             {vaccine.recommended_age_months !== undefined && (
               <View className="flex-row items-center">
-                <Ionicons name="calendar-outline" size={12} color="#9CA3AF" />
+                <AppIcon name="calendar-outline" size={12} color="#9CA3AF" />
                 <Text className="text-gray-400 text-xs ml-1">
                   Önerilen: {formatAgeMonths(vaccine.recommended_age_months)}
                 </Text>
@@ -94,7 +94,7 @@ export function VaccineCard({
 
             {vaccine.doses && vaccine.doses > 1 && (
               <View className="flex-row items-center">
-                <Ionicons name="layers-outline" size={12} color="#9CA3AF" />
+                <AppIcon name="layers-outline" size={12} color="#9CA3AF" />
                 <Text className="text-gray-400 text-xs ml-1">{vaccine.doses} doz</Text>
               </View>
             )}

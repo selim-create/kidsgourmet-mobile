@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
@@ -25,7 +24,7 @@ import { tariftenService, type TariftenSuggestion } from '../../../src/services/
 import { RecipeTariftenBanner } from '../../../src/components/recipe/RecipeTariftenBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
-import { AppIcon } from '../../../src/components/ui/AppIcon';
+
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Avatar } from '../../../src/components/ui/Avatar';
@@ -42,6 +41,7 @@ import { ApiError } from '../../../src/lib/api';
 import { TOOLS, pickRandom } from '../../../src/lib/tools';
 import type { SafetyCheck, Comment, Ingredient, RecipeSubstitute } from '../../../src/lib/types';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 // ─── Portion multiplier options (web-style labels) ───────────────────────────
 const PORTION_OPTIONS = [
   { label: '1 Öğün', value: 1 },
@@ -84,7 +84,7 @@ function StarRating({ rating, onRate, size = 24, readonly = false }: StarRatingP
           disabled={readonly}
           activeOpacity={readonly ? 1 : 0.7}
         >
-          <Ionicons
+          <AppIcon
             name={rating >= star ? 'star' : 'star-outline'}
             size={size}
             color={rating >= star ? '#F59E0B' : '#D1D5DB'}
@@ -141,7 +141,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
             flexShrink: 0,
           }}
         >
-          {isChecked ? <Ionicons name="checkmark" size={12} color="#fff" /> : null}
+          {isChecked ? <AppIcon name="checkmark" size={12} color="#fff" /> : null}
         </View>
 
         {/* Name + amount */}
@@ -170,7 +170,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="help-circle-outline" size={18} color="#6B7280" />
+              <AppIcon name="help-circle-outline" size={18} color="#6B7280" />
             </TouchableOpacity>
           ) : null}
           {hasSubstitute ? (
@@ -179,7 +179,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="swap-horizontal-outline" size={18} color={COLORS.primary} />
+              <AppIcon name="swap-horizontal-outline" size={18} color={COLORS.primary} />
             </TouchableOpacity>
           ) : null}
           {hasAllergen ? (
@@ -188,7 +188,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="alert-circle-outline" size={18} color="#F59E0B" />
+              <AppIcon name="alert-circle-outline" size={18} color="#F59E0B" />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -272,7 +272,7 @@ function IngredientRow({ ing, portionMultiplier, isChecked, onToggle, isExpanded
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons name="swap-horizontal-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="swap-horizontal-outline" size={20} color={COLORS.primary} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark }}>
@@ -597,7 +597,7 @@ export default function RecipeDetailScreen() {
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <DetailHeader transparent />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-          <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
+          <AppIcon name="alert-circle-outline" size={48} color="#EF4444" />
           <Text style={{ color: '#374151', fontWeight: '700', fontSize: 18, marginTop: 16 }}>
             Tarif yüklenemedi
           </Text>
@@ -703,7 +703,7 @@ export default function RecipeDetailScreen() {
           {/* ── Expert Approved badge ── */}
           {recipe.is_expert_approved ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-              <Ionicons name="shield-checkmark" size={16} color="#22C55E" />
+              <AppIcon name="shield-checkmark" size={16} color="#22C55E" />
               <Text style={{ color: '#15803D', fontSize: 13, marginLeft: 6, fontWeight: '600' }}>
                 Uzman Onaylı Tarif
               </Text>
@@ -751,7 +751,7 @@ export default function RecipeDetailScreen() {
                     padding: 6,
                   }}
                 >
-                  <Ionicons name="shield-checkmark" size={18} color="#22C55E" />
+                  <AppIcon name="shield-checkmark" size={18} color="#22C55E" />
                 </View>
               ) : null}
             </View>
@@ -768,7 +768,7 @@ export default function RecipeDetailScreen() {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', gap: 8 }}>
               {recipe.prep_time ? (
                 <View style={{ alignItems: 'center', minWidth: 64 }}>
-                  <Ionicons name="cut-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="cut-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Hazırlık</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
                     {formatDuration(recipe.prep_time)}
@@ -777,7 +777,7 @@ export default function RecipeDetailScreen() {
               ) : null}
               {recipe.cook_time ? (
                 <View style={{ alignItems: 'center', minWidth: 64 }}>
-                  <Ionicons name="flame-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="flame-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Pişirme</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
                     {formatDuration(recipe.cook_time)}
@@ -786,7 +786,7 @@ export default function RecipeDetailScreen() {
               ) : null}
               {totalTime > 0 ? (
                 <View style={{ alignItems: 'center', minWidth: 64 }}>
-                  <Ionicons name="time-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="time-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Toplam</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
                     {formatDuration(totalTime)}
@@ -795,7 +795,7 @@ export default function RecipeDetailScreen() {
               ) : null}
               {recipe.servings ? (
                 <View style={{ alignItems: 'center', minWidth: 64 }}>
-                  <Ionicons name="people-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="people-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Porsiyon</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
                     {recipe.servings} kişilik
@@ -804,7 +804,7 @@ export default function RecipeDetailScreen() {
               ) : null}
               {recipe.difficulty ? (
                 <View style={{ alignItems: 'center', minWidth: 64 }}>
-                  <Ionicons name="bar-chart-outline" size={20} color={COLORS.primary} />
+                  <AppIcon name="bar-chart-outline" size={20} color={COLORS.primary} />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>Zorluk</Text>
                   <Text style={{ color: COLORS.dark, fontWeight: '600', fontSize: 13, marginTop: 2 }}>
                     {DIFFICULTY_LABELS[recipe.difficulty] ?? recipe.difficulty}
@@ -840,7 +840,7 @@ export default function RecipeDetailScreen() {
                     onPress={() => router.push(`/(tabs)/recipes?meal_type=${encodeURIComponent(recipe.meal_type as string)}` as never)}
                   >
                     <View style={{ backgroundColor: '#FFF3EE', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                      <Ionicons name="restaurant-outline" size={11} color={COLORS.primary} />
+                      <AppIcon name="restaurant-outline" size={11} color={COLORS.primary} />
                       <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>{recipe.meal_type}</Text>
                     </View>
                   </TouchableOpacity>
@@ -852,7 +852,7 @@ export default function RecipeDetailScreen() {
                     onPress={() => router.push(`/(tabs)/recipes?diet_type=${encodeURIComponent(dt)}` as never)}
                   >
                     <View style={{ backgroundColor: '#F0FDF4', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                      <Ionicons name="leaf-outline" size={11} color="#15803D" />
+                      <AppIcon name="leaf-outline" size={11} color="#15803D" />
                       <Text style={{ fontSize: 12, color: '#15803D', fontWeight: '600' }}>{dt}</Text>
                     </View>
                   </TouchableOpacity>
@@ -951,7 +951,7 @@ export default function RecipeDetailScreen() {
                     gap: 6,
                   }}
                 >
-                  <Ionicons name="logo-whatsapp" size={18} color="#fff" />
+                  <AppIcon name="logo-whatsapp" size={18} color="#fff" />
                   <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>WhatsApp</Text>
                 </TouchableOpacity>
 
@@ -969,7 +969,7 @@ export default function RecipeDetailScreen() {
                     gap: 6,
                   }}
                 >
-                  <Ionicons name="copy-outline" size={18} color={COLORS.dark} />
+                  <AppIcon name="copy-outline" size={18} color={COLORS.dark} />
                   <Text style={{ color: COLORS.dark, fontSize: 13, fontWeight: '600' }}>Listeyi Kopyala</Text>
                 </TouchableOpacity>
               </View>
@@ -1012,7 +1012,7 @@ export default function RecipeDetailScreen() {
                     flexShrink: 0,
                   }}
                 >
-                  <Ionicons name="swap-horizontal-outline" size={20} color="#fff" />
+                  <AppIcon name="swap-horizontal-outline" size={20} color="#fff" />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.dark }}>
@@ -1024,7 +1024,7 @@ export default function RecipeDetailScreen() {
                       : 'Alternatif tariflere git →'}
                   </Text>
                 </View>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
+                <AppIcon name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           ) : null}
@@ -1060,7 +1060,7 @@ export default function RecipeDetailScreen() {
                       }}
                     >
                       {isCompleted ? (
-                        <Ionicons name="checkmark" size={18} color="#fff" />
+                        <AppIcon name="checkmark" size={18} color="#fff" />
                       ) : (
                         <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{stepNumber}</Text>
                       )}
@@ -1108,7 +1108,7 @@ export default function RecipeDetailScreen() {
             >
               {/* Header */}
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                <Ionicons name="shield-checkmark" size={18} color="#15803D" style={{ marginRight: 8 }} />
+                <AppIcon name="shield-checkmark" size={18} color="#15803D" style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: '#15803D' }}>
                   Uzman Görüşü
                 </Text>
@@ -1176,7 +1176,7 @@ export default function RecipeDetailScreen() {
           {recipe.allergens && recipe.allergens.length > 0 ? (
             <Card style={{ marginBottom: 16, backgroundColor: '#FFFBE6', borderWidth: 1, borderColor: '#FDE68A' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="warning-outline" size={18} color="#D97706" style={{ marginRight: 8 }} />
+                <AppIcon name="warning-outline" size={18} color="#D97706" style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: '#D97706' }}>
                   Alerjen Uyarısı
                 </Text>
@@ -1214,7 +1214,7 @@ export default function RecipeDetailScreen() {
           {recipe.special_notes ? (
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="document-text-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+                <AppIcon name="document-text-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.dark }}>
                   Özel Notlar
                 </Text>
@@ -1303,7 +1303,7 @@ export default function RecipeDetailScreen() {
                   borderColor: '#FFE4D2',
                 }}
               >
-                <Ionicons name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
+                <AppIcon name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
                 <Text style={{ fontSize: 16, fontWeight: '700', color: '#0F172A', marginTop: 12, textAlign: 'center' }}>
                   Yorum yapmak için giriş yapın
                 </Text>
@@ -1473,7 +1473,7 @@ export default function RecipeDetailScreen() {
                     flexShrink: 0,
                   }}
                 >
-                  <Ionicons name="chatbubble-ellipses-outline" size={26} color={COLORS.primary} />
+                  <AppIcon name="chatbubble-ellipses-outline" size={26} color={COLORS.primary} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.dark, marginBottom: 6 }}>
@@ -1484,7 +1484,7 @@ export default function RecipeDetailScreen() {
                   </Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.primary, alignSelf: 'flex-start', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, gap: 6 }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Soru Sor</Text>
-                    <Ionicons name="arrow-forward" size={15} color="#fff" />
+                    <AppIcon name="arrow-forward" size={15} color="#fff" />
                   </View>
                 </View>
               </View>
@@ -1518,7 +1518,7 @@ export default function RecipeDetailScreen() {
                         }}
                       >
                         <Text style={{ fontSize: 12, color: COLORS.dark }}>{ing.name}</Text>
-                        <Ionicons name="chevron-forward" size={10} color="#9CA3AF" />
+                        <AppIcon name="chevron-forward" size={10} color="#9CA3AF" />
                       </View>
                     </TouchableOpacity>
                   );

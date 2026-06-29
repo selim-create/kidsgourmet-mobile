@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 export function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -24,7 +24,7 @@ export function NewsletterSection() {
     <View style={styles.card}>
       {/* Icon */}
       <View style={styles.iconWrap}>
-        <Ionicons name="mail-outline" size={28} color={COLORS.primary} />
+        <AppIcon name="mail-outline" size={28} color={COLORS.primary} />
       </View>
 
       {/* Title */}
@@ -38,7 +38,7 @@ export function NewsletterSection() {
 
       {subscribed ? (
         <View style={styles.successRow}>
-          <Ionicons name="checkmark-circle" size={20} color="#22C55E" />
+          <AppIcon name="checkmark-circle" size={20} color="#22C55E" />
           <Text style={styles.successText}>
             Abone oldunuz! Teşekkür ederiz 🎉
           </Text>

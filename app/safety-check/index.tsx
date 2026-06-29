@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { checkIngredientSafety } from '../../src/services/safety-service';
 import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 import { COLORS } from '../../src/lib/constants';
 import type { SafetyCheckResult } from '../../src/lib/types';
 import {
+
   getSafetyConfig,
   validateFoodQuery,
   MSG_API_ERROR,
@@ -27,6 +27,7 @@ import {
   REFERENCE_NOTE,
 } from '../../src/lib/tools/safety-check';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function SafetyCheckScreen() {
   const { activeChild } = useActiveChild();
   const [query, setQuery] = useState('');
@@ -90,7 +91,7 @@ export default function SafetyCheckScreen() {
             style={{ marginRight: 12, padding: 4 }}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', flex: 1 }}>
             Bu Gıda Verilir mi? 🔍
@@ -129,7 +130,7 @@ export default function SafetyCheckScreen() {
                 alignItems: 'flex-start',
               }}
             >
-              <Ionicons name="information-circle-outline" size={20} color="#D97706" />
+              <AppIcon name="information-circle-outline" size={20} color="#D97706" />
               <Text style={{ fontSize: 13, color: '#92400E', marginLeft: 10, flex: 1, lineHeight: 19 }}>
                 {MSG_NO_CHILD}
               </Text>
@@ -195,7 +196,7 @@ export default function SafetyCheckScreen() {
                 {isChecking ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Ionicons name="search" size={18} color={query.trim() ? '#fff' : '#9CA3AF'} />
+                  <AppIcon name="search" size={18} color={query.trim() ? '#fff' : '#9CA3AF'} />
                 )}
               </TouchableOpacity>
             </View>
@@ -230,7 +231,7 @@ export default function SafetyCheckScreen() {
             >
               {/* Level header */}
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name={safetyConfig.icon} size={24} color={safetyConfig.border} />
+                <AppIcon name={safetyConfig.icon} size={24} color={safetyConfig.border} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: safetyConfig.text }}>
                     {checkedName}

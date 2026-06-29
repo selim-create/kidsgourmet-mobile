@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 interface PrepAgeItem {
   age?: string;
   age_range?: string;
@@ -67,12 +67,12 @@ function AgeCard({ item, index }: { item: PrepAgeItem; index: number }) {
             marginRight: 10,
           }}
         >
-          <Ionicons name="time-outline" size={16} color={COLORS.primary} />
+          <AppIcon name="time-outline" size={16} color={COLORS.primary} />
         </View>
         <Text style={{ flex: 1, fontSize: 14, fontWeight: '700', color: COLORS.dark }}>
           {ageLabel}
         </Text>
-        <Ionicons
+        <AppIcon
           name={expanded ? 'chevron-up' : 'chevron-down'}
           size={18}
           color="#6B7280"
@@ -101,7 +101,7 @@ function AgeCard({ item, index }: { item: PrepAgeItem; index: number }) {
                 padding: 8,
               }}
             >
-              <Ionicons name="information-circle-outline" size={16} color="#D97706" style={{ marginRight: 6, marginTop: 1 }} />
+              <AppIcon name="information-circle-outline" size={16} color="#D97706" style={{ marginRight: 6, marginTop: 1 }} />
               <Text style={{ flex: 1, fontSize: 12, color: '#92400E', lineHeight: 18 }}>
                 {notes}
               </Text>
@@ -113,10 +113,10 @@ function AgeCard({ item, index }: { item: PrepAgeItem; index: number }) {
   );
 }
 
-function Row({ icon, label, value }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; value: string }) {
+function Row({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-      <Ionicons name={icon} size={14} color={COLORS.primary} style={{ marginRight: 6, marginTop: 2 }} />
+      <AppIcon name={icon} size={14} color={COLORS.primary} style={{ marginRight: 6, marginTop: 2 }} />
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 11, fontWeight: '600', color: '#6B7280', textTransform: 'uppercase', marginBottom: 1 }}>
           {label}

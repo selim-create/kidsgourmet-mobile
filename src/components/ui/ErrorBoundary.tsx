@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 interface Props {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -38,7 +38,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       }
       return (
         <View className="flex-1 items-center justify-center bg-light px-6">
-          <Ionicons name="alert-circle-outline" size={56} color={COLORS.primary} />
+          <AppIcon name="alert-circle-outline" size={56} color={COLORS.primary} />
           <Text className="text-dark text-xl font-bold mt-4 text-center">
             Bir şeyler ters gitti
           </Text>

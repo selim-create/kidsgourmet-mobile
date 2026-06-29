@@ -2,8 +2,8 @@ import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../src/lib/constants';
-import { AppIcon } from '../../src/components/ui/AppIcon';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const bottomPadding = Platform.select({

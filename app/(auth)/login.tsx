@@ -8,7 +8,6 @@ import {
   Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
@@ -19,6 +18,7 @@ import { Input } from '../../src/components/ui/Input';
 import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function LoginScreen() {
   const { login, refreshUser } = useAuth();
   const [username, setUsername] = useState('');
@@ -169,7 +169,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               error={errors.username}
-              leftIcon={<Ionicons name="person-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="person-outline" size={18} color="#9CA3AF" />}
             />
 
             <Input
@@ -179,10 +179,10 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               error={errors.password}
-              leftIcon={<Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />}
+              leftIcon={<AppIcon name="lock-closed-outline" size={18} color="#9CA3AF" />}
               rightIcon={
                 <TouchableOpacity onPress={() => setShowPassword((p) => !p)}>
-                  <Ionicons
+                  <AppIcon
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={18}
                     color="#9CA3AF"
@@ -220,7 +220,7 @@ export default function LoginScreen() {
                 onPress={handleGooglePress}
                 disabled={!googleRequest || isLoading}
               >
-                <Ionicons name="logo-google" size={18} color="#EA4335" />
+                <AppIcon name="logo-google" size={18} color="#EA4335" />
                 <Text className="text-dark text-sm font-medium ml-2 flex-1">
                   Google ile Giriş Yap
                 </Text>
@@ -233,7 +233,7 @@ export default function LoginScreen() {
                   onPress={handleApplePress}
                   disabled={isLoading}
                 >
-                  <Ionicons name="logo-apple" size={18} color="#fff" />
+                  <AppIcon name="logo-apple" size={18} color="#fff" />
                   <Text className="text-white text-sm font-medium ml-2 flex-1">
                     Apple ile Giriş Yap
                   </Text>

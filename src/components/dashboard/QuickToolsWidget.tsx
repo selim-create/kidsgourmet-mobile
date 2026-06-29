@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+import { AppIcon } from '../ui/AppIcon';
+type IoniconName = string;
 
 interface QuickTool {
   icon: IoniconName;
@@ -118,7 +118,7 @@ export function QuickToolsWidget() {
                 justifyContent: 'center',
               }}
             >
-              <Ionicons name={tool.icon} size={18} color={tool.color} />
+              <AppIcon name={tool.icon} size={18} color={tool.color} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: '#1F2937' }} numberOfLines={1}>

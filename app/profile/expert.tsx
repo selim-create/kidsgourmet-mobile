@@ -10,13 +10,13 @@ import {
   Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { updateUserProfile } from '../../src/services/user-service';
 import type { SocialLinks } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 const SOCIAL_FIELDS: {
   key: keyof SocialLinks;
   label: string;
@@ -126,7 +126,7 @@ export default function ExpertScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">
             Uzman Profili
@@ -153,7 +153,7 @@ export default function ExpertScreen() {
                   {tag}
                 </Text>
                 <TouchableOpacity onPress={() => removeExpertise(tag)}>
-                  <Ionicons name="close" size={14} color="#FF8A65" />
+                  <AppIcon name="close" size={14} color="#FF8A65" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -175,7 +175,7 @@ export default function ExpertScreen() {
               className="bg-primary rounded-xl px-4 items-center justify-center"
               activeOpacity={0.8}
             >
-              <Ionicons name="add" size={22} color="#fff" />
+              <AppIcon name="add" size={22} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -203,7 +203,7 @@ export default function ExpertScreen() {
           {SOCIAL_FIELDS.map((field) => (
             <View key={field.key} className="flex-row items-center mb-3">
               <View className="w-10 h-10 bg-gray-100 rounded-xl items-center justify-center mr-3">
-                <Ionicons
+                <AppIcon
                   name={field.icon as 'globe-outline'}
                   size={20}
                   color="#6B7280"

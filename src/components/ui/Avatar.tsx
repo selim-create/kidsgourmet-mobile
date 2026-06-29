@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 
+import { AppIcon } from './AppIcon';
 interface AvatarProps {
   uri?: string | null;
   name?: string;
@@ -59,7 +59,7 @@ export function Avatar({ uri, name, size = 40, className }: AvatarProps) {
       style={style}
       className={`bg-gray-200 items-center justify-center ${className ?? ''}`}
     >
-      <Ionicons name="person" size={size * 0.5} color="#9CA3AF" />
+      <AppIcon name="person" size={size * 0.5} color="#9CA3AF" />
     </View>
   );
 }

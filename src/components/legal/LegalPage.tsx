@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface LegalPageProps {
@@ -153,7 +153,7 @@ export function LegalPage({ title, subtitle, breadcrumb, date, children }: Legal
       <View style={{ backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }} numberOfLines={1}>

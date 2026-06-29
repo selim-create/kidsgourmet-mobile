@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { Recipe } from '../../lib/types';
 import { Avatar } from '../ui/Avatar';
@@ -10,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatDuration, getAgeGroupColor, getAgeGroupTextColor } from '../../utils/helpers';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 interface RecipeCardProps {
   recipe: Recipe;
   onPress?: () => void;
@@ -157,7 +157,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
               elevation: 3,
             })}
           >
-            <Ionicons
+            <AppIcon
               name={favorite ? 'heart' : 'heart-outline'}
               size={20}
               color={favorite ? '#EF4444' : '#6B7280'}
@@ -181,7 +181,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="checkmark" size={12} color="#fff" />
+            <AppIcon name="checkmark" size={12} color="#fff" />
           </View>
         ) : null}
 
@@ -201,7 +201,7 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
               backgroundColor: 'rgba(0,0,0,0.6)',
             }}
           >
-            <Ionicons name="time-outline" size={12} color="#fff" />
+            <AppIcon name="time-outline" size={12} color="#fff" />
             <Text style={{ color: '#fff', fontWeight: '600', marginLeft: 4, fontSize: 11 }}>
               {formatDuration(totalTime)}
             </Text>

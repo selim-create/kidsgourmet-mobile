@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type {
+
   EmbedItem,
   RecipeEmbedItem,
   IngredientEmbedItem,
@@ -11,6 +11,7 @@ import type {
   PostEmbedItem,
 } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 // ─── Age Group Colors (ported from web) ───────────────────────────────────────
 
 const AGE_GROUP_COLORS: Record<string, { bg: string; text: string }> = {
@@ -78,7 +79,7 @@ function RecipeCard({ item }: { item: RecipeEmbedItem }) {
         />
       ) : (
         <View style={[styles.image, styles.imagePlaceholder]}>
-          <Ionicons name="restaurant-outline" size={28} color="#AED581" />
+          <AppIcon name="restaurant-outline" size={28} color="#AED581" />
         </View>
       )}
       <View style={styles.textBlock}>
@@ -118,7 +119,7 @@ function IngredientCard({ item }: { item: IngredientEmbedItem }) {
         />
       ) : (
         <View style={[styles.image, styles.imagePlaceholder]}>
-          <Ionicons name="leaf-outline" size={28} color="#AED581" />
+          <AppIcon name="leaf-outline" size={28} color="#AED581" />
         </View>
       )}
       <View style={styles.textBlock}>
@@ -147,7 +148,7 @@ function ToolCard({ item }: { item: ToolEmbedItem }) {
       hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
     >
       <View style={[styles.image, styles.toolPlaceholder]}>
-        <Ionicons name="sparkles" size={28} color="#fff" />
+        <AppIcon name="sparkles" size={28} color="#fff" />
       </View>
       <View style={styles.textBlock}>
         <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
@@ -179,7 +180,7 @@ function PostCard({ item }: { item: PostEmbedItem }) {
         />
       ) : (
         <View style={[styles.image, styles.imagePlaceholder]}>
-          <Ionicons name="newspaper-outline" size={28} color="#AED581" />
+          <AppIcon name="newspaper-outline" size={28} color="#AED581" />
         </View>
       )}
       <View style={styles.textBlock}>

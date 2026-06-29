@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type FontAwesomeIconName = React.ComponentProps<typeof FontAwesome>['name'];
@@ -111,7 +112,7 @@ function NewsletterForm() {
   if (subscribed) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
-        <Ionicons name="checkmark-circle" size={20} color="#22C55E" />
+        <AppIcon name="checkmark-circle" size={20} color="#22C55E" />
         <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>
           Abone oldunuz! Teşekkür ederiz 🎉
         </Text>
@@ -247,7 +248,7 @@ export function Footer() {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <Ionicons name="mail-outline" size={22} color="#fff" />
+            <AppIcon name="mail-outline" size={22} color="#fff" />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '800', lineHeight: 22 }}>

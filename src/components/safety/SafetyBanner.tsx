@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import type { SafetyCheck } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface SafetyBannerProps {
   safetyData: SafetyCheck | SafetyCheck[] | null | undefined;
   isLoading?: boolean;
@@ -51,7 +51,7 @@ export function SafetyBanner({ safetyData, isLoading }: SafetyBannerProps) {
   if (isLoading) {
     return (
       <View className="bg-gray-50 rounded-2xl p-4 mb-4 flex-row items-center">
-        <Ionicons name="shield-outline" size={20} color="#9CA3AF" />
+        <AppIcon name="shield-outline" size={20} color="#9CA3AF" />
         <Text className="text-gray-400 text-sm ml-2">Güvenlik kontrolü yapılıyor...</Text>
       </View>
     );
@@ -78,13 +78,13 @@ export function SafetyBanner({ safetyData, isLoading }: SafetyBannerProps) {
         onPress={() => hasDetails && setExpanded((v) => !v)}
       >
         <View className="flex-row items-center flex-1">
-          <Ionicons name={config.icon} size={22} color={config.iconColor} />
+          <AppIcon name={config.icon} size={22} color={config.iconColor} />
           <Text className="font-bold text-sm ml-2" style={{ color: config.textColor }}>
             {emoji} {config.title}
           </Text>
         </View>
         {hasDetails && (
-          <Ionicons
+          <AppIcon
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={16}
             color={config.iconColor}

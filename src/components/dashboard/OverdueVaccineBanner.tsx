@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { Vaccine } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface OverdueVaccineBannerProps {
   overdueVaccines: Vaccine[];
 }
@@ -26,7 +26,7 @@ export function OverdueVaccineBanner({ overdueVaccines }: OverdueVaccineBannerPr
         borderLeftColor: '#EF4444',
       }}
     >
-      <Ionicons name="medical-outline" size={18} color="#DC2626" />
+      <AppIcon name="medical-outline" size={18} color="#DC2626" />
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text style={{ fontSize: 13, fontWeight: '700', color: '#991B1B' }}>
           Gecikmiş Aşı
@@ -37,7 +37,7 @@ export function OverdueVaccineBanner({ overdueVaccines }: OverdueVaccineBannerPr
             : `${overdueVaccines.length} aşı gecikmiş`}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color="#DC2626" />
+      <AppIcon name="chevron-forward" size={16} color="#DC2626" />
     </TouchableOpacity>
   );
 }

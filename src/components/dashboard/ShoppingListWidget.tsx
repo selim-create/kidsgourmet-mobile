@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { ShoppingListItem } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface ShoppingListWidgetProps {
   items: ShoppingListItem[];
   isLoading?: boolean;
@@ -38,7 +38,7 @@ export function ShoppingListWidget({ items, isLoading }: ShoppingListWidgetProps
           marginRight: 12,
         }}
       >
-        <Ionicons name="cart-outline" size={22} color="#16A34A" />
+        <AppIcon name="cart-outline" size={22} color="#16A34A" />
       </View>
       <View style={{ flex: 1 }}>
         {isLoading ? (
@@ -53,7 +53,7 @@ export function ShoppingListWidget({ items, isLoading }: ShoppingListWidgetProps
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={18} color="#16A34A" />
+      <AppIcon name="chevron-forward" size={18} color="#16A34A" />
     </TouchableOpacity>
   );
 }

@@ -11,7 +11,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
@@ -31,6 +30,7 @@ import {
 import { addFavoriteItem, removeFavoriteItem } from '../../src/services/favorites-service';
 import type { Circle, Discussion, TopContributor } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── TopContributorCard ───────────────────────────────────────────────────────
 
 function getProfileSlug(person: { id: number; slug?: string }): string {
@@ -267,7 +267,7 @@ export default function CommunityHomeScreen() {
           onPress={() => router.push('/(tabs)/topluluk/soru-sor' as never)}
           activeOpacity={0.7}
         >
-          <Ionicons name="create-outline" size={24} color={COLORS.primary} />
+          <AppIcon name="create-outline" size={24} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
 
@@ -313,7 +313,7 @@ export default function CommunityHomeScreen() {
 
             {/* ── Search ────────────────────────────────────────────────────── */}
             <View style={styles.searchContainer}>
-              <Ionicons name="search-outline" size={18} color={COLORS.gray[400]} style={styles.searchIcon} />
+              <AppIcon name="search-outline" size={18} color={COLORS.gray[400]} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Tartışmalarda ara..."
@@ -395,7 +395,7 @@ export default function CommunityHomeScreen() {
             {discussions.length > 0 && (
               <View style={styles.rulesCard}>
                 <View style={styles.rulesHeader}>
-                  <Ionicons name="shield-checkmark-outline" size={18} color={COLORS.primary} />
+                  <AppIcon name="shield-checkmark-outline" size={18} color={COLORS.primary} />
                   <Text style={styles.rulesTitle}>Topluluk Kuralları</Text>
                 </View>
                 <Text style={styles.rulesItem}>
@@ -426,7 +426,7 @@ export default function CommunityHomeScreen() {
         onPress={() => router.push('/(tabs)/topluluk/soru-sor' as never)}
         activeOpacity={0.85}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <AppIcon name="add" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
   );

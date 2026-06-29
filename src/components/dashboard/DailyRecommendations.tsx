@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import type { Recipe } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface DailyRecommendationsProps {
   recommendations: Recipe[];
   isLoading?: boolean;
@@ -66,7 +66,7 @@ export function DailyRecommendations({ recommendations, isLoading }: DailyRecomm
               </Text>
               {recipe.total_time ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                  <Ionicons name="time-outline" size={10} color="#9CA3AF" />
+                  <AppIcon name="time-outline" size={10} color="#9CA3AF" />
                   <Text style={{ fontSize: 10, color: '#9CA3AF', marginLeft: 3 }}>
                     {recipe.total_time} dk
                   </Text>

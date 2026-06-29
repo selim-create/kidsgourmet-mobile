@@ -8,7 +8,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useBlog } from '../../src/hooks/use-blog';
 import { useBlogCategories } from '../../src/hooks/use-blog-categories';
@@ -19,6 +18,7 @@ import { EmptyState } from '../../src/components/ui/EmptyState';
 import { COLORS } from '../../src/lib/constants';
 import { useSWRConfig } from 'swr';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function BlogListScreen() {
   const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
   const [page, setPage] = useState(1);
@@ -47,12 +47,12 @@ export default function BlogListScreen() {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={() => router.back()} activeOpacity={0.8}>
-              <Ionicons name="arrow-back" size={24} color={COLORS.dark} />
+              <AppIcon name="arrow-back" size={24} color={COLORS.dark} />
             </TouchableOpacity>
             <Text className="text-dark text-xl font-bold">Blog & Keşfet</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/search')} activeOpacity={0.8}>
-            <Ionicons name="search-outline" size={22} color={COLORS.dark} />
+            <AppIcon name="search-outline" size={22} color={COLORS.dark} />
           </TouchableOpacity>
         </View>
       </View>
@@ -109,7 +109,7 @@ export default function BlogListScreen() {
                     page === 1 ? 'border-gray-200 opacity-40' : 'border-primary'
                   }`}
                 >
-                  <Ionicons
+                  <AppIcon
                     name="chevron-back"
                     size={18}
                     color={page === 1 ? '#D1D5DB' : COLORS.primary}
@@ -128,7 +128,7 @@ export default function BlogListScreen() {
                     page === totalPages ? 'border-gray-200 opacity-40' : 'border-primary'
                   }`}
                 >
-                  <Ionicons
+                  <AppIcon
                     name="chevron-forward"
                     size={18}
                     color={page === totalPages ? '#D1D5DB' : COLORS.primary}

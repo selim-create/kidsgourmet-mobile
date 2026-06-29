@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../../src/components/ui/AppHeader';
 import { BlogCard } from '../../src/components/blog/BlogCard';
 import { CategoryChips } from '../../src/components/blog/CategoryChips';
@@ -17,6 +16,7 @@ import { useBlog } from '../../src/hooks/use-blog';
 import { useBlogCategories } from '../../src/hooks/use-blog-categories';
 import { COLORS } from '../../src/lib/constants';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function DiscoverScreen() {
   const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
   const { categories } = useBlogCategories();
@@ -69,13 +69,13 @@ export default function DiscoverScreen() {
           onPress={() => router.push('/ingredient')}
         >
           <View style={[styles.bigCardIcon, { backgroundColor: COLORS.secondary + '33' }]}>
-            <Ionicons name="nutrition-outline" size={32} color={COLORS.secondary} />
+            <AppIcon name="nutrition-outline" size={32} color={COLORS.secondary} />
           </View>
           <View style={styles.bigCardText}>
             <Text style={styles.bigCardTitle}>Beslenme Rehberi</Text>
             <Text style={styles.bigCardDesc}>Bebeğiniz için doğru besinleri keşfedin</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={COLORS.gray[300]} />
+          <AppIcon name="chevron-forward" size={20} color={COLORS.gray[300]} />
         </TouchableOpacity>
 
         {/* Trending recipes shortcut */}
@@ -85,13 +85,13 @@ export default function DiscoverScreen() {
           onPress={() => router.push('/(tabs)/recipes')}
         >
           <View style={[styles.bigCardIcon, { backgroundColor: COLORS.primary + '22' }]}>
-            <Ionicons name="restaurant-outline" size={32} color={COLORS.primary} />
+            <AppIcon name="restaurant-outline" size={32} color={COLORS.primary} />
           </View>
           <View style={styles.bigCardText}>
             <Text style={styles.bigCardTitle}>Popüler Tarifler</Text>
             <Text style={styles.bigCardDesc}>Yüzlerce sağlıklı ve lezzetli tarif</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={COLORS.gray[300]} />
+          <AppIcon name="chevron-forward" size={20} color={COLORS.gray[300]} />
         </TouchableOpacity>
 
         {/* Newsletter banner */}

@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { COLORS } from '../../src/lib/constants';
 import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 import {
+
   AGE_RANGES,
   FOOD_GROUPS,
   AGE_RANGE_PLANS,
@@ -30,6 +30,7 @@ import {
   type FoodGroupSlug,
 } from '../../src/data/food-guide';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Section IDs (for accordion expand/collapse) ──────────────────────────────
 type Section = 'food-groups' | 'texture' | 'allergens' | 'tips';
 
@@ -67,7 +68,7 @@ export default function FoodGuideScreen() {
             style={styles.backBtn}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Ek Gıda Rehberi 🥣</Text>
           <TouchableOpacity
@@ -76,7 +77,7 @@ export default function FoodGuideScreen() {
             style={styles.backBtn}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="home-outline" size={22} color="#fff" />
+            <AppIcon name="home-outline" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
         {activeChild ? (
@@ -95,7 +96,7 @@ export default function FoodGuideScreen() {
         {/* ── No-child notice ────────────────────────────────────────────── */}
         {!activeChild && (
           <View style={styles.noChildBanner}>
-            <Ionicons name="information-circle-outline" size={20} color="#D97706" />
+            <AppIcon name="information-circle-outline" size={20} color="#D97706" />
             <Text style={styles.noChildText}>
               Kişiselleştirilmiş öneriler için Profil sekmesinden çocuk ekleyin.
             </Text>
@@ -139,11 +140,11 @@ export default function FoodGuideScreen() {
           </Text>
           <Text style={styles.milestoneText}>{plan.milestone}</Text>
           <View style={styles.mealPatternRow}>
-            <Ionicons name="time-outline" size={14} color={COLORS.primary} />
+            <AppIcon name="time-outline" size={14} color={COLORS.primary} />
             <Text style={styles.mealPatternText}>{plan.mealPattern}</Text>
           </View>
           <View style={[styles.mealPatternRow, { marginTop: 4 }]}>
-            <Ionicons name="water-outline" size={14} color="#0EA5E9" />
+            <AppIcon name="water-outline" size={14} color="#0EA5E9" />
             <Text style={[styles.mealPatternText, { color: '#0369A1' }]}>{plan.milkGuidance}</Text>
           </View>
         </View>
@@ -160,7 +161,7 @@ export default function FoodGuideScreen() {
             <Text style={styles.accordionHeaderIcon}>🥗</Text>
             <Text style={styles.accordionHeaderTitle}>Besin Grupları & Porsiyonlar</Text>
           </View>
-          <Ionicons
+          <AppIcon
             name={expandedSection === 'food-groups' ? 'chevron-up' : 'chevron-down'}
             size={20}
             color={COLORS.gray[500]}
@@ -183,7 +184,7 @@ export default function FoodGuideScreen() {
                       <Text style={styles.groupIcon}>{group.icon}</Text>
                     </View>
                     <Text style={styles.groupName}>{group.name}</Text>
-                    <Ionicons
+                    <AppIcon
                       name={isOpen ? 'chevron-up' : 'chevron-down'}
                       size={18}
                       color={COLORS.gray[400]}
@@ -216,7 +217,7 @@ export default function FoodGuideScreen() {
 
                       {/* Preparation note */}
                       <View style={styles.prepNote}>
-                        <Ionicons name="information-circle-outline" size={14} color={group.color} />
+                        <AppIcon name="information-circle-outline" size={14} color={group.color} />
                         <Text style={[styles.prepNoteText, { color: group.color }]}>{entry.note}</Text>
                       </View>
                     </View>
@@ -239,7 +240,7 @@ export default function FoodGuideScreen() {
             <Text style={styles.accordionHeaderIcon}>🥄</Text>
             <Text style={styles.accordionHeaderTitle}>Doku / Kıvam İlerlemesi</Text>
           </View>
-          <Ionicons
+          <AppIcon
             name={expandedSection === 'texture' ? 'chevron-up' : 'chevron-down'}
             size={20}
             color={COLORS.gray[500]}
@@ -326,7 +327,7 @@ export default function FoodGuideScreen() {
             <Text style={styles.accordionHeaderIcon}>🛡️</Text>
             <Text style={styles.accordionHeaderTitle}>Alerjen Tanıtım Takvimi</Text>
           </View>
-          <Ionicons
+          <AppIcon
             name={expandedSection === 'allergens' ? 'chevron-up' : 'chevron-down'}
             size={20}
             color={COLORS.gray[500]}
@@ -378,7 +379,7 @@ export default function FoodGuideScreen() {
               </Text>
             </Text>
           </View>
-          <Ionicons
+          <AppIcon
             name={expandedSection === 'tips' ? 'chevron-up' : 'chevron-down'}
             size={20}
             color={COLORS.gray[500]}

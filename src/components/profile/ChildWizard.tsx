@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +27,7 @@ import { ChildAvatarPicker } from './ChildAvatarPicker';
 import type { Child } from '../../lib/types';
 import { API_ENDPOINTS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 type Gender = 'male' | 'female' | 'other';
 type Mode = 'create' | 'edit';
 
@@ -308,7 +308,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           onPress={() => setTermsAccepted((prev) => !prev)}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={termsAccepted ? 'checkbox' : 'square-outline'}
             size={20}
             color={termsAccepted ? '#FF8A65' : '#9CA3AF'}
@@ -332,7 +332,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           onPress={() => setSensitiveDataConsent((prev) => !prev)}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={sensitiveDataConsent ? 'checkbox' : 'square-outline'}
             size={20}
             color={sensitiveDataConsent ? '#FF8A65' : '#9CA3AF'}
@@ -347,7 +347,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
           onPress={() => setGuardianDeclaration((prev) => !prev)}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={guardianDeclaration ? 'checkbox' : 'square-outline'}
             size={20}
             color={guardianDeclaration ? '#FF8A65' : '#9CA3AF'}
@@ -461,7 +461,7 @@ export function ChildWizard({ mode, child }: ChildWizardProps) {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={handleBack} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">
             {mode === 'edit' ? 'Çocuğu Düzenle' : 'Yeni Çocuk Ekle'}

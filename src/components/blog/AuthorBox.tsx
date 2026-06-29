@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Avatar } from '../ui/Avatar';
 import type { Author } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface AuthorBoxProps {
   author: Author;
 }
@@ -28,7 +28,7 @@ export function AuthorBox({ author }: AuthorBoxProps) {
             <Text style={styles.name}>{author.name}</Text>
             {author.is_expert && (
               <View style={styles.expertBadge}>
-                <Ionicons name="shield-checkmark" size={10} color="#16A34A" />
+                <AppIcon name="shield-checkmark" size={10} color="#16A34A" />
                 <Text style={styles.expertBadgeText}>Uzman</Text>
               </View>
             )}

@@ -13,7 +13,6 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBlogPost, getBlogPosts } from '../../src/services/blog-service';
@@ -31,6 +30,7 @@ import { useFavorites } from '../../src/contexts/FavoritesContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { router } from 'expo-router';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '';
   return new Date(dateStr).toLocaleDateString('tr-TR', {
@@ -158,7 +158,7 @@ export default function BlogDetailScreen() {
             />
           ) : (
             <View style={[styles.heroImage, styles.heroPlaceholder]}>
-              <Ionicons name="newspaper-outline" size={60} color="#AED581" />
+              <AppIcon name="newspaper-outline" size={60} color="#AED581" />
             </View>
           )}
           {/* Gradient overlay from bottom */}
@@ -169,10 +169,10 @@ export default function BlogDetailScreen() {
           {/* Floating action buttons: share + favorite */}
           <View style={[styles.heroActions, { top: insets.top + 12 }]}>
             <TouchableOpacity style={styles.heroActionBtn} onPress={handleShare} activeOpacity={0.7}>
-              <Ionicons name="share-outline" size={20} color="#fff" />
+              <AppIcon name="share-outline" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.heroActionBtn} onPress={handleFavorite} activeOpacity={0.7}>
-              <Ionicons
+              <AppIcon
                 name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
                 color={isFav ? '#EF4444' : '#fff'}
@@ -255,7 +255,7 @@ export default function BlogDetailScreen() {
               </View>
               {sd.discount_text ? (
                 <View style={styles.discountChip}>
-                  <Ionicons name="pricetag-outline" size={13} color="#16A34A" />
+                  <AppIcon name="pricetag-outline" size={13} color="#16A34A" />
                   <Text style={styles.discountText}>{sd.discount_text}</Text>
                 </View>
               ) : null}
@@ -330,7 +330,7 @@ export default function BlogDetailScreen() {
             </View>
           ) : (
             <View style={styles.authPromptCard}>
-              <Ionicons name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
+              <AppIcon name="chatbubble-ellipses-outline" size={28} color="#FF8A65" />
               <Text style={styles.authPromptTitle}>Yorum yapmak için giriş yapın</Text>
               <Text style={styles.authPromptDesc}>
                 Yorumunu paylaşmak ve başka anne-babalarla sohbet etmek için hesabına giriş yap veya yeni bir hesap oluştur.

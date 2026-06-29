@@ -7,7 +7,6 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
@@ -19,6 +18,7 @@ import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
 import { AppHeader } from '../../src/components/ui/AppHeader';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 function getWeekOffsetLabel(offset: number): string {
   if (offset === 0) return 'Bu Hafta';
   if (offset < 0) return `${Math.abs(offset)} hafta önce`;
@@ -89,7 +89,7 @@ export default function MealPlanScreen() {
           onPress={() => setWeekOffset((o) => o - 1)}
           style={styles.navButton}
         >
-          <Ionicons name="chevron-back" size={18} color="#455A64" />
+          <AppIcon name="chevron-back" size={18} color="#455A64" />
         </TouchableOpacity>
 
         <View style={{ alignItems: 'center' }}>
@@ -105,7 +105,7 @@ export default function MealPlanScreen() {
           onPress={() => setWeekOffset((o) => o + 1)}
           style={styles.navButton}
         >
-          <Ionicons name="chevron-forward" size={18} color="#455A64" />
+          <AppIcon name="chevron-forward" size={18} color="#455A64" />
         </TouchableOpacity>
       </View>
 

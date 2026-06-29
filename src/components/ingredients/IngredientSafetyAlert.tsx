@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import type { IngredientGuideItem } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface IngredientSafetyAlertProps {
   ingredient: Pick<
     IngredientGuideItem,
@@ -45,7 +45,7 @@ export function IngredientSafetyAlert({ ingredient }: IngredientSafetyAlertProps
     >
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-        <Ionicons
+        <AppIcon
           name={shouldHighlight ? 'warning' : 'shield-checkmark-outline'}
           size={22}
           color={colors.icon}
@@ -115,7 +115,7 @@ export function IngredientSafetyAlert({ ingredient }: IngredientSafetyAlertProps
           ) : null}
           {allergen_info.cross_contamination ? (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: 4 }}>
-              <Ionicons name="alert-circle-outline" size={14} color={colors.icon} style={{ marginRight: 4, marginTop: 1 }} />
+              <AppIcon name="alert-circle-outline" size={14} color={colors.icon} style={{ marginRight: 4, marginTop: 1 }} />
               <Text style={{ fontSize: 12, color: colors.text, flex: 1, lineHeight: 18 }}>
                 <Text style={{ fontWeight: '700' }}>Çapraz bulaşma: </Text>
                 {allergen_info.cross_contamination}

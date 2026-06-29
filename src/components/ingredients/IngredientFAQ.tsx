@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 interface FaqItem {
   question?: string;
   q?: string;
@@ -57,7 +57,7 @@ function FAQRow({ item, index }: { item: FaqItem; index: number }) {
         <Text style={{ flex: 1, fontSize: 14, fontWeight: '600', color: COLORS.dark, lineHeight: 20 }}>
           {question}
         </Text>
-        <Ionicons
+        <AppIcon
           name={expanded ? 'chevron-up' : 'chevron-down'}
           size={18}
           color="#9CA3AF"

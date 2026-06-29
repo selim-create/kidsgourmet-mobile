@@ -10,7 +10,6 @@ import {
   ScrollView,
 } from 'react-native';
 import useSWR from 'swr';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getRecipes } from '../../../src/services/recipe-service';
 import { RecipeCard } from '../../../src/components/recipes/RecipeCard';
@@ -28,6 +27,7 @@ import { API_ENDPOINTS, PAGINATION, COLORS } from '../../../src/lib/constants';
 import { searchIngredients } from '../../../src/services/ingredient-service';
 import { getAgeGroupColor } from '../../../src/utils/helpers';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 const SORT_OPTIONS: { value: NonNullable<SearchFilters['sort']>; label: string }[] = [
   { value: 'newest', label: 'En Yeni' },
   { value: 'popular', label: 'En Popüler' },
@@ -37,7 +37,7 @@ const SORT_OPTIONS: { value: NonNullable<SearchFilters['sort']>; label: string }
 
 interface FilterSectionProps {
   title: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   children: React.ReactNode;
 }
 
@@ -45,7 +45,7 @@ function FilterSection({ title, icon, children }: FilterSectionProps) {
   return (
     <View style={{ marginBottom: 20 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-        <Ionicons name={icon} size={18} color={COLORS.primary} />
+        <AppIcon name={icon} size={18} color={COLORS.primary} />
         <Text style={{ fontSize: 15, fontWeight: '700', color: '#374151', marginLeft: 6 }}>{title}</Text>
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -268,7 +268,7 @@ export default function RecipesScreen() {
       <View className="bg-white px-4 py-3 border-b border-gray-100">
         <View className="flex-row items-center gap-2">
           <View className="flex-1 flex-row items-center bg-gray-100 rounded-xl px-3 py-2">
-            <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+            <AppIcon name="search-outline" size={18} color="#9CA3AF" />
             <TextInput
               className="flex-1 ml-2 text-dark text-sm"
               placeholder="Tarif ara..."
@@ -285,7 +285,7 @@ export default function RecipesScreen() {
                   setFilters((p) => ({ ...p, query: undefined, page: 1 }));
                 }}
               >
-                <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+                <AppIcon name="close-circle" size={18} color="#9CA3AF" />
               </TouchableOpacity>
             ) : null}
           </View>
@@ -295,7 +295,7 @@ export default function RecipesScreen() {
             style={{ padding: 8, position: 'relative' }}
             activeOpacity={0.7}
           >
-            <Ionicons name="options-outline" size={22} color={COLORS.primary} />
+            <AppIcon name="options-outline" size={22} color={COLORS.primary} />
             {activeFilterCount > 0 && (
               <View
                 style={{
@@ -388,7 +388,7 @@ export default function RecipesScreen() {
               <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>
                 {chip.label}
               </Text>
-              <Ionicons name="close-circle" size={14} color={COLORS.primary} />
+              <AppIcon name="close-circle" size={14} color={COLORS.primary} />
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -502,7 +502,7 @@ export default function RecipesScreen() {
                 Filtrele
               </Text>
               <TouchableOpacity onPress={() => setShowFilterModal(false)} activeOpacity={0.7}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <AppIcon name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
             </View>
 
@@ -589,7 +589,7 @@ export default function RecipesScreen() {
                 {/* Malzeme Ara */}
                 <View style={{ marginBottom: 20 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                    <Ionicons name="nutrition-outline" size={18} color={COLORS.primary} />
+                    <AppIcon name="nutrition-outline" size={18} color={COLORS.primary} />
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#374151', marginLeft: 6 }}>
                       Malzeme
                     </Text>
@@ -604,7 +604,7 @@ export default function RecipesScreen() {
                       paddingVertical: 10,
                     }}
                   >
-                    <Ionicons name="search-outline" size={16} color="#9CA3AF" />
+                    <AppIcon name="search-outline" size={16} color="#9CA3AF" />
                     <TextInput
                       style={{ flex: 1, marginLeft: 8, fontSize: 14, color: '#374151' }}
                       placeholder="Malzeme ara..."
@@ -623,7 +623,7 @@ export default function RecipesScreen() {
                           setTempFilters((f) => ({ ...f, ingredient: undefined }));
                         }}
                       >
-                        <Ionicons name="close-circle" size={16} color="#9CA3AF" />
+                        <AppIcon name="close-circle" size={16} color="#9CA3AF" />
                       </TouchableOpacity>
                     ) : null}
                   </View>
@@ -667,7 +667,7 @@ export default function RecipesScreen() {
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
                     activeOpacity={0.7}
                   >
-                    <Ionicons
+                    <AppIcon
                       name={tempFilters.expert_approved ? 'checkbox' : 'square-outline'}
                       size={24}
                       color={COLORS.primary}

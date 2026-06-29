@@ -7,10 +7,10 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 const AGE_OPTIONS = [
   { label: 'Tüm Aylar', value: '' },
   { label: '0-6 Ay', value: '0-6' },
@@ -50,7 +50,7 @@ export function QuickSearch() {
       {/* Search input */}
       <View style={styles.inputRow}>
         <View style={styles.inputWrap}>
-          <Ionicons name="search-outline" size={18} color={COLORS.gray[400]} style={styles.searchIcon} />
+          <AppIcon name="search-outline" size={18} color={COLORS.gray[400]} style={styles.searchIcon} />
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -69,9 +69,9 @@ export function QuickSearch() {
         activeOpacity={0.8}
         style={styles.agePicker}
       >
-        <Ionicons name="people-outline" size={16} color={COLORS.primary} />
+        <AppIcon name="people-outline" size={16} color={COLORS.primary} />
         <Text style={styles.agePickerText}>{selectedAgeLabel}</Text>
-        <Ionicons
+        <AppIcon
           name={showAgePicker ? 'chevron-up' : 'chevron-down'}
           size={16}
           color={COLORS.gray[400]}
@@ -103,7 +103,7 @@ export function QuickSearch() {
                 {opt.label}
               </Text>
               {selectedAge === opt.value && (
-                <Ionicons name="checkmark" size={16} color={COLORS.primary} />
+                <AppIcon name="checkmark" size={16} color={COLORS.primary} />
               )}
             </TouchableOpacity>
           ))}
@@ -112,7 +112,7 @@ export function QuickSearch() {
 
       {/* Search button */}
       <TouchableOpacity onPress={handleSearch} activeOpacity={0.85} style={styles.searchBtn}>
-        <Ionicons name="search" size={18} color="#fff" />
+        <AppIcon name="search" size={18} color="#fff" />
         <Text style={styles.searchBtnText}>Tarif Bul</Text>
       </TouchableOpacity>
 

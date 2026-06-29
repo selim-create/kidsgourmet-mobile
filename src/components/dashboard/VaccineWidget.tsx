@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
 import type { Vaccine } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface VaccineWidgetProps {
   vaccines: Vaccine[];
   isLoading?: boolean;
@@ -40,7 +40,7 @@ export function VaccineWidget({ vaccines, isLoading }: VaccineWidgetProps) {
           marginRight: 12,
         }}
       >
-        <Ionicons name="medical-outline" size={22} color="#059669" />
+        <AppIcon name="medical-outline" size={22} color="#059669" />
       </View>
       <View style={{ flex: 1 }}>
         {isLoading ? (
@@ -53,7 +53,7 @@ export function VaccineWidget({ vaccines, isLoading }: VaccineWidgetProps) {
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={18} color={COLORS.success} />
+      <AppIcon name="chevron-forward" size={18} color={COLORS.success} />
     </TouchableOpacity>
   );
 }

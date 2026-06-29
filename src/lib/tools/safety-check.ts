@@ -33,7 +33,7 @@ export interface SafetyLevelConfig {
   /** Primary text colour */
   text: string;
   /** Ionicons icon name */
-  icon: ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   /** Human-readable label with emoji */
   label: string;
   /** Short badge text (no emoji) */

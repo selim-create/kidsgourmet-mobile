@@ -9,7 +9,6 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 import { Avatar } from '../ui/Avatar';
 import { useAuth } from '../../contexts/AuthContext';
@@ -17,6 +16,7 @@ import { COLORS } from '../../lib/constants';
 import { decodeHtmlEntities, formatRelativeTime, stripHtml, truncate } from '../../utils/helpers';
 import type { Discussion } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface DiscussionCardProps {
   discussion: Discussion;
   onVote: (id: number, vote: 'up' | 'down') => void;
@@ -125,7 +125,7 @@ export function DiscussionCard({
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleMoreMenu} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Ionicons name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
+          <AppIcon name="ellipsis-vertical" size={18} color={COLORS.gray[400]} />
         </TouchableOpacity>
       </View>
 
@@ -141,7 +141,7 @@ export function DiscussionCard({
         )}
         {(discussion.has_expert_answer || discussion.is_answered) && (
           <View style={styles.expertBadge}>
-            <Ionicons name="checkmark-circle" size={12} color="#16A34A" />
+            <AppIcon name="checkmark-circle" size={12} color="#16A34A" />
             <Text style={styles.expertBadgeText}>Uzman Yanıtladı</Text>
           </View>
         )}
@@ -161,7 +161,7 @@ export function DiscussionCard({
           onPress={() => handleVote('up')}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={discussion.user_vote === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
             size={16}
             color={discussion.user_vote === 'up' ? COLORS.primary : COLORS.gray[400]}
@@ -178,7 +178,7 @@ export function DiscussionCard({
           onPress={() => handleVote('down')}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={discussion.user_vote === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
             size={16}
             color={discussion.user_vote === 'down' ? '#EF4444' : COLORS.gray[400]}
@@ -191,7 +191,7 @@ export function DiscussionCard({
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.commentButton} onPress={handlePress} activeOpacity={0.7}>
-          <Ionicons name="chatbubble-outline" size={16} color={COLORS.gray[400]} />
+          <AppIcon name="chatbubble-outline" size={16} color={COLORS.gray[400]} />
           <Text style={styles.commentCount}>{commentCount}</Text>
         </TouchableOpacity>
 
@@ -200,7 +200,7 @@ export function DiscussionCard({
           onPress={handleFavorite}
           activeOpacity={0.7}
         >
-          <Ionicons
+          <AppIcon
             name={discussion.is_favorite ? 'heart' : 'heart-outline'}
             size={18}
             color={discussion.is_favorite ? '#EF4444' : COLORS.gray[400]}

@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '../ui/Avatar';
 import { uploadChildAvatar } from '../../services/user-service';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../ui/AppIcon';
 interface ChildAvatarPickerProps {
   childUuid?: string;
   currentUrl?: string | null;
@@ -120,7 +120,7 @@ export function ChildAvatarPicker({
           {uploading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Ionicons name="camera" size={14} color="#fff" />
+            <AppIcon name="camera" size={14} color="#fff" />
           )}
         </View>
       </View>

@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
@@ -31,6 +30,7 @@ import {
 } from '../../../src/services/community-service';
 import { faToIonicon } from '../../../src/utils/iconHelpers';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 type VoteKind = 'up' | 'down';
 
 function getVoteUpdate(currentVote: VoteKind | null | undefined, nextVote: VoteKind) {
@@ -230,7 +230,7 @@ export default function CircleDetailScreen() {
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
+            <AppIcon name="arrow-back" size={24} color="#374151" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Odak</Text>
           <View style={styles.headerBackButton} />
@@ -245,7 +245,7 @@ export default function CircleDetailScreen() {
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
+            <AppIcon name="arrow-back" size={24} color="#374151" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Odak</Text>
           <View style={styles.headerBackButton} />
@@ -264,7 +264,7 @@ export default function CircleDetailScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/topluluk' as never)} style={styles.headerBackButton}>
-          <Ionicons name="arrow-back" size={24} color="#374151" />
+          <AppIcon name="arrow-back" size={24} color="#374151" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{circle?.name ?? 'Odak'}</Text>
         <View style={styles.headerBackButton} />
@@ -282,7 +282,7 @@ export default function CircleDetailScreen() {
           <>
             <View style={styles.heroCard}>
               <View style={[styles.heroIcon, { backgroundColor: `${color}22` }]}>
-                <Ionicons name={iconName} size={26} color={color} />
+                <AppIcon name={String(iconName)} size={26} color={color} />
               </View>
               <Text style={styles.heroTitle}>{circle?.name}</Text>
               {circle?.description ? (
@@ -292,7 +292,7 @@ export default function CircleDetailScreen() {
               {typeof circle?.discussion_count === 'number' ? (
                 <View style={styles.heroStats}>
                   <View style={styles.heroStatChip}>
-                    <Ionicons name="chatbubbles-outline" size={16} color={COLORS.gray[500]} />
+                    <AppIcon name="chatbubbles-outline" size={16} color={COLORS.gray[500]} />
                     <Text style={styles.heroStatText}>{circle.discussion_count} tartışma</Text>
                   </View>
                 </View>
@@ -328,7 +328,7 @@ export default function CircleDetailScreen() {
               activeOpacity={0.85}
             >
               <View style={styles.askCardIcon}>
-                <Ionicons name="create-outline" size={18} color={COLORS.primary} />
+                <AppIcon name="create-outline" size={18} color={COLORS.primary} />
               </View>
               <Text style={styles.askCardText}>
                 {circle ? `${circle.name} odağında bir soru sor...` : 'Bu odakta bir soru sor...'}
@@ -378,7 +378,7 @@ export default function CircleDetailScreen() {
         onPress={() => router.push(askQuestionRoute)}
         activeOpacity={0.85}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <AppIcon name="add" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
   );

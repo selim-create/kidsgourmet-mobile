@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { GrowthData } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface GrowthTrackingWidgetProps {
   growthData?: GrowthData | null;
   isLoading?: boolean;
@@ -37,7 +37,7 @@ export function GrowthTrackingWidget({ growthData, isLoading }: GrowthTrackingWi
           marginRight: 12,
         }}
       >
-        <Ionicons name="trending-up-outline" size={22} color="#2563EB" />
+        <AppIcon name="trending-up-outline" size={22} color="#2563EB" />
       </View>
       <View style={{ flex: 1 }}>
         {isLoading ? (
@@ -57,7 +57,7 @@ export function GrowthTrackingWidget({ growthData, isLoading }: GrowthTrackingWi
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={18} color="#3B82F6" />
+      <AppIcon name="chevron-forward" size={18} color="#3B82F6" />
     </TouchableOpacity>
   );
 }

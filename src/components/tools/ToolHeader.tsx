@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { Icon } from '../ui/Icon';
 
+import { AppIcon } from '../ui/AppIcon';
 interface ToolHeaderProps {
   title: string;
   onBack?: () => void;
@@ -48,7 +48,7 @@ export function ToolHeader({
             activeOpacity={0.7}
             className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center"
           >
-            <Ionicons name="home-outline" size={16} color="#475569" />
+            <AppIcon name="home-outline" size={16} color="#475569" />
           </TouchableOpacity>
         ) : (
           <View className="w-9 h-9" />

@@ -8,10 +8,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function PreferencesScreen() {
   const insets = useSafeAreaInsets();
   const [newsletter, setNewsletter] = useState(true);
@@ -36,7 +36,7 @@ export default function PreferencesScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">Tercihler</Text>
         </View>
@@ -52,7 +52,7 @@ export default function PreferencesScreen() {
         >
           <View className="p-5">
             <View className="flex-row items-center mb-2">
-              <Ionicons name="star" size={20} color="#FDE68A" />
+              <AppIcon name="star" size={20} color="#FDE68A" />
               <Text className="text-yellow-200 font-bold text-base ml-2">
                 KidsGourmet Free
               </Text>

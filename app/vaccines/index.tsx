@@ -7,7 +7,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useVaccines } from '../../src/hooks/useVaccines';
 import { VaccineCard } from '../../src/components/vaccines/VaccineCard';
@@ -17,6 +16,7 @@ import { EmptyState } from '../../src/components/ui/EmptyState';
 import { COLORS } from '../../src/lib/constants';
 import { useSWRConfig } from 'swr';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function VaccineScreen() {
   const { vaccines, isLoading } = useVaccines();
   const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
@@ -48,7 +48,7 @@ export default function VaccineScreen() {
       <View className="bg-primary px-4 pt-4 pb-10">
         <View className="flex-row items-center gap-3 mb-4">
           <TouchableOpacity onPress={() => router.back()} activeOpacity={0.8}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <AppIcon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text className="text-white text-xl font-bold">Aşı Takvimi</Text>
         </View>
@@ -108,7 +108,7 @@ export default function VaccineScreen() {
             {/* Overdue warning */}
             {safeVaccines.some((v) => !administered[v.id]) && (
               <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4 flex-row items-start">
-                <Ionicons name="warning-outline" size={20} color="#CA8A04" />
+                <AppIcon name="warning-outline" size={20} color="#CA8A04" />
                 <View className="ml-2 flex-1">
                   <Text className="text-yellow-800 font-semibold text-sm">
                     Bekleyen aşılarınız var

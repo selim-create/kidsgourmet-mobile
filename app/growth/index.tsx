@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../src/contexts/AuthContext';
@@ -33,6 +32,7 @@ import type { GrowthChartType, GrowthRecord, PercentileResult } from '../../src/
 import { GrowthChart } from '../../src/components/growth/GrowthChart';
 import { useGrowthChartData, useGrowthData } from '../../src/hooks/useGrowthData';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDate(date: Date): string {
@@ -116,11 +116,11 @@ function DateField({
           minHeight: 44,
         }}
       >
-        <Ionicons name="calendar-outline" size={16} color="#6B7280" style={{ marginRight: 8 }} />
+        <AppIcon name="calendar-outline" size={16} color="#6B7280" style={{ marginRight: 8 }} />
         <Text style={{ fontSize: 14, color: '#1F2937', flex: 1 }}>
           {displayDate(formatDate(value))}
         </Text>
-        <Ionicons name="chevron-down" size={14} color="#9CA3AF" />
+        <AppIcon name="chevron-down" size={14} color="#9CA3AF" />
       </TouchableOpacity>
       {show && (
         <DateTimePicker
@@ -339,7 +339,7 @@ function RegistrationModal({
                 Hesap Oluştur &amp; Kaydet
               </Text>
               <TouchableOpacity activeOpacity={0.8} onPress={onClose}>
-                <Ionicons name="close" size={22} color="#9CA3AF" />
+                <AppIcon name="close" size={22} color="#9CA3AF" />
               </TouchableOpacity>
             </View>
 
@@ -399,7 +399,7 @@ function RegistrationModal({
               onPress={() => setShowChildDatePicker(true)}
               style={[inputStyle, { flexDirection: 'row', alignItems: 'center' }]}
             >
-              <Ionicons name="calendar-outline" size={16} color="#6B7280" style={{ marginRight: 8 }} />
+              <AppIcon name="calendar-outline" size={16} color="#6B7280" style={{ marginRight: 8 }} />
               <Text style={{ fontSize: 14, color: '#1F2937', flex: 1 }}>
                 {displayDate(formatDate(form.childBirthDate))}
               </Text>
@@ -509,7 +509,7 @@ function ChildSelectorModal({
               Çocuk Seçin
             </Text>
             <TouchableOpacity activeOpacity={0.8} onPress={onClose}>
-              <Ionicons name="close" size={22} color="#9CA3AF" />
+              <AppIcon name="close" size={22} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
           <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 16 }}>
@@ -542,12 +542,12 @@ function ChildSelectorModal({
                   marginRight: 12,
                 }}
               >
-                <Ionicons name="person-outline" size={20} color="#2563EB" />
+                <AppIcon name="person-outline" size={20} color="#2563EB" />
               </View>
               <Text style={{ fontSize: 15, fontWeight: '600', color: '#1F2937' }}>
                 {child.name}
               </Text>
-              <Ionicons
+              <AppIcon
                 name="chevron-forward"
                 size={18}
                 color="#9CA3AF"
@@ -606,7 +606,7 @@ function CheckboxRow({
           flexShrink: 0,
         }}
       >
-        {checked && <Ionicons name="checkmark" size={12} color="#fff" />}
+        {checked && <AppIcon name="checkmark" size={12} color="#fff" />}
       </View>
       <Text style={{ fontSize: 12, color: '#374151', flex: 1, lineHeight: 18 }}>{label}</Text>
     </TouchableOpacity>
@@ -935,7 +935,7 @@ export default function PercentileCalculatorScreen() {
             accessibilityLabel="Geri git"
             accessibilityRole="button"
           >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>
             Persentil Hesaplayıcı 📊
@@ -966,7 +966,7 @@ export default function PercentileCalculatorScreen() {
               alignItems: 'flex-start',
             }}
           >
-            <Ionicons name="information-circle-outline" size={18} color="#2563EB" style={{ marginRight: 8, marginTop: 1 }} />
+            <AppIcon name="information-circle-outline" size={18} color="#2563EB" style={{ marginRight: 8, marginTop: 1 }} />
             <Text style={{ fontSize: 12, color: '#1E40AF', flex: 1, lineHeight: 18 }}>
               Bu araç WHO büyüme standartlarını kullanır ve 0-5 yaş arası çocuklar için tasarlanmıştır. Sonuçlar tıbbi tavsiye yerine geçmez.
             </Text>

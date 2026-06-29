@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import type { BLWTestResult } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface BLWReadinessWidgetProps {
   blwResult?: BLWTestResult | null;
   isLoading?: boolean;
@@ -48,7 +48,7 @@ export function BLWReadinessWidget({ blwResult, isLoading, ageMonths }: BLWReadi
           marginRight: 12,
         }}
       >
-        <Ionicons name="nutrition-outline" size={22} color="#EA580C" />
+        <AppIcon name="nutrition-outline" size={22} color="#EA580C" />
       </View>
       <View style={{ flex: 1 }}>
         {isLoading ? (
@@ -63,7 +63,7 @@ export function BLWReadinessWidget({ blwResult, isLoading, ageMonths }: BLWReadi
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={18} color="#EA580C" />
+      <AppIcon name="chevron-forward" size={18} color="#EA580C" />
     </TouchableOpacity>
   );
 }

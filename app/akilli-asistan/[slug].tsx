@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { TOOLS } from '../../src/lib/tools';
 import type { ToolSlug } from '../../src/lib/tools';
 import { COLORS } from '../../src/lib/constants';
-import { AppIcon } from '../../src/components/ui/AppIcon';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function ToolPlaceholderScreen() {
   const { slug } = useLocalSearchParams<{ slug: ToolSlug }>();
   const tool = TOOLS.find((t) => t.slug === slug);
@@ -33,7 +32,7 @@ export default function ToolPlaceholderScreen() {
       <Text style={styles.desc}>{tool.description}</Text>
 
       <View style={styles.soonBadge}>
-        <Ionicons name="time-outline" size={14} color="#92400E" />
+        <AppIcon name="time-outline" size={14} color="#92400E" />
         <Text style={styles.soonText}>Mobilde Yakında</Text>
       </View>
 
@@ -46,7 +45,7 @@ export default function ToolPlaceholderScreen() {
         activeOpacity={0.85}
         onPress={() => Linking.openURL(tool.webUrl)}
       >
-        <Ionicons name="open-outline" size={18} color="#fff" />
+        <AppIcon name="open-outline" size={18} color="#fff" />
         <Text style={styles.btnPrimaryText}>{"Web'de Aç"}</Text>
       </TouchableOpacity>
 

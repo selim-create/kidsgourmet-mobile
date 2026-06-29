@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking, ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
+import { AppIcon } from '../ui/AppIcon';
 interface CrossSellBannerProps {
   variant: 'tariften' | 'rejimde';
   /** Optional style override for the card container (e.g. margins). */
@@ -54,13 +54,13 @@ export function CrossSellBanner({ variant, style }: CrossSellBannerProps) {
       <View style={styles.content}>
         {/* Badge */}
         <View style={styles.badge}>
-          <Ionicons name="star" size={10} color={config.gradient1} />
+          <AppIcon name="star" size={10} color={config.gradient1} />
           <Text style={[styles.badgeText, { color: config.gradient1 }]}>{config.badge}</Text>
         </View>
 
         {/* Icon */}
         <View style={styles.iconWrap}>
-          <Ionicons name={config.icon} size={32} color="#fff" />
+          <AppIcon name={config.icon} size={32} color="#fff" />
         </View>
 
         {/* Title */}
@@ -76,7 +76,7 @@ export function CrossSellBanner({ variant, style }: CrossSellBannerProps) {
           style={styles.ctaBtn}
         >
           <Text style={[styles.ctaText, { color: config.gradient1 }]}>{config.cta}</Text>
-          <Ionicons name="arrow-forward" size={16} color={config.gradient1} />
+          <AppIcon name="arrow-forward" size={16} color={config.gradient1} />
         </TouchableOpacity>
       </View>
     </View>

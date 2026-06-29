@@ -8,7 +8,6 @@ import {
   Linking,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
@@ -25,6 +24,7 @@ import { formatAge } from '../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function ProfileScreen() {
   const { user, logout, isAuthenticated } = useAuth();
   const { activeChild, setActiveChild } = useActiveChild();
@@ -258,7 +258,7 @@ export default function ProfileScreen() {
                 className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center"
                 onPress={() => router.push('/profile/children/new')}
               >
-                <Ionicons name="add" size={18} color="#FF8A65" />
+                <AppIcon name="add" size={18} color="#FF8A65" />
               </TouchableOpacity>
             </View>
 
@@ -287,7 +287,7 @@ export default function ProfileScreen() {
                   {activeChild?.id === child.id ? (
                     <Badge variant="secondary" size="sm">Aktif</Badge>
                   ) : (
-                    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                    <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
                   )}
                 </TouchableOpacity>
               ))
@@ -314,10 +314,10 @@ export default function ProfileScreen() {
                 }`}
               >
                 <View className="w-9 h-9 rounded-full bg-primary/10 items-center justify-center mr-3">
-                  <Ionicons name={item.icon} size={18} color="#FF8A65" />
+                  <AppIcon name={item.icon} size={18} color="#FF8A65" />
                 </View>
                 <Text className="text-dark flex-1 text-sm">{item.label}</Text>
-                <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                <AppIcon name="chevron-forward" size={16} color="#D1D5DB" />
               </TouchableOpacity>
             ))}
           </Card>
@@ -345,10 +345,10 @@ export default function ProfileScreen() {
                 }`}
               >
                 <View className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center mr-3">
-                  <Ionicons name={item.icon} size={16} color="#9CA3AF" />
+                  <AppIcon name={item.icon} size={16} color="#9CA3AF" />
                 </View>
                 <Text className="text-gray-600 flex-1 text-sm">{item.label}</Text>
-                <Ionicons name="chevron-forward" size={14} color="#D1D5DB" />
+                <AppIcon name="chevron-forward" size={14} color="#D1D5DB" />
               </TouchableOpacity>
             ))}
           </Card>

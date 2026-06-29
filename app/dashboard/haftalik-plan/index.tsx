@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../src/contexts/AuthContext';
@@ -27,6 +26,7 @@ import { COLORS } from '../../../src/lib/constants';
 import type { MealPlan, MealPlanDay } from '../../../src/lib/types';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const DAYS_TR_FULL = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
@@ -160,7 +160,7 @@ export default function HaftalikPlanScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.primary }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Haftalık Plan</Text>
         </View>
@@ -189,7 +189,7 @@ export default function HaftalikPlanScreen() {
       <View style={{ backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700', flex: 1 }}>Haftalık Plan</Text>
         </View>
@@ -200,7 +200,7 @@ export default function HaftalikPlanScreen() {
             onPress={goToPrevWeek}
             style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}
           >
-            <Ionicons name="chevron-back" size={20} color="#fff" />
+            <AppIcon name="chevron-back" size={20} color="#fff" />
           </TouchableOpacity>
 
           <View style={{ alignItems: 'center' }}>
@@ -216,7 +216,7 @@ export default function HaftalikPlanScreen() {
             onPress={goToNextWeek}
             style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}
           >
-            <Ionicons name="chevron-forward" size={20} color="#fff" />
+            <AppIcon name="chevron-forward" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -241,7 +241,7 @@ export default function HaftalikPlanScreen() {
           {generating ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Ionicons name="refresh-outline" size={16} color="#fff" />
+            <AppIcon name="refresh-outline" size={16} color="#fff" />
           )}
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Planı Yenile</Text>
         </TouchableOpacity>
@@ -264,7 +264,7 @@ export default function HaftalikPlanScreen() {
           {generatingList ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Ionicons name="cart-outline" size={16} color="#fff" />
+            <AppIcon name="cart-outline" size={16} color="#fff" />
           )}
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Alışveriş Listesi</Text>
         </TouchableOpacity>
@@ -358,7 +358,7 @@ export default function HaftalikPlanScreen() {
                             />
                           ) : (
                             <View style={{ width: 44, height: 44, borderRadius: 8, backgroundColor: '#FFF3EE', alignItems: 'center', justifyContent: 'center' }}>
-                              <Ionicons name="restaurant-outline" size={20} color={COLORS.primary} />
+                              <AppIcon name="restaurant-outline" size={20} color={COLORS.primary} />
                             </View>
                           )}
                           <View style={{ flex: 1, marginLeft: 10 }}>
@@ -375,7 +375,7 @@ export default function HaftalikPlanScreen() {
                                 onPress={() => router.push(`/(tabs)/recipes/${meal.recipe!.slug}`)}
                                 style={{ padding: 4 }}
                               >
-                                <Ionicons name="eye-outline" size={18} color="#6B7280" />
+                                <AppIcon name="eye-outline" size={18} color="#6B7280" />
                               </TouchableOpacity>
                             )}
                             {meal.id && (
@@ -383,7 +383,7 @@ export default function HaftalikPlanScreen() {
                                 onPress={() => handleRemoveMeal(meal.id)}
                                 style={{ padding: 4 }}
                               >
-                                <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                                <AppIcon name="trash-outline" size={18} color="#EF4444" />
                               </TouchableOpacity>
                             )}
                           </View>

@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useBLWResults } from '../../src/hooks/useBLWResults';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { submitBLWTest } from '../../src/services/blw-service';
@@ -16,6 +15,7 @@ import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { COLORS } from '../../src/lib/constants';
 import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 const BLW_QUESTIONS = [
   { id: 'sits_unsupported', question: 'Desteksiz oturabilir mi?' },
   { id: 'head_control', question: 'Baş kontrolü tam mı?' },
@@ -100,7 +100,7 @@ export default function BLWTestScreen() {
             onPress={() => router.back()}
             style={{ marginRight: 12 }}
           >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>
             BLW Hazırlık Testi 🥣
@@ -128,7 +128,7 @@ export default function BLWTestScreen() {
               alignItems: 'center',
             }}
           >
-            <Ionicons name="information-circle-outline" size={20} color="#D97706" />
+            <AppIcon name="information-circle-outline" size={20} color="#D97706" />
             <Text style={{ fontSize: 13, color: '#92400E', marginLeft: 10, flex: 1 }}>
               Test için profil sekmesinden çocuk ekleyin.
             </Text>
@@ -288,7 +288,7 @@ export default function BLWTestScreen() {
                   }}
                 >
                   {isSubmitting ? (
-                    <Ionicons name="hourglass-outline" size={18} color="#fff" />
+                    <AppIcon name="hourglass-outline" size={18} color="#fff" />
                   ) : (
                     <Text style={{ color: allAnswered ? '#fff' : '#9CA3AF', fontSize: 15, fontWeight: '700' }}>
                       Sonucu Gör ({answeredCount}/{BLW_QUESTIONS.length})

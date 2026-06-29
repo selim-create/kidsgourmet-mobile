@@ -9,10 +9,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 interface SearchModalProps {
   visible: boolean;
   onClose: () => void;
@@ -102,13 +102,13 @@ export function SearchModal({ visible, onClose }: SearchModalProps) {
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-dark text-lg font-bold">Arama</Text>
             <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-              <Ionicons name="close" size={24} color={COLORS.dark} />
+              <AppIcon name="close" size={24} color={COLORS.dark} />
             </TouchableOpacity>
           </View>
 
           {/* Search Input */}
           <View className="flex-row items-center bg-gray-50 rounded-2xl border border-gray-100 px-4 mb-5">
-            <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+            <AppIcon name="search-outline" size={18} color="#9CA3AF" />
             <TextInput
               value={term}
               onChangeText={setTerm}
@@ -156,7 +156,7 @@ export function SearchModal({ visible, onClose }: SearchModalProps) {
                 className="flex-1 items-center rounded-2xl py-3 px-2"
                 style={{ backgroundColor: link.bg, minWidth: '44%' }}
               >
-                <Ionicons name={link.icon} size={22} color={link.color} />
+                <AppIcon name={link.icon} size={22} color={link.color} />
                 <Text className="text-sm font-semibold mt-1" style={{ color: link.color }}>
                   {link.label}
                 </Text>

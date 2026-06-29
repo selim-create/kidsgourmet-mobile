@@ -8,11 +8,12 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/ui/AppHeader';
-import { AppIcon } from '../../src/components/ui/AppIcon';
+
 import { COLORS } from '../../src/lib/constants';
 import { TOOLS } from '../../src/lib/tools';
 import type { ToolSlug } from '../../src/lib/tools';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function AssistantScreen() {
   const handlePress = (route: string | null, slug: ToolSlug) => {
     if (route) {

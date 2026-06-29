@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useShoppingList } from '../../src/hooks/useShoppingList';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
@@ -19,6 +18,7 @@ import { COLORS } from '../../src/lib/constants';
 import type { ShoppingListItem, ShoppingCategory } from '../../src/lib/types';
 import Toast from 'react-native-toast-message';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 // ─── Category Metadata ────────────────────────────────────────────────────────
 
 const CATEGORY_META: Record<string, { label: string; emoji: string; color: string }> = {
@@ -75,7 +75,7 @@ function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
         onPress={() => onToggle(item.id, !isChecked)}
         style={{ marginRight: 12 }}
       >
-        <Ionicons
+        <AppIcon
           name={isChecked ? 'checkmark-circle' : 'ellipse-outline'}
           size={22}
           color={isChecked ? '#22C55E' : COLORS.primary}
@@ -111,7 +111,7 @@ function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
         onPress={() => onRemove(item.id)}
         style={{ padding: 4 }}
       >
-        <Ionicons name="trash-outline" size={18} color={isChecked ? '#D1D5DB' : '#EF4444'} />
+        <AppIcon name="trash-outline" size={18} color={isChecked ? '#D1D5DB' : '#EF4444'} />
       </TouchableOpacity>
     </View>
   );
@@ -201,7 +201,7 @@ export default function ShoppingListScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.primary }}>
           <TouchableOpacity activeOpacity={0.8} onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Alışveriş Listesi 🛒</Text>
         </View>
@@ -237,7 +237,7 @@ export default function ShoppingListScreen() {
       <View style={{ backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity activeOpacity={0.8} onPress={() => router.back()} style={{ marginRight: 12 }}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <AppIcon name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>Alışveriş Listesi 🛒</Text>
@@ -265,7 +265,7 @@ export default function ShoppingListScreen() {
               }}
               style={{ padding: 4 }}
             >
-              <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+              <AppIcon name="ellipsis-vertical" size={20} color="#fff" />
             </TouchableOpacity>
           )}
         </View>
@@ -294,7 +294,7 @@ export default function ShoppingListScreen() {
               disabled={isAdding || !newItemText.trim()}
               style={{ paddingHorizontal: 16, backgroundColor: newItemText.trim() ? COLORS.primary : '#E5E7EB', alignItems: 'center', justifyContent: 'center' }}
             >
-              {isAdding ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="add" size={22} color={newItemText.trim() ? '#fff' : '#9CA3AF'} />}
+              {isAdding ? <ActivityIndicator size="small" color="#fff" /> : <AppIcon name="add" size={22} color={newItemText.trim() ? '#fff' : '#9CA3AF'} />}
             </TouchableOpacity>
           </View>
 
@@ -308,7 +308,7 @@ export default function ShoppingListScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: selectedCatMeta.color, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, gap: 4 }}>
               <Text style={{ fontSize: 12 }}>{selectedCatMeta.emoji}</Text>
               <Text style={{ fontSize: 12, fontWeight: '600', color: '#374151' }}>{selectedCatMeta.label}</Text>
-              <Ionicons name={showCategoryPicker ? 'chevron-up' : 'chevron-down'} size={12} color="#6B7280" />
+              <AppIcon name={showCategoryPicker ? 'chevron-up' : 'chevron-down'} size={12} color="#6B7280" />
             </View>
           </TouchableOpacity>
 
@@ -326,7 +326,7 @@ export default function ShoppingListScreen() {
                   >
                     <Text style={{ fontSize: 16 }}>{meta.emoji}</Text>
                     <Text style={{ fontSize: 13, fontWeight: isSelected ? '700' : '400', color: '#374151' }}>{meta.label}</Text>
-                    {isSelected && <Ionicons name="checkmark" size={16} color={COLORS.primary} style={{ marginLeft: 'auto' }} />}
+                    {isSelected && <AppIcon name="checkmark" size={16} color={COLORS.primary} style={{ marginLeft: 'auto' }} />}
                   </TouchableOpacity>
                 );
               })}

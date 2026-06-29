@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Linking } from 'react-native';
 import type { BlogPost } from '../../lib/types';
@@ -10,6 +9,7 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { extractImageUrl } from '../../utils/url';
 
+import { AppIcon } from '../ui/AppIcon';
 interface BlogCardProps {
   post: BlogPost;
   variant?: 'default' | 'hero' | 'sponsored';
@@ -84,7 +84,7 @@ function DefaultCard({ post }: { post: BlogPost }) {
           />
         ) : (
           <View style={[styles.defaultImage, styles.imagePlaceholder]}>
-            <Ionicons name="newspaper-outline" size={40} color="#AED581" />
+            <AppIcon name="newspaper-outline" size={40} color="#AED581" />
           </View>
         )}
         {/* Category badge top-left */}
@@ -97,7 +97,7 @@ function DefaultCard({ post }: { post: BlogPost }) {
           activeOpacity={0.8}
           onPress={handleFavorite}
         >
-          <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
+          <AppIcon name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
         </TouchableOpacity>
       </View>
 
@@ -119,7 +119,7 @@ function DefaultCard({ post }: { post: BlogPost }) {
           <Text style={styles.readMore}>Devamını Oku →</Text>
           {post.comment_count ? (
             <View style={styles.commentRow}>
-              <Ionicons name="chatbubble-outline" size={12} color="#9CA3AF" />
+              <AppIcon name="chatbubble-outline" size={12} color="#9CA3AF" />
               <Text style={styles.commentText}>{post.comment_count}</Text>
             </View>
           ) : null}
@@ -164,7 +164,7 @@ function SponsoredCard({ post }: { post: BlogPost }) {
           />
         ) : (
           <View style={[styles.defaultImage, styles.imagePlaceholder]}>
-            <Ionicons name="newspaper-outline" size={40} color="#AED581" />
+            <AppIcon name="newspaper-outline" size={40} color="#AED581" />
           </View>
         )}
         {/* Sponsored badge top-left */}
@@ -188,7 +188,7 @@ function SponsoredCard({ post }: { post: BlogPost }) {
           activeOpacity={0.8}
           onPress={handleFavorite}
         >
-          <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
+          <AppIcon name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#1F2937'} />
         </TouchableOpacity>
       </View>
 
@@ -207,7 +207,7 @@ function SponsoredCard({ post }: { post: BlogPost }) {
         {/* Discount text */}
         {sd?.discount_text ? (
           <View style={styles.discountBox}>
-            <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
+            <AppIcon name="pricetag-outline" size={14} color="#16A34A" />
             <Text style={styles.discountText}>{sd.discount_text}</Text>
           </View>
         ) : null}
@@ -259,7 +259,7 @@ function HeroCard({ post }: { post: BlogPost }) {
         />
       ) : (
         <View style={[styles.heroImage, styles.imagePlaceholder]}>
-          <Ionicons name="newspaper-outline" size={60} color="#AED581" />
+          <AppIcon name="newspaper-outline" size={60} color="#AED581" />
         </View>
       )}
 
@@ -282,7 +282,7 @@ function HeroCard({ post }: { post: BlogPost }) {
         activeOpacity={0.8}
         onPress={handleFavorite}
       >
-        <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#fff'} />
+        <AppIcon name={isFav ? 'heart' : 'heart-outline'} size={16} color={isFav ? '#EF4444' : '#fff'} />
       </TouchableOpacity>
 
       {/* Bottom content */}
@@ -304,7 +304,7 @@ function HeroCard({ post }: { post: BlogPost }) {
           {post.comment_count ? (
             <>
               <Text style={styles.heroMetaText}>{'  ·  '}</Text>
-              <Ionicons name="chatbubble-outline" size={12} color="rgba(255,255,255,0.8)" />
+              <AppIcon name="chatbubble-outline" size={12} color="rgba(255,255,255,0.8)" />
               <Text style={styles.heroMetaText}> {post.comment_count}</Text>
             </>
           ) : null}

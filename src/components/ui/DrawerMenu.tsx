@@ -12,16 +12,16 @@ import {
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from './Avatar';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 const DRAWER_WIDTH = Dimensions.get('window').width * 0.8;
 
-const SOCIAL_LINKS: { name: string; icon: React.ComponentProps<typeof Ionicons>['name']; url: string; color: string }[] = [
+const SOCIAL_LINKS: { name: string; icon: string; url: string; color: string }[] = [
   { name: 'Instagram', icon: 'logo-instagram', url: 'https://www.instagram.com/kidsgourmet/', color: '#E1306C' },
   { name: 'Facebook', icon: 'logo-facebook', url: 'https://www.facebook.com/kidsandgourmet', color: '#1877F2' },
   { name: 'Pinterest', icon: 'logo-pinterest', url: 'https://tr.pinterest.com/KidsandGourmet', color: '#E60023' },
@@ -50,7 +50,7 @@ interface MenuSection {
 
 interface MenuItem {
   label: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   route: string;
 }
 
@@ -177,7 +177,7 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
               contentFit="contain"
             />
             <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.7}>
-              <Ionicons name="close" size={24} color={COLORS.dark} />
+              <AppIcon name="close" size={24} color={COLORS.dark} />
             </TouchableOpacity>
           </View>
 
@@ -193,7 +193,7 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 <Text style={styles.userName}>{user.name}</Text>
                 <Text style={styles.userEmail}>{user.email}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.gray[300]} />
+              <AppIcon name="chevron-forward" size={18} color={COLORS.gray[300]} />
             </TouchableOpacity>
           )}
 
@@ -214,10 +214,10 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                     onPress={() => handleNavigate(item.route)}
                   >
                     <View style={styles.menuIconWrap}>
-                      <Ionicons name={item.icon} size={20} color={COLORS.primary} />
+                      <AppIcon name={item.icon} size={20} color={COLORS.primary} />
                     </View>
                     <Text style={styles.menuItemLabel}>{item.label}</Text>
-                    <Ionicons name="chevron-forward" size={16} color={COLORS.gray[300]} />
+                    <AppIcon name="chevron-forward" size={16} color={COLORS.gray[300]} />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -237,7 +237,7 @@ export function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                     activeOpacity={0.7}
                     style={styles.socialIcon}
                   >
-                    <Ionicons name={link.icon} size={22} color={link.color} />
+                    <AppIcon name={link.icon} size={22} color={link.color} />
                   </TouchableOpacity>
                 ))}
               </View>

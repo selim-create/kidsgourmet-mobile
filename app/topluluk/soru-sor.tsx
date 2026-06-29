@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSWR from 'swr';
 import Toast from 'react-native-toast-message';
@@ -23,6 +22,7 @@ import { COLORS } from '../../src/lib/constants';
 import { getCircles, createDiscussion } from '../../src/services/community-service';
 import type { Circle } from '../../src/lib/types';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function SoruSorScreen() {
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
@@ -273,7 +273,7 @@ export default function SoruSorScreen() {
         {/* ── Submit error ──────────────────────────────────────────────────── */}
         {submitError ? (
           <View style={styles.submitErrorContainer}>
-            <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+            <AppIcon name="alert-circle-outline" size={16} color="#EF4444" />
             <Text style={styles.submitErrorText}>{submitError}</Text>
           </View>
         ) : null}
@@ -298,7 +298,7 @@ export default function SoruSorScreen() {
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <>
-                <Ionicons name="send-outline" size={18} color="#fff" />
+                <AppIcon name="send-outline" size={18} color="#fff" />
                 <Text style={styles.submitButtonText}>Soruyu Gönder</Text>
               </>
             )}
@@ -308,7 +308,7 @@ export default function SoruSorScreen() {
         {/* ── Community Rules Info Card ─────────────────────────────────────── */}
         <View style={styles.infoCard}>
           <View style={styles.infoCardHeader}>
-            <Ionicons name="information-circle-outline" size={18} color="#3B82F6" />
+            <AppIcon name="information-circle-outline" size={18} color="#3B82F6" />
             <Text style={styles.infoCardTitle}>Topluluk Kuralları</Text>
           </View>
           <Text style={styles.infoCardText}>

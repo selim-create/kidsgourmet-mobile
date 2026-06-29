@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking, ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import type { RecipeCrossSell } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface RecipeTariftenBannerProps {
   crossSell: RecipeCrossSell;
   /** Optional style override for the card container (e.g. margins). */
@@ -25,7 +25,7 @@ export function RecipeTariftenBanner({ crossSell, style }: RecipeTariftenBannerP
       <View style={styles.content}>
         {/* Badge */}
         <View style={styles.badge}>
-          <Ionicons name="restaurant-outline" size={10} color="#1E3A5F" />
+          <AppIcon name="restaurant-outline" size={10} color="#1E3A5F" />
           <Text style={styles.badgeText}>EBEVEYNLERE ÖZEL</Text>
         </View>
 
@@ -69,13 +69,13 @@ export function RecipeTariftenBanner({ crossSell, style }: RecipeTariftenBannerP
               <View style={styles.meta}>
                 {crossSell.prep_time ? (
                   <View style={styles.metaItem}>
-                    <Ionicons name="time-outline" size={13} color="rgba(255,255,255,0.75)" />
+                    <AppIcon name="time-outline" size={13} color="rgba(255,255,255,0.75)" />
                     <Text style={styles.metaText}>{crossSell.prep_time}</Text>
                   </View>
                 ) : null}
                 {crossSell.difficulty ? (
                   <View style={styles.metaItem}>
-                    <Ionicons name="bar-chart-outline" size={13} color="rgba(255,255,255,0.75)" />
+                    <AppIcon name="bar-chart-outline" size={13} color="rgba(255,255,255,0.75)" />
                     <Text style={styles.metaText}>{crossSell.difficulty}</Text>
                   </View>
                 ) : null}
@@ -87,7 +87,7 @@ export function RecipeTariftenBanner({ crossSell, style }: RecipeTariftenBannerP
         {/* CTA */}
         <TouchableOpacity onPress={handlePress} activeOpacity={0.85} style={styles.ctaBtn}>
           <Text style={styles.ctaText}>Tarifi Gör (Tariften.com)</Text>
-          <Ionicons name="open-outline" size={15} color="#1E3A5F" />
+          <AppIcon name="open-outline" size={15} color="#1E3A5F" />
         </TouchableOpacity>
       </View>
     </View>

@@ -7,7 +7,6 @@ import {
   Linking,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/ui/Avatar';
@@ -16,6 +15,7 @@ import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { usePublicProfile } from '../../../src/hooks/usePublicProfile';
 import { faToIonicon } from '../../../src/utils/iconHelpers';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 export default function PublicProfileScreen() {
   const insets = useSafeAreaInsets();
   const { username } = useLocalSearchParams<{ username: string }>();
@@ -31,7 +31,7 @@ export default function PublicProfileScreen() {
         >
           <View className="flex-row items-center px-4 py-3">
             <TouchableOpacity onPress={() => router.back()} className="mr-3">
-              <Ionicons name="arrow-back" size={24} color="#455A64" />
+              <AppIcon name="arrow-back" size={24} color="#455A64" />
             </TouchableOpacity>
             <Text className="text-dark font-bold text-lg flex-1">Profil</Text>
           </View>
@@ -50,7 +50,7 @@ export default function PublicProfileScreen() {
         >
           <View className="flex-row items-center px-4 py-3">
             <TouchableOpacity onPress={() => router.back()} className="mr-3">
-              <Ionicons name="arrow-back" size={24} color="#455A64" />
+              <AppIcon name="arrow-back" size={24} color="#455A64" />
             </TouchableOpacity>
             <Text className="text-dark font-bold text-lg flex-1">Profil</Text>
           </View>
@@ -75,7 +75,7 @@ export default function PublicProfileScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">Profil</Text>
         </View>
@@ -180,8 +180,8 @@ export default function PublicProfileScreen() {
                         flexShrink: 0,
                       }}
                     >
-                      <Ionicons
-                        name={faToIonicon(question.circle.icon)}
+                      <AppIcon
+                        name={String(faToIonicon(question.circle.icon))}
                         size={18}
                         color={question.circle.color_code}
                       />
@@ -202,7 +202,7 @@ export default function PublicProfileScreen() {
                     </Text>
                     <View className="flex-row items-center gap-3">
                       <View className="flex-row items-center gap-1">
-                        <Ionicons
+                        <AppIcon
                           name="chatbubble-outline"
                           size={12}
                           color="#9CA3AF"
@@ -220,7 +220,7 @@ export default function PublicProfileScreen() {
                       ) : null}
                     </View>
                   </View>
-                  <Ionicons
+                  <AppIcon
                     name="chevron-forward"
                     size={16}
                     color="#D1D5DB"
@@ -230,7 +230,7 @@ export default function PublicProfileScreen() {
               ))
             ) : (
               <View className="py-6 items-center">
-                <Ionicons
+                <AppIcon
                   name="chatbubble-ellipses-outline"
                   size={32}
                   color="#D1D5DB"
@@ -245,7 +245,7 @@ export default function PublicProfileScreen() {
           {/* Privacy Notice */}
           <View className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
             <View className="flex-row items-start gap-2">
-              <Ionicons
+              <AppIcon
                 name="information-circle-outline"
                 size={18}
                 color="#3B82F6"

@@ -7,7 +7,6 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -18,6 +17,7 @@ import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { formatAge } from '../../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../../src/lib/constants';
 
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 export default function ChildrenListScreen() {
   const insets = useSafeAreaInsets();
   const { activeChild, setActiveChild, reloadChildren } = useActiveChild();
@@ -69,7 +69,7 @@ export default function ChildrenListScreen() {
       >
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#455A64" />
+            <AppIcon name="arrow-back" size={24} color="#455A64" />
           </TouchableOpacity>
           <Text className="text-dark font-bold text-lg flex-1">Çocuklarım</Text>
           <TouchableOpacity
@@ -77,7 +77,7 @@ export default function ChildrenListScreen() {
             className="bg-primary/10 rounded-xl px-3 py-1.5 flex-row items-center gap-1"
             activeOpacity={0.7}
           >
-            <Ionicons name="add" size={18} color="#FF8A65" />
+            <AppIcon name="add" size={18} color="#FF8A65" />
             <Text className="text-primary text-sm font-medium">Yeni Ekle</Text>
           </TouchableOpacity>
         </View>
@@ -136,7 +136,7 @@ export default function ChildrenListScreen() {
                         className="p-2 mr-1"
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
-                        <Ionicons
+                        <AppIcon
                           name="create-outline"
                           size={20}
                           color="#6B7280"
@@ -147,7 +147,7 @@ export default function ChildrenListScreen() {
                         className="p-2"
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
-                        <Ionicons
+                        <AppIcon
                           name="trash-outline"
                           size={20}
                           color="#EF4444"
@@ -172,7 +172,7 @@ export default function ChildrenListScreen() {
             </>
           ) : (
             <View className="items-center py-12">
-              <Ionicons name="people-outline" size={48} color="#D1D5DB" />
+              <AppIcon name="people-outline" size={48} color="#D1D5DB" />
               <Text className="text-dark font-bold text-lg mt-4 mb-2">
                 Henüz çocuk eklenmedi
               </Text>
@@ -209,7 +209,7 @@ export default function ChildrenListScreen() {
               }}
               activeOpacity={0.7}
             >
-              <Ionicons name="add-circle-outline" size={22} color="#9CA3AF" />
+              <AppIcon name="add-circle-outline" size={22} color="#9CA3AF" />
               <Text className="text-gray-400 font-medium">
                 + Yeni Çocuk Ekle
               </Text>

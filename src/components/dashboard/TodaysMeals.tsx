@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import type { MealPlanDay } from '../../lib/types';
 
+import { AppIcon } from '../ui/AppIcon';
 interface TodaysMealsProps {
   selectedDate: string;
   mealPlanDays?: MealPlanDay[];
@@ -72,7 +72,7 @@ export function TodaysMeals({ selectedDate, mealPlanDays, isLoading }: TodaysMea
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons name="restaurant-outline" size={22} color="#FF8A65" />
+                  <AppIcon name="restaurant-outline" size={22} color="#FF8A65" />
                 </View>
               )}
               <View style={{ flex: 1, marginLeft: 12 }}>
@@ -84,9 +84,9 @@ export function TodaysMeals({ selectedDate, mealPlanDays, isLoading }: TodaysMea
                 </Text>
               </View>
               {meal.is_completed ? (
-                <Ionicons name="checkmark-circle" size={20} color="#22C55E" />
+                <AppIcon name="checkmark-circle" size={20} color="#22C55E" />
               ) : (
-                <Ionicons name="ellipse-outline" size={20} color="#D1D5DB" />
+                <AppIcon name="ellipse-outline" size={20} color="#D1D5DB" />
               )}
             </TouchableOpacity>
           ))}
@@ -105,7 +105,7 @@ export function TodaysMeals({ selectedDate, mealPlanDays, isLoading }: TodaysMea
             borderStyle: 'dashed',
           }}
         >
-          <Ionicons name="add-circle-outline" size={28} color="#9CA3AF" />
+          <AppIcon name="add-circle-outline" size={28} color="#9CA3AF" />
           <Text style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>
             {isToday ? 'Bugün için öğün ekle' : 'Bu gün için öğün ekle'}
           </Text>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import useSWR from 'swr';
 import { getAuthor, getAuthorRecipes } from '../../src/services/author-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
@@ -10,6 +9,7 @@ import { RecipeCard } from '../../src/components/recipes/RecipeCard';
 import { DetailPageHeader } from '../../src/components/ui/DetailPageHeader';
 import { COLORS } from '../../src/lib/constants';
 
+import { AppIcon } from '../../src/components/ui/AppIcon';
 export default function AuthorDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const authorId = Number(id);
@@ -33,7 +33,7 @@ export default function AuthorDetailScreen() {
       <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
         <DetailPageHeader title="Yazar Profili" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-          <Ionicons name="person-outline" size={48} color="#9CA3AF" />
+          <AppIcon name="person-outline" size={48} color="#9CA3AF" />
           <Text style={{ color: '#374151', fontWeight: '700', fontSize: 18, marginTop: 16 }}>
             Yazar bulunamadı
           </Text>
@@ -74,7 +74,7 @@ export default function AuthorDetailScreen() {
 
           {author.is_expert ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, backgroundColor: '#F0FDF4', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
-              <Ionicons name="shield-checkmark" size={14} color="#16A34A" style={{ marginRight: 4 }} />
+              <AppIcon name="shield-checkmark" size={14} color="#16A34A" style={{ marginRight: 4 }} />
               <Text style={{ fontSize: 12, fontWeight: '700', color: '#16A34A' }}>Uzman</Text>
             </View>
           ) : null}
@@ -100,7 +100,7 @@ export default function AuthorDetailScreen() {
             ))
           ) : (
             <View style={{ alignItems: 'center', paddingVertical: 32 }}>
-              <Ionicons name="restaurant-outline" size={40} color="#D1D5DB" />
+              <AppIcon name="restaurant-outline" size={40} color="#D1D5DB" />
               <Text style={{ color: '#9CA3AF', marginTop: 12, textAlign: 'center' }}>
                 Henüz tarif bulunamadı.
               </Text>

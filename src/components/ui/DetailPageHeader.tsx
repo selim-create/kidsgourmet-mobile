@@ -7,9 +7,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 interface DetailPageHeaderProps {
   title: string;
   onBack?: () => void;
@@ -44,7 +44,7 @@ export function DetailPageHeader({
           style={styles.iconButton}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={22} color={textColor} />
+          <AppIcon name="arrow-back" size={22} color={textColor} />
         </TouchableOpacity>
 
         <Text style={[styles.title, { color: textColor }]} numberOfLines={1}>
@@ -59,7 +59,7 @@ export function DetailPageHeader({
             style={styles.iconButton}
             activeOpacity={0.7}
           >
-            <Ionicons name="home-outline" size={22} color={textColor} />
+            <AppIcon name="home-outline" size={22} color={textColor} />
           </TouchableOpacity>
         ) : (
           <View style={styles.iconButton} />

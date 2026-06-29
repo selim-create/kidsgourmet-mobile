@@ -9,7 +9,6 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import useSWR from 'swr';
 import { getAllFeatured } from '../../services/featured-service';
@@ -17,6 +16,7 @@ import type { FeaturedItem } from '../../services/featured-service';
 import { handleSponsorPress } from '../../utils/sponsorRedirect';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from '../ui/AppIcon';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 40;
 
@@ -89,11 +89,11 @@ function RecipeFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           />
         ) : (
           <View style={{ width: '100%', height: 180, backgroundColor: '#FFF3EE', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="restaurant-outline" size={48} color={COLORS.primary} />
+            <AppIcon name="restaurant-outline" size={48} color={COLORS.primary} />
           </View>
         )}
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: COLORS.primary, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="restaurant-outline" size={12} color="#fff" />
+          <AppIcon name="restaurant-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Tarif</Text>
         </View>
         {data.meta?.age_group ? (
@@ -109,7 +109,7 @@ function RecipeFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         ) : null}
         {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
+            <AppIcon name="person-circle-outline" size={14} color={COLORS.gray[400]} />
             <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
@@ -131,11 +131,11 @@ function GuideFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Image source={{ uri: data.image }} style={{ width: '100%', height: 180 }} contentFit="cover" placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }} />
         ) : (
           <View style={{ width: '100%', height: 180, backgroundColor: '#EBF5FB', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="newspaper-outline" size={48} color="#2196F3" />
+            <AppIcon name="newspaper-outline" size={48} color="#2196F3" />
           </View>
         )}
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#2196F3', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="newspaper-outline" size={12} color="#fff" />
+          <AppIcon name="newspaper-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Rehber</Text>
         </View>
         {data.meta?.category ? (
@@ -151,7 +151,7 @@ function GuideFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         ) : null}
         {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
+            <AppIcon name="person-circle-outline" size={14} color={COLORS.gray[400]} />
             <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
@@ -169,9 +169,9 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
       style={{ width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10 }}
     >
       <View style={{ width: '100%', height: 180, backgroundColor: '#F3E8FF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <Ionicons name="chatbubbles-outline" size={48} color="#9C27B0" />
+        <AppIcon name="chatbubbles-outline" size={48} color="#9C27B0" />
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#9C27B0', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="chatbubbles-outline" size={12} color="#fff" />
+          <AppIcon name="chatbubbles-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Soru</Text>
         </View>
         {data.meta?.answer_count !== undefined ? (
@@ -187,7 +187,7 @@ function QuestionFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         ) : null}
         {data.meta?.author_name ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <Ionicons name="person-circle-outline" size={14} color={COLORS.gray[400]} />
+            <AppIcon name="person-circle-outline" size={14} color={COLORS.gray[400]} />
             <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>{data.meta?.author_name}</Text>
           </View>
         ) : null}
@@ -215,7 +215,7 @@ function SponsorFeaturedCard({ item }: { item: MappedFeaturedItem }) {
             {sponsorLogo ? (
               <Image source={{ uri: sponsorLogo }} style={{ width: 80, height: 80 }} contentFit="contain" />
             ) : (
-              <Ionicons name="business-outline" size={48} color="#334155" />
+              <AppIcon name="business-outline" size={48} color="#334155" />
             )}
           </View>
         )}
@@ -250,11 +250,11 @@ function IngredientFeaturedCard({ item }: { item: MappedFeaturedItem }) {
           <Image source={{ uri: data.image }} style={{ width: '100%', height: 180 }} contentFit="cover" placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }} />
         ) : (
           <View style={{ width: '100%', height: 180, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="leaf-outline" size={48} color="#4CAF50" />
+            <AppIcon name="leaf-outline" size={48} color="#4CAF50" />
           </View>
         )}
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#4CAF50', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="leaf-outline" size={12} color="#fff" />
+          <AppIcon name="leaf-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Malzeme</Text>
         </View>
         {data.meta?.start_age ? (
@@ -270,7 +270,7 @@ function IngredientFeaturedCard({ item }: { item: MappedFeaturedItem }) {
         ) : null}
         {data.meta?.allergy_risk ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <Ionicons name="warning-outline" size={14} color={COLORS.gray[400]} />
+            <AppIcon name="warning-outline" size={14} color={COLORS.gray[400]} />
             <Text style={{ fontSize: 12, color: COLORS.gray[400], marginLeft: 4 }}>Alerji riski: {data.meta?.allergy_risk}</Text>
           </View>
         ) : null}
@@ -287,9 +287,9 @@ function ToolFeaturedCard() {
       style={{ width: CARD_WIDTH, backgroundColor: '#EEF2FF', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 10 }}
     >
       <View style={{ width: '100%', height: 180, backgroundColor: '#EEF2FF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <Ionicons name="sparkles-outline" size={64} color="#4F46E5" />
+        <AppIcon name="sparkles-outline" size={64} color="#4F46E5" />
         <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#4F46E5', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="sparkles-outline" size={12} color="#fff" />
+          <AppIcon name="sparkles-outline" size={12} color="#fff" />
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Araçlar</Text>
         </View>
       </View>
@@ -299,7 +299,7 @@ function ToolFeaturedCard() {
           BLW testi, katı gıda hazırlığı, persentil hesaplama ve daha fazlası
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-          <Ionicons name="arrow-forward-circle-outline" size={14} color="#4F46E5" />
+          <AppIcon name="arrow-forward-circle-outline" size={14} color="#4F46E5" />
           <Text style={{ fontSize: 12, color: '#4F46E5', marginLeft: 4, fontWeight: '600' }}>Araçlara Git</Text>
         </View>
       </View>
@@ -312,7 +312,7 @@ function ToolFeaturedCard() {
 interface TabConfig {
   type: FilterTab;
   label: string;
-  icon?: React.ComponentProps<typeof Ionicons>['name'];
+  icon?: string;
   activeColor: string;
   activeBg: string;
   inactiveBg: string;
@@ -426,10 +426,10 @@ export function FeaturedSlider() {
                     contentFit="contain"
                   />
                 ) : (
-                  <Ionicons name="business-outline" size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
+                  <AppIcon name="business-outline" size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
                 )
               ) : tab.icon ? (
-                <Ionicons name={tab.icon} size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
+                <AppIcon name={tab.icon} size={13} color={isActive ? tab.activeColor : tab.inactiveColor} />
               ) : null}
               <Text style={{ fontSize: 13, fontWeight: '600', color: isActive ? tab.activeColor : tab.inactiveColor }}>
                 {isSponsored ? sponsorName : tab.label}
@@ -495,7 +495,7 @@ export function FeaturedSlider() {
         </>
       ) : (
         <View style={{ paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center' }}>
-          <Ionicons name="star-outline" size={40} color={COLORS.gray[300]} />
+          <AppIcon name="star-outline" size={40} color={COLORS.gray[300]} />
           <Text style={{ color: COLORS.gray[400], marginTop: 8, fontSize: 14 }}>
             İçerik yükleniyor...
           </Text>

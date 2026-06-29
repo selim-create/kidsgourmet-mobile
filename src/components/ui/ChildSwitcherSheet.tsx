@@ -11,7 +11,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
@@ -21,6 +20,7 @@ import { Avatar } from './Avatar';
 import { COLORS } from '../../lib/constants';
 import type { Child } from '../../lib/types';
 
+import { AppIcon } from './AppIcon';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SHEET_HEIGHT = Math.min(340, SCREEN_HEIGHT * 0.5);
 /** Delay (ms) to wait for the sheet close animation before navigating. */
@@ -64,7 +64,7 @@ function ChildCard({ child, isActive, onSelect }: ChildCardProps) {
       >
         {isActive && (
           <View style={styles.checkBadge}>
-            <Ionicons name="checkmark" size={12} color="#fff" />
+            <AppIcon name="checkmark" size={12} color="#fff" />
           </View>
         )}
         <Avatar uri={child.avatar_url} name={child.name} size={60} />
@@ -191,7 +191,7 @@ export function ChildSwitcherSheet({ visible, onClose }: ChildSwitcherSheetProps
             {/* Add child card */}
             <TouchableOpacity style={styles.addCard} onPress={handleAddChild} activeOpacity={0.75}>
               <View style={styles.addIcon}>
-                <Ionicons name="add" size={28} color={COLORS.gray[400]} />
+                <AppIcon name="add" size={28} color={COLORS.gray[400]} />
               </View>
               <Text style={styles.addLabel}>Çocuk Ekle</Text>
             </TouchableOpacity>

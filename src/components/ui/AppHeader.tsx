@@ -35,10 +35,11 @@ import { SmartSearchPill } from './SmartSearchPill';
 import { ChildSwitcherPill } from './ChildSwitcherPill';
 import { ChildSwitcherSheet } from './ChildSwitcherSheet';
 import { HeaderGreeting } from './HeaderGreeting';
-import { AppIcon } from './AppIcon';
+
 import { useBottomRowStyle } from '../../hooks/use-collapsible-header';
 import { COLORS } from '../../lib/constants';
 
+import { AppIcon } from './AppIcon';
 export interface AppHeaderProps {
   variant?: 'full' | 'compact' | 'detail';
   showChildSwitcher?: boolean;
@@ -91,7 +92,7 @@ export function AppHeader({
 
   const handleAvatarPress = () => {
     if (isAuthenticated) {
-      setChildSheetVisible(true);
+      router.push('/(tabs)/profile');
     } else {
       router.push('/(auth)/login');
     }

@@ -1,6 +1,3 @@
-import type { ComponentProps } from 'react';
-import type { Ionicons } from '@expo/vector-icons';
-
 export type ToolSlug =
   | 'besin-takvimi'
   | 'alerjen-planlayici'
@@ -21,7 +18,7 @@ export interface ToolDefinition {
   slug: ToolSlug;
   title: string;
   description: string;
-  icon: ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   /** Renk (ikon arka planı) — pastel + canlı eşleştirme */
   color: string;
   bg: string;

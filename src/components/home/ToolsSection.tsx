@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Linking,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS } from '../../lib/constants';
+import { AppIcon } from '../ui/AppIcon';
 import { TOOLS, pickRandom, type ToolDefinition } from '../../lib/tools';
 
 export function ToolsSection() {
@@ -54,7 +54,7 @@ export function ToolsSection() {
           >
             {/* Icon */}
             <View style={[styles.iconWrap, { backgroundColor: tool.bg }]}>
-              <Ionicons name={tool.icon} size={26} color={tool.color} />
+              <AppIcon name={tool.icon} size={26} color={tool.color} />
             </View>
             {/* Name */}
             <Text style={styles.toolName} numberOfLines={2}>

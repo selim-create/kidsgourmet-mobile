@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { TOOLS } from '../../src/lib/tools';
 import type { ToolSlug } from '../../src/lib/tools';
 import { COLORS } from '../../src/lib/constants';
+import { AppIcon } from '../../src/components/ui/AppIcon';
 
 export default function ToolPlaceholderScreen() {
   const { slug } = useLocalSearchParams<{ slug: ToolSlug }>();
@@ -25,7 +26,7 @@ export default function ToolPlaceholderScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Stack.Screen options={{ title: tool.title, headerBackTitle: 'Asistan' }} />
       <View style={[styles.iconWrap, { backgroundColor: tool.bg }]}>
-        <Ionicons name={tool.icon} size={48} color={tool.color} />
+        <AppIcon name={tool.icon} size={48} color={tool.color} />
       </View>
 
       <Text style={styles.title}>{tool.title}</Text>

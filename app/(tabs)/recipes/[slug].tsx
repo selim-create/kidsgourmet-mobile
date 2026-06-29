@@ -25,6 +25,7 @@ import { tariftenService, type TariftenSuggestion } from '../../../src/services/
 import { RecipeTariftenBanner } from '../../../src/components/recipe/RecipeTariftenBanner';
 import { LoadingSpinner } from '../../../src/components/ui/LoadingSpinner';
 import { Badge } from '../../../src/components/ui/Badge';
+import { AppIcon } from '../../../src/components/ui/AppIcon';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Avatar } from '../../../src/components/ui/Avatar';
@@ -1423,7 +1424,7 @@ export default function RecipeDetailScreen() {
                       marginBottom: 10,
                     }}
                   >
-                    <Ionicons name={tool.icon} size={22} color={tool.color} />
+                    <AppIcon name={tool.icon} size={22} color={tool.color} />
                   </View>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.dark, marginBottom: 4 }} numberOfLines={2}>
                     {tool.title}

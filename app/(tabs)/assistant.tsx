@@ -7,8 +7,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../../src/components/ui/AppHeader';
+import { AppIcon } from '../../src/components/ui/AppIcon';
 import { COLORS } from '../../src/lib/constants';
 import { TOOLS } from '../../src/lib/tools';
 import type { ToolSlug } from '../../src/lib/tools';
@@ -38,8 +38,8 @@ export default function AssistantScreen() {
             activeOpacity={0.8}
             onPress={() => handlePress(tool.route, tool.slug)}
           >
-            <View style={[styles.cardIcon, { backgroundColor: tool.bg }]}>
-              <Ionicons name={tool.icon} size={30} color={tool.color} />
+            <View style={[styles.cardIcon, { backgroundColor: tool.bg }]}> 
+              <AppIcon name={tool.icon} size={30} color={tool.color} />
             </View>
             <View style={styles.cardText}>
               <View style={styles.cardTitleRow}>
@@ -60,7 +60,7 @@ export default function AssistantScreen() {
                 <Text style={[styles.ctaText, { color: tool.color }]}>Başla →</Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray[300]} />
+            <AppIcon name="chevron-forward" size={20} color={COLORS.gray[300]} />
           </TouchableOpacity>
         ))}
       </ScrollView>

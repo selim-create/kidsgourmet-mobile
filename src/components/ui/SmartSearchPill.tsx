@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
 import { SearchModal } from './SearchModal';
+import { AppIcon } from './AppIcon';
 
 function buildSuggestions(childName?: string, ageMonths?: number): string[] {
   const name = childName ?? 'Minik';
@@ -25,14 +25,10 @@ export function SmartSearchPill() {
   if (activeChild?.birth_date) {
     const birth = new Date(activeChild.birth_date);
     const now = new Date();
-    ageMonths = Math.max(
-      0,
-      (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth()),
-    );
+    ageMonths = Math.max(0, (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth()));
   }
 
   const suggestions = useMemo(() => buildSuggestions(activeChild?.name, ageMonths), [activeChild?.name, ageMonths]);
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -46,17 +42,12 @@ export function SmartSearchPill() {
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.pill}
-        activeOpacity={0.75}
-        onPress={() => setModalVisible(true)}
-      >
-        <Ionicons name="search-outline" size={16} color={COLORS.gray[400]} style={styles.searchIcon} />
+      <TouchableOpacity style={styles.pill} activeOpacity={0.75} onPress={() => setModalVisible(true)}>
+        <AppIcon name="search-outline" size={16} color={COLORS.gray[400]} style={styles.searchIcon} />
         <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
           {suggestions[index]}
         </Text>
       </TouchableOpacity>
-
       <SearchModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </>
   );
@@ -82,4 +73,3 @@ const styles = StyleSheet.create({
     color: COLORS.gray[400],
   },
 });
-

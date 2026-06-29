@@ -23,7 +23,6 @@ import Animated from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
@@ -36,6 +35,7 @@ import { SmartSearchPill } from './SmartSearchPill';
 import { ChildSwitcherPill } from './ChildSwitcherPill';
 import { ChildSwitcherSheet } from './ChildSwitcherSheet';
 import { HeaderGreeting } from './HeaderGreeting';
+import { AppIcon } from './AppIcon';
 import { useBottomRowStyle } from '../../hooks/use-collapsible-header';
 import { COLORS } from '../../lib/constants';
 
@@ -48,11 +48,6 @@ export interface AppHeaderProps {
   title?: string;
 }
 
-/**
- * Logo tap counter for Quiet Mode easter egg.
- * 3 taps within 1 second → toggle dark/light header background.
- * TODO: persist with AsyncStorage for cross-session memory.
- */
 function useLogoTapEasterEgg() {
   const tapCount = useRef(0);
   const lastTap = useRef(0);
@@ -91,11 +86,9 @@ export function AppHeader({
   const [childSheetVisible, setChildSheetVisible] = useState(false);
   const { quietMode, onLogoPress } = useLogoTapEasterEgg();
 
-  // ── Quiet-mode theming ──────────────────────────────────────────────────────
   const bgColor = quietMode ? COLORS.dark : '#FFFFFF';
   const iconColor = quietMode ? '#FFFFFF' : COLORS.dark;
 
-  // ── Avatar / child press handling ───────────────────────────────────────────
   const handleAvatarPress = () => {
     if (isAuthenticated) {
       setChildSheetVisible(true);
@@ -112,16 +105,12 @@ export function AppHeader({
     }
   };
 
-  // ── Bottom row: show when auth and has children (or "add child" pill) ───────
   const showBottomRow = isAuthenticated && showChildSwitcher;
-
-  // ── Collapsible bottom row animated style (via shared hook to avoid duplication) ──
   const animatedBottomRowStyle = useBottomRowStyle(scrollY);
 
-  // ── Detail variant: simple back-arrow header ─────────────────────────────────
   if (variant === 'detail') {
     return (
-      <View style={[styles.container, { paddingTop: insets.top + 4, backgroundColor: bgColor }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 4, backgroundColor: bgColor }]}> 
         <LinearGradient
           colors={[COLORS.primary, COLORS.secondary, COLORS.blue]}
           start={{ x: 0, y: 0 }}
@@ -130,7 +119,7 @@ export function AppHeader({
         />
         <View style={styles.topRow}>
           <TouchableOpacity onPress={() => router.back()} style={styles.iconButton} activeOpacity={0.7}>
-            <Ionicons name="arrow-back-outline" size={24} color={iconColor} />
+            <AppIcon name="arrow-back-outline" size={24} color={iconColor} />
           </TouchableOpacity>
           <Text style={[styles.detailTitle, { color: iconColor }]} numberOfLines={1}>
             {title ?? ''}
@@ -143,8 +132,7 @@ export function AppHeader({
 
   return (
     <>
-      <View style={[styles.container, { paddingTop: insets.top + 4, backgroundColor: bgColor }]}>
-        {/* ── 2px gradient stripe at top ────────────────────────────────────── */}
+      <View style={[styles.container, { paddingTop: insets.top + 4, backgroundColor: bgColor }]}> 
         <LinearGradient
           colors={[COLORS.primary, COLORS.secondary, COLORS.blue]}
           start={{ x: 0, y: 0 }}
@@ -152,24 +140,20 @@ export function AppHeader({
           style={styles.gradientStripe}
         />
 
-        {/* ── Top row (always visible, ~56px) ──────────────────────────────── */}
         <View style={styles.topRow}>
-          {/* Hamburger + notification dot */}
           <View style={styles.hamburgerWrap}>
             <TouchableOpacity
               onPress={() => setDrawerVisible(true)}
               style={styles.iconButton}
               activeOpacity={0.7}
             >
-              <Ionicons name="menu-outline" size={26} color={iconColor} />
+              <AppIcon name="menu-outline" size={26} color={iconColor} />
             </TouchableOpacity>
-            {/* Show notification dot when there's relevant activity (currently hidden; TODO: wire to real notifications) */}
             <View style={styles.dotPositioned}>
               <NotificationDot size={7} visible={false} />
             </View>
           </View>
 
-          {/* Logo (left-center) — tappable for quiet-mode easter egg */}
           <TouchableOpacity onPress={onLogoPress} activeOpacity={0.9} style={styles.logoButton}>
             {quietMode ? (
               <Text style={styles.quietLogoText}>KG</Text>
@@ -182,20 +166,17 @@ export function AppHeader({
             )}
           </TouchableOpacity>
 
-          {/* Smart search pill (flexible width) */}
           {showSearchPill && variant !== 'compact' && <SmartSearchPill />}
 
-          {/* Notification bell */}
           <View style={styles.bellWrap}>
             <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}>
-              <Ionicons name="notifications-outline" size={22} color={iconColor} />
+              <AppIcon name="notifications-outline" size={22} color={iconColor} />
             </TouchableOpacity>
             <View style={styles.dotPositioned}>
               <NotificationDot size={7} visible={false} />
             </View>
           </View>
 
-          {/* Child / user avatar button */}
           <TouchableOpacity
             style={styles.avatarButton}
             activeOpacity={0.75}
@@ -207,37 +188,34 @@ export function AppHeader({
               <Avatar uri={user.avatar_url} name={user.name} size={30} />
             ) : (
               <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person-outline" size={18} color={COLORS.gray[400]} />
+                <AppIcon name="person-outline" size={18} color={COLORS.gray[400]} />
               </View>
             )}
           </TouchableOpacity>
         </View>
 
-        {/* ── Bottom row (collapsible, ~48px) ─────────────────────────────── */}
         {showBottomRow && (
           <Animated.View style={[styles.bottomRow, animatedBottomRowStyle as any]}>
             {children.length > 0 ? (
               <ChildSwitcherPill />
             ) : (
-              /* No children yet — show "+ Çocuk ekle" pill */
               <TouchableOpacity
                 style={styles.addChildPill}
                 activeOpacity={0.75}
                 onPress={() => router.push('/(tabs)/profile')}
               >
-                <Ionicons name="add-circle-outline" size={16} color={COLORS.primary} />
+                <AppIcon name="add-circle-outline" size={16} color={COLORS.primary} />
                 <Text style={styles.addChildText}>Çocuk ekle</Text>
               </TouchableOpacity>
             )}
 
-            {/* Favorites count */}
             <View style={styles.favWrap}>
               <TouchableOpacity
                 style={styles.favButton}
                 activeOpacity={0.75}
                 onPress={() => router.push('/(tabs)/favorites')}
               >
-                <Ionicons name="heart-outline" size={20} color={COLORS.primary} />
+                <AppIcon name="heart-outline" size={20} color={COLORS.primary} />
                 {favorites.length > 0 && (
                   <View style={styles.favBadge}>
                     <Text style={styles.favBadgeText}>
@@ -251,10 +229,7 @@ export function AppHeader({
         )}
       </View>
 
-      {/* ── Greeting band (only on home) ─────────────────────────────────── */}
       {showGreeting && <HeaderGreeting />}
-
-      {/* ── Modals ──────────────────────────────────────────────────────── */}
       <DrawerMenu visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
       <ChildSwitcherSheet visible={childSheetVisible} onClose={() => setChildSheetVisible(false)} />
     </>

@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../src/lib/constants';
+import { AppIcon } from '../../src/components/ui/AppIcon';
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
@@ -29,6 +29,9 @@ export default function TabsLayout() {
           shadowRadius: 8,
           elevation: 10,
         },
+        tabBarIconStyle: {
+          marginBottom: -2,
+        },
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -42,7 +45,7 @@ export default function TabsLayout() {
         options={{
           title: 'Ana Sayfa',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={22} color={color} />
+            <AppIcon name={focused ? 'home' : 'home-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -51,7 +54,7 @@ export default function TabsLayout() {
         options={{
           title: 'Tarifler',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'restaurant' : 'restaurant-outline'} size={22} color={color} />
+            <AppIcon name={focused ? 'restaurant' : 'restaurant-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -60,7 +63,7 @@ export default function TabsLayout() {
         options={{
           title: 'Keşfet',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'compass' : 'compass-outline'} size={24} color={color} />
+            <AppIcon name={focused ? 'compass' : 'compass-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -69,7 +72,7 @@ export default function TabsLayout() {
         options={{
           title: 'Asistan',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'sparkles' : 'sparkles-outline'} size={22} color={color} />
+            <AppIcon name={focused ? 'sparkles' : 'sparkles-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -78,7 +81,7 @@ export default function TabsLayout() {
         options={{
           title: 'Rehber',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'book' : 'book-outline'} size={22} color={color} />
+            <AppIcon name={focused ? 'book' : 'book-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -87,7 +90,7 @@ export default function TabsLayout() {
         options={{
           title: 'Topluluk',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'people' : 'people-outline'} size={22} color={color} />
+            <AppIcon name={focused ? 'people' : 'people-outline'} size={22} color={color} />
           ),
         }}
       />

@@ -17,25 +17,40 @@ function getInitials(name?: string): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
+function isValidHttpUrl(value?: string | null): value is string {
+  if (!value) return false;
+  return /^https?:\/\//i.test(value);
+}
+
 export function Avatar({ uri, name, size = 40, className }: AvatarProps) {
   const [errored, setErrored] = useState(false);
   const style = { width: size, height: size, borderRadius: size / 2 };
   const fontSize = Math.floor(size * 0.4);
+
+  // Only treat http/https URIs as valid to prevent native crashes from corrupt
+  // or file-scheme cache entries on physical iOS devices.
+  const validUri = isValidHttpUrl(uri) ? uri : null;
 
   // Reset error state when uri changes (e.g. signed URL refresh)
   useEffect(() => {
     setErrored(false);
   }, [uri]);
 
-  if (uri && !errored) {
+  if (validUri && !errored) {
     return (
       <Image
-        source={{ uri }}
+        source={{ uri: validUri }}
         style={style}
         className={`bg-gray-200 ${className ?? ''}`}
         contentFit="cover"
         onError={() => setErrored(true)}
-        cachePolicy="memory-disk"
+        // Use memory-only cache to avoid corrupt disk-cached PNG entries that
+        // trigger native XMP-metadata parsing crashes on physical iOS devices.
+        cachePolicy="memory"
+        // recyclingKey forces expo-image to discard stale image instances when
+        // the source URI changes (e.g. signed-URL refresh), preventing
+        // use-after-free / SIGSEGV on the TurboModules thread.
+        recyclingKey={validUri}
         transition={150}
       />
     );

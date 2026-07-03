@@ -21,12 +21,13 @@ import { Badge } from '../../src/components/ui/Badge';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { AppHeader } from '../../src/components/ui/AppHeader';
+import { ErrorBoundary } from '../../src/components/ui/ErrorBoundary';
 import { formatAge } from '../../src/utils/ageFormatter';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 import Toast from 'react-native-toast-message';
 
 export default function ProfileScreen() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
   const { activeChild, setActiveChild } = useActiveChild();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -92,6 +93,17 @@ export default function ProfileScreen() {
       { cancelable: true },
     );
   };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+        <AppHeader />
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
+      </View>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -227,7 +239,8 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
+    <ErrorBoundary>
+      <View style={{ flex: 1, backgroundColor: '#FFFBE6' }}>
       <AppHeader />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* User Info */}
@@ -365,5 +378,6 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
     </View>
+    </ErrorBoundary>
   );
 }

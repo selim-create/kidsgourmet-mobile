@@ -7,13 +7,21 @@ const AVATAR_UPLOAD_ERROR = 'Avatar yüklenemedi';
 function toAbsoluteUrl(value?: string | null): string | null | undefined {
   if (!value) return value;
   if (/^https?:\/\//i.test(value)) return value;
+  // Relative paths are resolved against the API base URL
   return `${API_URL}${value.startsWith('/') ? value : `/${value}`}`;
 }
 
+function isValidAvatarUrl(value?: string | null): value is string {
+  if (!value) return false;
+  // Must be an absolute http/https URL after normalization
+  return /^https?:\/\/.+/i.test(value);
+}
+
 function normalizeChild(child: Child): Child {
+  const url = toAbsoluteUrl(child.avatar_url ?? child.avatar_path ?? null);
   return {
     ...child,
-    avatar_url: toAbsoluteUrl(child.avatar_url ?? child.avatar_path ?? null),
+    avatar_url: isValidAvatarUrl(url) ? url : null,
   };
 }
 
@@ -26,19 +34,21 @@ export function normalizeUserProfile(user: User): User {
   const avatarObject = typeof raw.avatar === 'object' && raw.avatar !== null ? raw.avatar : null;
   const avatarString = typeof raw.avatar === 'string' ? raw.avatar : null;
 
+  const resolvedAvatarUrl =
+    toAbsoluteUrl(
+      user.avatar_url
+      ?? avatarString
+      ?? avatarObject?.url
+      ?? avatarObject?.full
+      ?? raw.user_avatar
+      ?? raw.profile_image
+      ?? null,
+    ) ?? null;
+
   return {
     ...user,
     name: user.name ?? user.display_name ?? '',
-    avatar_url:
-      toAbsoluteUrl(
-        user.avatar_url
-        ?? avatarString
-        ?? avatarObject?.url
-        ?? avatarObject?.full
-        ?? raw.user_avatar
-        ?? raw.profile_image
-        ?? null,
-      ) ?? null,
+    avatar_url: isValidAvatarUrl(resolvedAvatarUrl) ? resolvedAvatarUrl : null,
     children: Array.isArray(user.children) ? user.children.map(normalizeChild) : user.children,
   };
 }

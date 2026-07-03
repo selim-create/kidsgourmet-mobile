@@ -4,6 +4,7 @@ import { LogBox } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { Image } from 'expo-image';
 import Toast from 'react-native-toast-message';
 import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
@@ -25,6 +26,10 @@ LogBox.ignoreLogs([
 export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
+    // Clear the expo-image disk cache on every app start to evict any corrupt
+    // PNG entries that would trigger native XMP-metadata parsing crashes on
+    // physical iOS devices (EXC_BAD_ACCESS / SIGSEGV in SDImageCache.ioQueue).
+    Image.clearDiskCache().catch(() => {});
   }, []);
 
   return (

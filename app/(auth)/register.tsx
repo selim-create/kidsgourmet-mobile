@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,13 +12,16 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
-import { GoogleSignInButton } from '../../src/components/auth/GoogleSignInButton';
-import { ErrorBoundary } from '../../src/components/ui/ErrorBoundary';
 import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function RegisterScreen() {
   const { register, refreshUser } = useAuth();
@@ -44,18 +47,49 @@ export default function RegisterScreen() {
 
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
-    AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
+    AppleAuthentication.isAvailableAsync().then(setAppleAvailable).catch(() => {});
   }, []);
 
-  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+  const handleGooglePress = async () => {
     try {
       setIsLoading(true);
-      const result = await signInWithGoogle(idToken);
-      if (result.token) {
-        await refreshUser();
-        router.replace('/(tabs)');
+
+      const clientId = Platform.select({
+        ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
+        android: Constants.expoConfig?.extra?.googleAndroidClientId as string | undefined,
+        default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
+      });
+
+      if (!clientId) {
+        Toast.show({ type: 'info', text1: 'Google giriş bu platformda kullanılamıyor' });
+        return;
+      }
+
+      const redirectUri = AuthSession.makeRedirectUri({
+        scheme: 'kidsgourmet',
+        path: 'redirect',
+      });
+
+      const discovery = await AuthSession.fetchDiscoveryAsync('https://accounts.google.com');
+
+      const authRequest = new AuthSession.AuthRequest({
+        clientId,
+        scopes: ['openid', 'profile', 'email'],
+        redirectUri,
+        responseType: AuthSession.ResponseType.IdToken,
+      });
+
+      const result = await authRequest.promptAsync(discovery);
+
+      if (result.type === 'success' && result.params?.id_token) {
+        const authResult = await signInWithGoogle(result.params.id_token);
+        if (authResult.token) {
+          await refreshUser();
+          router.replace('/(tabs)');
+        }
       }
     } catch (err) {
+      console.warn('[GoogleAuth] Error:', err);
       Toast.show({
         type: 'error',
         text1: 'Google ile kayıt başarısız',
@@ -64,7 +98,7 @@ export default function RegisterScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [refreshUser]);
+  };
 
   const update = (key: keyof typeof form) => (val: string | boolean) =>
     setForm((f) => ({ ...f, [key]: val }));
@@ -355,13 +389,17 @@ export default function RegisterScreen() {
                 <View className="flex-1 h-px bg-gray-200" />
               </View>
 
-              <ErrorBoundary fallback={null}>
-                <GoogleSignInButton
-                  text="Google ile Kayıt Ol"
-                  onSuccess={handleGoogleSuccess}
-                  disabled={isLoading}
-                />
-              </ErrorBoundary>
+              <TouchableOpacity
+                className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
+                activeOpacity={0.8}
+                onPress={handleGooglePress}
+                disabled={isLoading}
+              >
+                <Ionicons name="logo-google" size={18} color="#EA4335" />
+                <Text className="text-dark text-sm font-medium ml-2 flex-1">
+                  Google ile Kayıt Ol
+                </Text>
+              </TouchableOpacity>
 
               {Platform.OS === 'ios' && appleAvailable && (
                 <TouchableOpacity

@@ -16,16 +16,22 @@ export function GoogleSignInButton({
   onSuccess,
   disabled = false,
 }: GoogleSignInButtonProps) {
-  const googleClientId = Platform.select({
+  const googleConfig = {
     ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
     android: (Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId) as string | undefined,
     default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
-  });
+  };
+  const hasGoogleClientId =
+    Platform.OS === 'ios'
+      ? Boolean(googleConfig.ios)
+      : Platform.OS === 'android'
+        ? Boolean(googleConfig.android)
+        : Boolean(googleConfig.default);
 
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
-    androidClientId: Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId,
-    webClientId: Constants.expoConfig?.extra?.googleWebClientId,
+    iosClientId: googleConfig.ios,
+    androidClientId: googleConfig.android,
+    webClientId: googleConfig.default,
   });
 
   useEffect(() => {
@@ -46,7 +52,7 @@ export function GoogleSignInButton({
     });
   }, [googleResponse, onSuccess]);
 
-  if (!googleClientId) {
+  if (!hasGoogleClientId) {
     return null;
   }
 

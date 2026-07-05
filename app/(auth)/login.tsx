@@ -28,8 +28,15 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const [appleAvailable, setAppleAvailable] = useState(false);
 
+  const googleClientId = Platform.select({
+    ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
+    android: (Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId) as string | undefined,
+    default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
+  });
+
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
     iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
+    androidClientId: Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId,
     webClientId: Constants.expoConfig?.extra?.googleWebClientId,
   });
 
@@ -214,6 +221,7 @@ export default function LoginScreen() {
                 <View className="flex-1 h-px bg-gray-200" />
               </View>
 
+              {googleClientId && (
               <TouchableOpacity
                 className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
                 activeOpacity={0.8}
@@ -225,6 +233,7 @@ export default function LoginScreen() {
                   Google ile Giriş Yap
                 </Text>
               </TouchableOpacity>
+              )}
 
               {Platform.OS === 'ios' && appleAvailable && (
                 <TouchableOpacity

@@ -66,6 +66,7 @@
     },
     "extra": {
       "googleIosClientId": "944387456679-nuv4qnlq1lvrdpl1llp31sf30n8mm1j3.apps.googleusercontent.com",
+      "googleAndroidClientId": "944387456679-mis73fvvfhh7p715mm50j45v61l01ljh.apps.googleusercontent.com",
       "googleWebClientId": "944387456679-mis73fvvfhh7p715mm50j45v61l01ljh.apps.googleusercontent.com",
       "router": {
         "origin": false

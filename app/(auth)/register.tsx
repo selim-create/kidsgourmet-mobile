@@ -11,12 +11,12 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import Constants from 'expo-constants';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
+import { GoogleSignInButton } from '../../src/components/auth/GoogleSignInButton';
+import { ErrorBoundary } from '../../src/components/ui/ErrorBoundary';
 import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
 
@@ -42,18 +42,6 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [appleAvailable, setAppleAvailable] = useState(false);
 
-  const googleClientId = Platform.select({
-    ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
-    android: (Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId) as string | undefined,
-    default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
-  });
-
-  const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
-    androidClientId: Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId,
-    webClientId: Constants.expoConfig?.extra?.googleWebClientId,
-  });
-
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
     AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
@@ -77,17 +65,6 @@ export default function RegisterScreen() {
       setIsLoading(false);
     }
   }, [refreshUser]);
-
-  useEffect(() => {
-    if (googleResponse?.type === 'success') {
-      const idToken =
-        (googleResponse.params as Record<string, string> | undefined)?.id_token ??
-        googleResponse.authentication?.idToken;
-      if (idToken) {
-        handleGoogleSuccess(idToken);
-      }
-    }
-  }, [googleResponse, handleGoogleSuccess]);
 
   const update = (key: keyof typeof form) => (val: string | boolean) =>
     setForm((f) => ({ ...f, [key]: val }));
@@ -138,11 +115,6 @@ export default function RegisterScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGooglePress = () => {
-    if (!googleRequest) return;
-    promptGoogleAsync();
   };
 
   const handleApplePress = async () => {
@@ -383,19 +355,13 @@ export default function RegisterScreen() {
                 <View className="flex-1 h-px bg-gray-200" />
               </View>
 
-              {googleClientId && (
-              <TouchableOpacity
-                className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
-                activeOpacity={0.8}
-                onPress={handleGooglePress}
-                disabled={!googleRequest || isLoading}
-              >
-                <Ionicons name="logo-google" size={18} color="#EA4335" />
-                <Text className="text-dark text-sm font-medium ml-2 flex-1">
-                  Google ile Kayıt Ol
-                </Text>
-              </TouchableOpacity>
-              )}
+              <ErrorBoundary fallback={null}>
+                <GoogleSignInButton
+                  text="Google ile Kayıt Ol"
+                  onSuccess={handleGoogleSuccess}
+                  disabled={isLoading}
+                />
+              </ErrorBoundary>
 
               {Platform.OS === 'ios' && appleAvailable && (
                 <TouchableOpacity

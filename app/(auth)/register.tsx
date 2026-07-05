@@ -42,8 +42,15 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [appleAvailable, setAppleAvailable] = useState(false);
 
+  const googleClientId = Platform.select({
+    ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
+    android: (Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId) as string | undefined,
+    default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
+  });
+
   const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
     iosClientId: Constants.expoConfig?.extra?.googleIosClientId,
+    androidClientId: Constants.expoConfig?.extra?.googleAndroidClientId ?? Constants.expoConfig?.extra?.googleWebClientId,
     webClientId: Constants.expoConfig?.extra?.googleWebClientId,
   });
 
@@ -376,6 +383,7 @@ export default function RegisterScreen() {
                 <View className="flex-1 h-px bg-gray-200" />
               </View>
 
+              {googleClientId && (
               <TouchableOpacity
                 className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3 px-4 bg-white mb-3"
                 activeOpacity={0.8}
@@ -387,6 +395,7 @@ export default function RegisterScreen() {
                   Google ile Kayıt Ol
                 </Text>
               </TouchableOpacity>
+              )}
 
               {Platform.OS === 'ios' && appleAvailable && (
                 <TouchableOpacity

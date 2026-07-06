@@ -36,9 +36,17 @@ function parseStartAgeMonths(startAge?: string): number | null {
   return parseInt(match[0], 10);
 }
 
-/** Client-side safety decision — mirrors web page logic exactly */
+/**
+ * Client-side safety decision — mirrors web page logic exactly.
+ *
+ * The 1-month caution buffer (`startAgeMonths - 1`) reflects the web's UX
+ * design: babies within one month of the recommended start age get a "proceed
+ * with caution" signal rather than a hard block, matching pediatric guidance
+ * that introduction timing is approximate.
+ */
 function getClientSafetyLevel(babyAgeMonths: number, startAgeMonths: number): SafetyLevel {
   if (babyAgeMonths >= startAgeMonths) return 'safe';
+  // Within one month of recommended age → caution, not a hard block
   if (babyAgeMonths >= startAgeMonths - 1) return 'caution';
   return 'avoid';
 }
@@ -46,7 +54,7 @@ function getClientSafetyLevel(babyAgeMonths: number, startAgeMonths: number): Sa
 // ─── Result type (client-side) ────────────────────────────────────────────────
 
 interface ClientSafetyResult {
-  level: SafetyLevel;
+  level: SafetyLevel | 'unknown';
   ingredientName: string;
   startAge: string;
   babyAgeMonths: number;
@@ -61,7 +69,7 @@ export default function SafetyCheckScreen() {
   // Manual age input for when no active child
   const [manualAge, setManualAge] = useState('6');
 
-  const ageMonths = autoAgeMonths !== null ? autoAgeMonths : parseInt(manualAge, 10) || 0;
+  const ageMonths = autoAgeMonths !== null ? autoAgeMonths : (parseInt(manualAge, 10) || 0);
 
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<IngredientGuideItem[]>([]);
@@ -125,13 +133,22 @@ export default function SafetyCheckScreen() {
       return;
     }
 
+    // Validate age when entered manually
+    if (autoAgeMonths === null) {
+      const parsedAge = parseInt(manualAge, 10);
+      if (isNaN(parsedAge) || parsedAge < 0 || parsedAge > 36) {
+        setQueryError('Lütfen 0–36 arasında geçerli bir ay değeri girin.');
+        return;
+      }
+    }
+
     const startAgeMonths = parseStartAgeMonths(selectedIngredient.start_age);
     if (startAgeMonths === null) {
-      // No start_age data — treat as safe (unknown)
+      // Cannot determine safety without start_age data
       setResult({
-        level: 'safe',
+        level: 'unknown',
         ingredientName: selectedIngredient.name,
-        startAge: selectedIngredient.start_age ?? 'Belirtilmemiş',
+        startAge: 'Belirtilmemiş',
         babyAgeMonths: ageMonths,
       });
       return;
@@ -146,12 +163,33 @@ export default function SafetyCheckScreen() {
     });
   };
 
-  const safetyConfig = result ? SAFETY_CONFIGS[result.level] : null;
+  // For 'unknown' level use a neutral caution-style config
+  const UNKNOWN_CONFIG = {
+    bg: '#F3F4F6',
+    border: '#6B7280',
+    text: '#374151',
+    icon: 'help-circle' as const,
+    label: 'Bilgi Yetersiz ℹ️',
+    badge: 'Bilinmiyor',
+  };
 
-  const resultMessages: Record<SafetyLevel, string> = {
-    safe: `${result?.ingredientName ?? ''} bu yaşta verilebilir. Önerilen başlangıç yaşına ulaşmış.`,
-    caution: `${result?.ingredientName ?? ''} önerilen yaşa çok yakın. Küçük porsiyonlarla dikkatli deneyin ve reaksiyonları gözlemleyin.`,
-    avoid: `${result?.ingredientName ?? ''} henüz erken. Önerilen başlangıç yaşı: ${result?.startAge ?? ''}.`,
+  const safetyConfig = result
+    ? result.level === 'unknown'
+      ? UNKNOWN_CONFIG
+      : SAFETY_CONFIGS[result.level]
+    : null;
+
+  const getResultMessage = (r: ClientSafetyResult): string => {
+    if (r.level === 'unknown') {
+      return `${r.ingredientName} için başlangıç yaşı bilgisi bulunamadı. Pediatristenize danışın.`;
+    }
+    if (r.level === 'safe') {
+      return `${r.ingredientName} bu yaşta verilebilir. Önerilen başlangıç yaşına ulaşmış.`;
+    }
+    if (r.level === 'caution') {
+      return `${r.ingredientName} önerilen yaşa çok yakın. Küçük porsiyonlarla dikkatli deneyin ve reaksiyonları gözlemleyin.`;
+    }
+    return `${r.ingredientName} henüz erken. Önerilen başlangıç yaşı: ${r.startAge}.`;
   };
 
   return (
@@ -419,7 +457,7 @@ export default function SafetyCheckScreen() {
               <View style={{ flexDirection: 'row', marginBottom: 5 }}>
                 <Text style={{ color: safetyConfig.text, fontSize: 13, marginRight: 6 }}>•</Text>
                 <Text style={{ fontSize: 13, color: safetyConfig.text, flex: 1, lineHeight: 19 }}>
-                  {resultMessages[result.level]}
+                  {getResultMessage(result)}
                 </Text>
               </View>
 

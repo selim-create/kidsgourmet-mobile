@@ -42,21 +42,29 @@ export default function VaccineScreen() {
       return;
     }
     const dateAdministered = new Date().toISOString();
+    // Optimistic update — show done immediately, rollback on API failure
+    setAdministered((prev) => ({ ...prev, [vaccineId]: dateAdministered }));
     try {
       await markVaccineDone({
         vaccine_id: vaccineId,
         child_id: childId,
         date_administered: dateAdministered,
       });
-      setAdministered((prev) => ({ ...prev, [vaccineId]: dateAdministered }));
       Toast.show({
         type: 'success',
         text1: 'Aşı işaretlendi',
         text2: 'Aşı başarıyla yapıldı olarak kaydedildi.',
       });
+      // Revalidate so the API-returned administered_at is shown going forward
       await mutate();
     } catch (error) {
       if (__DEV__) console.error('[Vaccines] markVaccineDone error:', error);
+      // Rollback optimistic update
+      setAdministered((prev) => {
+        const next = { ...prev };
+        delete next[vaccineId];
+        return next;
+      });
       Toast.show({
         type: 'error',
         text1: 'Hata',
@@ -65,7 +73,7 @@ export default function VaccineScreen() {
     }
   };
 
-  // Derive done status: prefer API-returned administered_at, fall back to local state
+  // Derive done status: prefer API-returned administered_at, fall back to local optimistic state
   const isDoneForVaccine = (v: (typeof safeVaccines)[0]) =>
     Boolean(v.administered_at || administered[v.id]);
 

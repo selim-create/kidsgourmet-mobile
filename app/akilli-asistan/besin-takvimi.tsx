@@ -227,7 +227,8 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
       }
       onSaved();
       onClose();
-    } catch {
+    } catch (error) {
+      if (__DEV__) console.error('[BesinTakvimi] save error:', error);
       Toast.show({
         type: 'error',
         text1: 'Hata',
@@ -414,7 +415,8 @@ export default function BesinTakvimiScreen() {
                 Toast.show({ type: 'success', text1: 'Silindi', text2: 'Deneme kaydı silindi.' });
                 mutateTrials();
                 mutateSummary();
-              } catch {
+              } catch (error) {
+                if (__DEV__) console.error('[BesinTakvimi] delete error:', error);
                 Toast.show({
                   type: 'error',
                   text1: 'Hata',

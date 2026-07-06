@@ -9,36 +9,68 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import Toast from 'react-native-toast-message';
 import { useVaccines } from '../../src/hooks/useVaccines';
+import { markVaccineDone } from '../../src/services/vaccine-service';
 import { VaccineCard } from '../../src/components/vaccines/VaccineCard';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
-import { Card } from '../../src/components/ui/Card';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { COLORS } from '../../src/lib/constants';
-import { useSWRConfig } from 'swr';
+import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 
 export default function VaccineScreen() {
-  const { vaccines, isLoading } = useVaccines();
+  const { activeChild } = useActiveChild();
+  const childId = activeChild?.id;
+  const { vaccines, isLoading, mutate } = useVaccines(childId);
   const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
   const [administered, setAdministered] = useState<Record<number, string>>({});
   const [refreshing, setRefreshing] = useState(false);
-  const { mutate } = useSWRConfig();
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await mutate(() => true, undefined, { revalidate: true });
+    await mutate();
     setRefreshing(false);
   };
 
-  const handleMarkDone = (vaccineId: number) => {
-    setAdministered((prev) => ({
-      ...prev,
-      [vaccineId]: new Date().toISOString(),
-    }));
+  const handleMarkDone = async (vaccineId: number) => {
+    if (!childId) {
+      Toast.show({
+        type: 'error',
+        text1: 'Çocuk profili seçilmedi',
+        text2: 'Aşı takibi için bir çocuk profili seçin.',
+      });
+      return;
+    }
+    const dateAdministered = new Date().toISOString();
+    try {
+      await markVaccineDone({
+        vaccine_id: vaccineId,
+        child_id: childId,
+        date_administered: dateAdministered,
+      });
+      setAdministered((prev) => ({ ...prev, [vaccineId]: dateAdministered }));
+      Toast.show({
+        type: 'success',
+        text1: 'Aşı işaretlendi',
+        text2: 'Aşı başarıyla yapıldı olarak kaydedildi.',
+      });
+      await mutate();
+    } catch (error) {
+      if (__DEV__) console.error('[Vaccines] markVaccineDone error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Hata',
+        text2: 'Aşı kaydedilemedi. Lütfen tekrar deneyin.',
+      });
+    }
   };
 
+  // Derive done status: prefer API-returned administered_at, fall back to local state
+  const isDoneForVaccine = (v: (typeof safeVaccines)[0]) =>
+    Boolean(v.administered_at || administered[v.id]);
+
   const total = safeVaccines.length;
-  const done = safeVaccines.filter((v) => administered[v.id]).length;
+  const done = safeVaccines.filter(isDoneForVaccine).length;
   const pending = total - done;
   const completionPct = total > 0 ? Math.round((done / total) * 100) : 0;
 
@@ -52,6 +84,13 @@ export default function VaccineScreen() {
           </TouchableOpacity>
           <Text className="text-white text-xl font-bold">Aşı Takvimi</Text>
         </View>
+
+        {/* Active child info */}
+        {activeChild && (
+          <Text className="text-white/80 text-sm mb-2 ml-9">
+            {activeChild.name} için
+          </Text>
+        )}
 
         {/* Stats */}
         {!isLoading && total > 0 && (
@@ -95,6 +134,21 @@ export default function VaccineScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={COLORS.primary} />
         }
       >
+        {/* No-child warning */}
+        {!activeChild && (
+          <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4 flex-row items-start">
+            <Ionicons name="information-circle-outline" size={20} color="#D97706" />
+            <View className="ml-2 flex-1">
+              <Text className="text-yellow-800 font-semibold text-sm">
+                Çocuk profili seçilmedi
+              </Text>
+              <Text className="text-yellow-700 text-xs mt-0.5">
+                Aşı takibi için bir çocuk profili seçin.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {isLoading ? (
           <LoadingSpinner label="Aşı takvimi yükleniyor..." />
         ) : safeVaccines.length === 0 ? (
@@ -106,7 +160,7 @@ export default function VaccineScreen() {
         ) : (
           <>
             {/* Overdue warning */}
-            {safeVaccines.some((v) => !administered[v.id]) && (
+            {safeVaccines.some((v) => !isDoneForVaccine(v)) && (
               <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4 flex-row items-start">
                 <Ionicons name="warning-outline" size={20} color="#CA8A04" />
                 <View className="ml-2 flex-1">
@@ -124,8 +178,8 @@ export default function VaccineScreen() {
               <VaccineCard
                 key={vaccine.id}
                 vaccine={vaccine}
-                administeredAt={administered[vaccine.id]}
-                onMarkDone={handleMarkDone}
+                administeredAt={vaccine.administered_at || administered[vaccine.id]}
+                onMarkDone={activeChild ? handleMarkDone : undefined}
               />
             ))}
           </>

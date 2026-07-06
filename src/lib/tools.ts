@@ -122,7 +122,7 @@ export const TOOLS: ToolDefinition[] = [
     description: 'Güncel hava kalitesine göre bebeğiniz için dış mekan aktivitesi önerileri alın.',
     icon: 'cloud-outline',
     color: '#0284C7', bg: '#E0F2FE',
-    route: null,
+    route: '/akilli-asistan/hava-kalitesi',
     webUrl: 'https://kidsgourmet.com.tr/akilli-asistan/hava-kalitesi',
   },
   {

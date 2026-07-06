@@ -663,6 +663,10 @@ export interface Vaccine {
   description?: string;
   is_mandatory?: boolean;
   is_overdue?: boolean;
+  /** ISO date string — present when fetched via VACCINES_BY_CHILD endpoint */
+  administered_at?: string;
+  /** Status string returned by child-specific endpoint */
+  status?: string;
 }
 
 // ─── Dashboard Types ──────────────────────────────────────────────────────────

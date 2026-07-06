@@ -65,7 +65,7 @@ export default function WaterCalculatorScreen() {
       setResult(res);
       setStage('result');
     } catch (err) {
-      console.error('[WaterCalculator] calculateWaterNeed error:', err);
+      if (__DEV__) console.error('[WaterCalculator] calculateWaterNeed error:', err);
       Toast.show({
         type: 'error',
         text1: 'Hesaplama başarısız',

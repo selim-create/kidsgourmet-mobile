@@ -98,7 +98,8 @@ export default function AlerjenPlanlayiciScreen() {
       });
       setPlan(result);
       setStage('result');
-    } catch {
+    } catch (error) {
+      if (__DEV__) console.error('[AlerjenPlanlayici] generateAllergenPlan error:', error);
       Toast.show({
         type: 'error',
         text1: 'Bir hata oluştu',

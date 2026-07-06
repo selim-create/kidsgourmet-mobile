@@ -46,7 +46,7 @@ export default function AssistantScreen() {
                 <Text style={styles.cardTitle} numberOfLines={2}>{tool.title}</Text>
                 {tool.requiresAuth && (
                   <View style={styles.authBadge}>
-                    <Text style={styles.authBadgeText}>Üyelik Gerekli</Text>
+                    <Text style={styles.authBadgeText}>Giriş Gerekli</Text>
                   </View>
                 )}
               </View>

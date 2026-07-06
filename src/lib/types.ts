@@ -87,6 +87,8 @@ export interface Child {
   dietary_restrictions?: string[];
   sensitive_data_consent?: boolean;
   guardian_declaration?: boolean;
+  weight_kg?: number | null;
+  current_weight_kg?: number | null;
 }
 
 // ─── Recipe Types ──────────────────────────────────────────────────────────────
@@ -657,6 +659,7 @@ export interface FoodIntroductionItem {
 
 export interface Vaccine {
   id: number;
+  vaccine_id?: number;
   name: string;
   recommended_age_months?: number;
   doses?: number;
@@ -665,6 +668,7 @@ export interface Vaccine {
   is_overdue?: boolean;
   /** ISO date string — present when fetched via VACCINES_BY_CHILD endpoint */
   administered_at?: string;
+  date_administered?: string;
   /** Status string returned by child-specific endpoint */
   status?: string;
 }
@@ -991,12 +995,15 @@ export interface PercentileMeasurement {
 // ─── Water Calculator Types ───────────────────────────────────────────────────
 
 export interface WaterNeedResult {
-  daily_ml: number;
-  min_ml?: number;
-  max_ml?: number;
-  note?: string;
-  sources?: string[];
-  disclaimer?: string;
+  daily_fluid_need_ml: number;
+  breakdown: {
+    from_breast_milk_formula: number;
+    from_food: number;
+    from_water: number;
+  };
+  notes: string[];
+  formula: string;
+  warning: string | null;
 }
 
 // ─── Solid Food Readiness Types ───────────────────────────────────────────────
@@ -1031,51 +1038,70 @@ export interface AllergenPlannerConfig {
 }
 
 export interface AllergenPlannerInput {
-  allergen_ids: string[];
+  allergen_id: string;
   child_id?: string | number;
-  start_date?: string;
+  previous_reactions?: string[];
 }
 
 export interface AllergenTrialDay {
   day: number;
-  allergen: string;
-  amount?: string;
-  instructions?: string;
+  amount: string;
+  form?: string;
+  time?: string;
+  notes?: string;
 }
 
 export interface AllergenTrialPlan {
-  schedule: AllergenTrialDay[];
-  notes?: string;
-  emergency_signs?: string[];
-  disclaimer?: string;
+  allergen: {
+    id: string;
+    name: string;
+    risk_level?: string;
+  };
+  introduction_plan: {
+    total_days: number;
+    days: AllergenTrialDay[];
+  };
+  warning_signs: string[];
+  emergency_signs: string[];
+  when_to_stop: string[];
+  success_criteria?: string;
+  related_ingredients?: string[];
 }
 
 // ─── Food Trial Types ─────────────────────────────────────────────────────────
 
 export interface FoodTrial {
   id: number;
-  child_id?: string | number;
-  food_name: string;
-  start_date: string;
-  status: 'planned' | 'in_progress' | 'completed' | 'reaction';
-  notes?: string;
-  reaction_type?: string;
+  child_id: string;
+  ingredient_id?: number;
+  ingredient_name?: string;
+  trial_date: string;
+  result: 'success' | 'mild_reaction' | 'reaction' | 'severe_reaction';
+  reaction_notes?: string;
+  amount?: string;
+  form?: string;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface FoodTrialInput {
-  child_id?: string | number;
-  food_name: string;
-  start_date?: string;
-  notes?: string;
+  child_id: string | number;
+  ingredient_id?: number;
+  ingredient_name?: string;
+  trial_date: string;
+  result: 'success' | 'mild_reaction' | 'reaction' | 'severe_reaction';
+  reaction_notes?: string;
+  amount?: string;
+  form?: string;
 }
 
 export interface FoodTrialSummary {
-  total: number;
-  completed: number;
-  in_progress: number;
-  reactions: number;
+  total_trials: number;
+  success: number;
+  mild_reaction: number;
+  reaction: number;
+  severe_reaction: number;
+  recent_trials?: FoodTrial[];
 }
 
 // ─── Bath Planner Types ───────────────────────────────────────────────────────

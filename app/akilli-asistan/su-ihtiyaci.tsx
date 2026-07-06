@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -13,26 +13,48 @@ import { ToolHeader } from '../../src/components/tools/ToolHeader';
 import { ToolGradientHero } from '../../src/components/tools/ToolGradientHero';
 import { Icon } from '../../src/components/ui/Icon';
 import { calculateWaterNeed } from '../../src/services/tool-service';
+import { useActiveChild } from '../../src/contexts/ActiveChildContext';
+import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 import type { WaterNeedResult } from '../../src/lib/types';
 
-type FeedingType = 'breast' | 'formula' | 'mixed' | 'solid';
+type Weather = 'hot' | 'normal' | 'cold';
 
-const FEEDING_OPTIONS: { value: FeedingType; label: string }[] = [
-  { value: 'breast', label: 'Anne Sütü' },
-  { value: 'formula', label: 'Mama' },
-  { value: 'mixed', label: 'Karma' },
-  { value: 'solid', label: 'Katı Gıda' },
+const WEATHER_OPTIONS: { value: Weather; label: string }[] = [
+  { value: 'hot', label: 'Sıcak' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'cold', label: 'Soğuk' },
 ];
 
 type Stage = 'form' | 'result';
 
 export default function WaterCalculatorScreen() {
+  const { activeChild } = useActiveChild();
   const [stage, setStage] = useState<Stage>('form');
   const [ageMonths, setAgeMonths] = useState('');
   const [weightKg, setWeightKg] = useState('');
-  const [feedingType, setFeedingType] = useState<FeedingType>('breast');
+  const [weather, setWeather] = useState<Weather>('normal');
+  const [isBreastfed, setIsBreastfed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WaterNeedResult | null>(null);
+
+  const autoWeight = useMemo(() => {
+    if (!activeChild) return null;
+    return (
+      activeChild.weight_kg ??
+      activeChild.current_weight_kg ??
+      null
+    );
+  }, [activeChild]);
+
+  useEffect(() => {
+    if (!activeChild) return;
+    if (activeChild.birth_date) {
+      setAgeMonths(String(getAgeInMonths(activeChild.birth_date)));
+    }
+    if (autoWeight !== null && autoWeight !== undefined && Number.isFinite(autoWeight)) {
+      setWeightKg(String(autoWeight));
+    }
+  }, [activeChild, autoWeight]);
 
   const handleCalculate = async () => {
     const age = parseInt(ageMonths, 10);
@@ -45,8 +67,17 @@ export default function WaterCalculatorScreen() {
       return;
     }
 
-    const weight = weightKg.trim() ? parseFloat(weightKg) : undefined;
-    if (weight !== undefined && (isNaN(weight) || weight <= 0 || weight > 30)) {
+    if (!weightKg.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Ağırlık zorunlu',
+        text2: 'Lütfen bebeğinizin kilosunu girin.',
+      });
+      return;
+    }
+
+    const weight = parseFloat(weightKg);
+    if (isNaN(weight) || weight <= 0 || weight > 30) {
       Toast.show({
         type: 'error',
         text1: 'Geçersiz ağırlık',
@@ -60,12 +91,18 @@ export default function WaterCalculatorScreen() {
       const res = await calculateWaterNeed({
         age_months: age,
         weight_kg: weight,
-        feeding_type: feedingType,
+        weather,
+        is_breastfed: isBreastfed,
       });
       setResult(res);
       setStage('result');
     } catch (err) {
-      if (__DEV__) console.error('[WaterCalculator] calculateWaterNeed error:', err);
+      if (__DEV__) {
+        console.error(
+          '[WaterCalculator] calculateWaterNeed error:',
+          err instanceof Error ? err.message : err,
+        );
+      }
       Toast.show({
         type: 'error',
         text1: 'Hesaplama başarısız',
@@ -79,9 +116,18 @@ export default function WaterCalculatorScreen() {
   const handleReset = () => {
     setStage('form');
     setResult(null);
-    setAgeMonths('');
-    setWeightKg('');
-    setFeedingType('breast');
+    setWeather('normal');
+    setIsBreastfed(false);
+    if (activeChild?.birth_date) {
+      setAgeMonths(String(getAgeInMonths(activeChild.birth_date)));
+    } else {
+      setAgeMonths('');
+    }
+    if (autoWeight !== null && autoWeight !== undefined && Number.isFinite(autoWeight)) {
+      setWeightKg(String(autoWeight));
+    } else {
+      setWeightKg('');
+    }
   };
 
   return (
@@ -93,7 +139,7 @@ export default function WaterCalculatorScreen() {
           iconColor="#ffffff"
           gradientColors={['#06B6D4', '#0891B2']}
           title="Su İhtiyacı Hesaplayıcı"
-          subtitle="Bebeğinizin yaş ve beslenme şekline göre günlük su ihtiyacını hesaplayın."
+          subtitle="Bebeğinizin yaş, kilo ve koşullarına göre günlük sıvı ihtiyacını hesaplayın."
         />
 
         {stage === 'form' ? (
@@ -115,9 +161,7 @@ export default function WaterCalculatorScreen() {
 
             {/* Weight field */}
             <View className="mb-5">
-              <Text className="text-sm font-medium text-gray-500 mb-2">
-                Ağırlık (kg) — opsiyonel
-              </Text>
+              <Text className="text-sm font-medium text-gray-500 mb-2">Ağırlık (kg) *</Text>
               <TextInput
                 className="bg-white border border-gray-200 rounded-2xl px-4 py-3 text-base text-dark"
                 placeholder="Örn: 7.5"
@@ -128,18 +172,21 @@ export default function WaterCalculatorScreen() {
               />
             </View>
 
-            {/* Feeding type */}
+            {/* Is breastfed */}
             <View className="mb-6">
-              <Text className="text-sm font-medium text-gray-500 mb-3">Beslenme Türü</Text>
-              <View className="gap-2">
-                {FEEDING_OPTIONS.map((opt) => {
-                  const selected = feedingType === opt.value;
+              <Text className="text-sm font-medium text-gray-500 mb-3">Sadece anne sütü mü?</Text>
+              <View className="flex-row gap-2">
+                {[
+                  { label: 'Evet', value: true },
+                  { label: 'Hayır', value: false },
+                ].map((opt) => {
+                  const selected = isBreastfed === opt.value;
                   return (
                     <TouchableOpacity
-                      key={opt.value}
-                      onPress={() => setFeedingType(opt.value)}
+                      key={opt.label}
+                      onPress={() => setIsBreastfed(opt.value)}
                       activeOpacity={0.8}
-                      className={`flex-row items-center bg-white border rounded-2xl px-4 py-3 gap-3 ${selected ? 'border-cyan-500' : 'border-gray-200'}`}
+                      className={`flex-1 flex-row items-center justify-center bg-white border rounded-2xl px-4 py-3 gap-3 ${selected ? 'border-cyan-500' : 'border-gray-200'}`}
                     >
                       <View
                         className={`w-5 h-5 rounded-full border-2 items-center justify-center ${selected ? 'border-cyan-500 bg-cyan-500' : 'border-gray-300'}`}
@@ -148,6 +195,30 @@ export default function WaterCalculatorScreen() {
                       </View>
                       <Text
                         className={`text-base ${selected ? 'font-semibold text-cyan-700' : 'text-dark'}`}
+                      >
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Weather */}
+            <View className="mb-6">
+              <Text className="text-sm font-medium text-gray-500 mb-3">Hava durumu</Text>
+              <View className="flex-row gap-2">
+                {WEATHER_OPTIONS.map((opt) => {
+                  const selected = weather === opt.value;
+                  return (
+                    <TouchableOpacity
+                      key={opt.value}
+                      onPress={() => setWeather(opt.value)}
+                      activeOpacity={0.8}
+                      className={`flex-1 bg-white border rounded-2xl px-4 py-3 items-center ${selected ? 'border-cyan-500' : 'border-gray-200'}`}
+                    >
+                      <Text
+                        className={`text-sm ${selected ? 'font-semibold text-cyan-700' : 'text-dark'}`}
                       >
                         {opt.label}
                       </Text>
@@ -178,60 +249,58 @@ export default function WaterCalculatorScreen() {
               <Text className="text-xs font-medium text-cyan-600 uppercase tracking-wide mb-1">
                 Günlük Su İhtiyacı
               </Text>
-              <Text className="text-5xl font-bold text-cyan-700 mb-1">{result.daily_ml}</Text>
+              <Text className="text-5xl font-bold text-cyan-700 mb-1">
+                {result.daily_fluid_need_ml}
+              </Text>
               <Text className="text-sm text-cyan-600">ml / gün</Text>
             </View>
 
-            {/* Min–Max range */}
-            {(result.min_ml !== undefined || result.max_ml !== undefined) && (
-              <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4 flex-row justify-around">
-                {result.min_ml !== undefined && (
-                  <View className="items-center">
-                    <Text className="text-xs text-gray-500 mb-1">Minimum</Text>
-                    <Text className="text-xl font-bold text-dark">{result.min_ml}</Text>
-                    <Text className="text-xs text-gray-400">ml</Text>
-                  </View>
-                )}
-                {result.min_ml !== undefined && result.max_ml !== undefined && (
-                  <View className="w-px bg-gray-100" />
-                )}
-                {result.max_ml !== undefined && (
-                  <View className="items-center">
-                    <Text className="text-xs text-gray-500 mb-1">Maksimum</Text>
-                    <Text className="text-xl font-bold text-dark">{result.max_ml}</Text>
-                    <Text className="text-xs text-gray-400">ml</Text>
-                  </View>
-                )}
-              </View>
-            )}
+            {/* Breakdown */}
+            <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
+              <Text className="text-sm font-semibold text-dark mb-3">Sıvı Dağılımı</Text>
+              {[
+                {
+                  label: 'Anne sütü / mama',
+                  value: result.breakdown.from_breast_milk_formula,
+                },
+                { label: 'Gıdadan', value: result.breakdown.from_food },
+                { label: 'Sudan', value: result.breakdown.from_water },
+              ].map((item) => (
+                <View key={item.label} className="flex-row items-center justify-between py-2">
+                  <Text className="text-sm text-gray-600">{item.label}</Text>
+                  <Text className="text-sm font-semibold text-dark">{item.value} ml</Text>
+                </View>
+              ))}
+            </View>
 
-            {/* Note */}
-            {result.note ? (
-              <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4 flex-row gap-3">
-                <Icon name="info-circle" size={18} color="#06B6D4" />
-                <Text className="flex-1 text-sm text-dark leading-5">{result.note}</Text>
+            {/* Formula */}
+            <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4 flex-row gap-3">
+              <Icon name="calculator" size={18} color="#06B6D4" />
+              <View className="flex-1">
+                <Text className="text-sm font-semibold text-dark mb-1">Kullanılan Formül</Text>
+                <Text className="text-sm text-gray-600 leading-5">{result.formula}</Text>
               </View>
-            ) : null}
+            </View>
 
-            {/* Sources */}
-            {result.sources && result.sources.length > 0 ? (
+            {/* Notes */}
+            {result.notes.length > 0 ? (
               <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
-                <Text className="text-sm font-semibold text-dark mb-3">Kaynaklar</Text>
-                {result.sources.map((source, index) => (
-                  <View key={index} className="flex-row gap-2 mb-2">
-                    <Icon name="link" size={14} color="#9CA3AF" />
-                    <Text className="flex-1 text-sm text-gray-600 leading-5">{source}</Text>
+                <Text className="text-sm font-semibold text-dark mb-3">Notlar</Text>
+                {result.notes.map((note, index) => (
+                  <View key={index} className="flex-row items-start gap-2 mb-2">
+                    <Icon name="circle-check" size={14} color="#06B6D4" />
+                    <Text className="flex-1 text-sm text-gray-600 leading-5">{note}</Text>
                   </View>
                 ))}
               </View>
             ) : null}
 
-            {/* Disclaimer */}
-            {result.disclaimer ? (
+            {/* Warning */}
+            {result.warning ? (
               <View className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 flex-row gap-3">
                 <Icon name="triangle-exclamation" size={16} color="#D97706" />
                 <Text className="flex-1 text-xs text-amber-800 leading-5">
-                  {result.disclaimer}
+                  {result.warning}
                 </Text>
               </View>
             ) : null}

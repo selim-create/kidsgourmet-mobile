@@ -178,7 +178,7 @@ export const API_ENDPOINTS = {
   SOLID_FOOD_SUBMIT: '/kg/v1/tools/solid-food-readiness/submit',
 
   // Water Calculator
-  WATER_CALCULATOR: '/kg/v1/tools/water-need/calculate',
+  WATER_CALCULATOR: '/kg/v1/tools/water-calculator',
 
   // Allergen Planner
   ALLERGEN_PLANNER_CONFIG: '/kg/v1/tools/allergen-planner/config',
@@ -189,7 +189,8 @@ export const API_ENDPOINTS = {
   // Food Trials (auth required)
   FOOD_TRIALS: '/kg/v1/tools/food-trials',
   FOOD_TRIAL: (id: number) => `/kg/v1/tools/food-trials/${id}`,
-  FOOD_TRIAL_SUMMARY: '/kg/v1/tools/food-trials/summary',
+  FOOD_TRIAL_STATS: '/kg/v1/tools/food-trials/stats',
+  FOOD_TRIAL_SUMMARY: '/kg/v1/tools/food-trials/stats',
   /** Web-aligned alias for FOOD_TRIALS (POST to create a trial) */
   FOOD_TRIAL_ADD: '/kg/v1/tools/food-trials',
 

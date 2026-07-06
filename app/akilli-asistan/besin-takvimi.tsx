@@ -53,17 +53,17 @@ function displayDate(isoDate?: string): string {
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<
-  FoodTrial['status'],
+  FoodTrial['result'],
   { label: string; bg: string; text: string }
 > = {
-  planned: { label: 'Planlandı', bg: '#EFF6FF', text: '#1D4ED8' },
-  in_progress: { label: 'Devam Ediyor', bg: '#FEF3C7', text: '#D97706' },
-  completed: { label: 'Tamamlandı', bg: '#DCFCE7', text: '#15803D' },
+  success: { label: 'Başarılı', bg: '#DCFCE7', text: '#15803D' },
+  mild_reaction: { label: 'Hafif Reaksiyon', bg: '#FEF3C7', text: '#D97706' },
   reaction: { label: 'Reaksiyon', bg: '#FEE2E2', text: '#DC2626' },
+  severe_reaction: { label: 'Şiddetli Reaksiyon', bg: '#FEE2E2', text: '#B91C1C' },
 };
 
-function StatusBadge({ status }: { status: FoodTrial['status'] }) {
-  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.planned;
+function StatusBadge({ status }: { status: FoodTrial['result'] }) {
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.success;
   return (
     <View
       style={{
@@ -83,10 +83,10 @@ function StatusBadge({ status }: { status: FoodTrial['status'] }) {
 
 function SummaryCards({ summary }: { summary: FoodTrialSummary }) {
   const cards = [
-    { label: 'Toplam', value: summary.total, color: '#16A34A' },
-    { label: 'Tamamlanan', value: summary.completed, color: '#15803D' },
-    { label: 'Devam Eden', value: summary.in_progress, color: '#D97706' },
-    { label: 'Reaksiyon', value: summary.reactions, color: '#DC2626' },
+    { label: 'Toplam', value: summary.total_trials, color: '#16A34A' },
+    { label: 'Başarılı', value: summary.success, color: '#15803D' },
+    { label: 'Hafif', value: summary.mild_reaction, color: '#D97706' },
+    { label: 'Reaksiyon', value: summary.reaction + summary.severe_reaction, color: '#DC2626' },
   ];
   return (
     <View className="flex-row flex-wrap px-4 pt-4 gap-3">
@@ -120,12 +120,12 @@ function FoodTrialCard({
       <View className="flex-row items-start justify-between mb-2">
         <View className="flex-1 pr-2">
           <Text className="text-base font-bold text-dark" numberOfLines={1}>
-            {trial.food_name}
+            {trial.ingredient_name || 'İsimsiz besin'}
           </Text>
-          {trial.start_date ? (
+          {trial.trial_date ? (
             <View className="flex-row items-center gap-1 mt-0.5">
               <Icon name="calendar-days" size={12} color="#9CA3AF" />
-              <Text className="text-xs text-gray-500">{displayDate(trial.start_date)}</Text>
+              <Text className="text-xs text-gray-500">{displayDate(trial.trial_date)}</Text>
             </View>
           ) : null}
         </View>
@@ -147,19 +147,15 @@ function FoodTrialCard({
         </View>
       </View>
 
-      <StatusBadge status={trial.status} />
+      <StatusBadge status={trial.result} />
 
-      {trial.reaction_type ? (
+      {trial.reaction_notes ? (
         <View className="flex-row items-center gap-1.5 mt-2">
           <Icon name="circle-exclamation" size={13} color="#DC2626" />
-          <Text className="text-xs text-red-600">{trial.reaction_type}</Text>
+          <Text className="text-xs text-red-600" numberOfLines={2}>
+            {trial.reaction_notes}
+          </Text>
         </View>
-      ) : null}
-
-      {trial.notes ? (
-        <Text className="text-xs text-gray-500 mt-2 leading-4" numberOfLines={2}>
-          {trial.notes}
-        </Text>
       ) : null}
     </View>
   );
@@ -178,9 +174,10 @@ interface FormModalProps {
 function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps) {
   const isEdit = !!trial;
 
-  const [foodName, setFoodName] = useState('');
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [notes, setNotes] = useState('');
+  const [ingredientName, setIngredientName] = useState('');
+  const [trialDate, setTrialDate] = useState<Date>(new Date());
+  const [result, setResult] = useState<FoodTrial['result']>('success');
+  const [reactionNotes, setReactionNotes] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -188,19 +185,21 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
   useEffect(() => {
     if (visible) {
       if (trial) {
-        setFoodName(trial.food_name);
-        setStartDate(trial.start_date ? new Date(trial.start_date) : new Date());
-        setNotes(trial.notes ?? '');
+        setIngredientName(trial.ingredient_name ?? '');
+        setTrialDate(trial.trial_date ? new Date(trial.trial_date) : new Date());
+        setResult(trial.result ?? 'success');
+        setReactionNotes(trial.reaction_notes ?? '');
       } else {
-        setFoodName('');
-        setStartDate(new Date());
-        setNotes('');
+        setIngredientName('');
+        setTrialDate(new Date());
+        setResult('success');
+        setReactionNotes('');
       }
     }
   }, [visible, trial]);
 
   const handleSave = async () => {
-    if (!foodName.trim()) {
+    if (!ingredientName.trim()) {
       Toast.show({ type: 'error', text1: 'Besin adı zorunlu', text2: 'Lütfen bir besin adı girin.' });
       return;
     }
@@ -210,10 +209,11 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
     }
 
     const input: FoodTrialInput = {
-      food_name: foodName.trim(),
-      start_date: formatDateISO(startDate),
-      notes: notes.trim() || undefined,
-      child_id: childId,
+      ingredient_name: ingredientName.trim(),
+      trial_date: formatDateISO(trialDate),
+      result,
+      reaction_notes: reactionNotes.trim() || undefined,
+      child_id: String(childId),
     };
 
     setSubmitting(true);
@@ -228,7 +228,12 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
       onSaved();
       onClose();
     } catch (error) {
-      if (__DEV__) console.error('[BesinTakvimi] save error:', error);
+      if (__DEV__) {
+        console.error(
+          '[BesinTakvimi] save error:',
+          error instanceof Error ? error.message : error,
+        );
+      }
       Toast.show({
         type: 'error',
         text1: 'Hata',
@@ -261,8 +266,8 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
           <View className="bg-white rounded-2xl p-4 border border-gray-100 mb-4">
             <Text className="text-sm font-semibold text-dark mb-2">Besin Adı *</Text>
             <TextInput
-              value={foodName}
-              onChangeText={setFoodName}
+              value={ingredientName}
+              onChangeText={setIngredientName}
               placeholder="Örn: Havuç, Elma, Yoğurt..."
               placeholderTextColor="#9CA3AF"
               className="bg-gray-50 rounded-xl px-4 py-3 text-dark text-base border border-gray-200"
@@ -280,19 +285,19 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
               className="bg-gray-50 rounded-xl px-4 py-3 border border-gray-200 flex-row items-center"
             >
               <Icon name="calendar-days" size={16} color="#6B7280" />
-              <Text className="text-base text-dark ml-2">{displayDate(formatDateISO(startDate))}</Text>
+              <Text className="text-base text-dark ml-2">{displayDate(formatDateISO(trialDate))}</Text>
             </TouchableOpacity>
             {showDatePicker && (
               <>
                 <DateTimePicker
-                  value={startDate}
+                  value={trialDate}
                   mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={(_event, selected) => {
                     if (Platform.OS === 'android') {
                       setShowDatePicker(false);
                     }
-                    if (selected) setStartDate(selected);
+                    if (selected) setTrialDate(selected);
                   }}
                 />
                 {Platform.OS === 'ios' && (
@@ -308,13 +313,40 @@ function FormModal({ visible, trial, childId, onClose, onSaved }: FormModalProps
             )}
           </View>
 
+          {/* Trial result */}
+          <View className="bg-white rounded-2xl p-4 border border-gray-100 mb-4">
+          <Text className="text-sm font-semibold text-dark mb-2">Deneme Sonucu *</Text>
+          <View className="gap-2">
+            {[
+              { value: 'success', label: 'Başarılı' },
+              { value: 'mild_reaction', label: 'Hafif reaksiyon' },
+              { value: 'reaction', label: 'Reaksiyon' },
+              { value: 'severe_reaction', label: 'Şiddetli reaksiyon' },
+            ].map((item) => {
+              const selected = result === item.value;
+              return (
+                <TouchableOpacity
+                  key={item.value}
+                  onPress={() => setResult(item.value as FoodTrial['result'])}
+                  activeOpacity={0.8}
+                  className={`rounded-xl px-4 py-3 border ${selected ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-200'}`}
+                >
+                  <Text className={`text-sm ${selected ? 'text-green-700 font-semibold' : 'text-dark'}`}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          </View>
+
           {/* Notes */}
           <View className="bg-white rounded-2xl p-4 border border-gray-100 mb-4">
-            <Text className="text-sm font-semibold text-dark mb-2">Notlar</Text>
-            <TextInput
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Reaksiyon, gözlem veya notlarınızı yazın..."
+          <Text className="text-sm font-semibold text-dark mb-2">Reaksiyon Notları</Text>
+          <TextInput
+            value={reactionNotes}
+            onChangeText={setReactionNotes}
+            placeholder="Reaksiyon, gözlem veya notlarınızı yazın..."
               placeholderTextColor="#9CA3AF"
               multiline
               numberOfLines={4}
@@ -369,16 +401,20 @@ export default function BesinTakvimiScreen() {
     isLoading: trialsLoading,
     mutate: mutateTrials,
   } = useSWR<FoodTrial[]>(
-    isAuthenticated ? API_ENDPOINTS.FOOD_TRIALS : null,
-    getFoodTrials,
+    isAuthenticated && activeChild?.id
+      ? `${API_ENDPOINTS.FOOD_TRIALS}?child_id=${activeChild.id}`
+      : null,
+    () => getFoodTrials(String(activeChild?.id)),
   );
 
   const {
     data: summary,
     mutate: mutateSummary,
   } = useSWR<FoodTrialSummary>(
-    isAuthenticated ? API_ENDPOINTS.FOOD_TRIAL_SUMMARY : null,
-    getFoodTrialSummary,
+    isAuthenticated && activeChild?.id
+      ? `${API_ENDPOINTS.FOOD_TRIAL_STATS}?child_id=${activeChild.id}`
+      : null,
+    () => getFoodTrialSummary(String(activeChild?.id)),
   );
 
   const [refreshing, setRefreshing] = useState(false);
@@ -403,7 +439,7 @@ export default function BesinTakvimiScreen() {
     (trial: FoodTrial) => {
       Alert.alert(
         'Denemeyi Sil',
-        `"${trial.food_name}" deneme kaydını silmek istediğinize emin misiniz?`,
+        `"${trial.ingredient_name || 'Bu besin'}" deneme kaydını silmek istediğinize emin misiniz?`,
         [
           { text: 'İptal', style: 'cancel' },
           {
@@ -416,7 +452,12 @@ export default function BesinTakvimiScreen() {
                 mutateTrials();
                 mutateSummary();
               } catch (error) {
-                if (__DEV__) console.error('[BesinTakvimi] delete error:', error);
+                if (__DEV__) {
+                  console.error(
+                    '[BesinTakvimi] delete error:',
+                    error instanceof Error ? error.message : error,
+                  );
+                }
                 Toast.show({
                   type: 'error',
                   text1: 'Hata',

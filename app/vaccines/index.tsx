@@ -21,7 +21,7 @@ import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 export default function VaccineScreen() {
   const { activeChild } = useActiveChild();
   const childId = activeChild?.id;
-  const { vaccines, isLoading, mutate } = useVaccines(childId);
+  const { vaccines, isLoading, error, mutate } = useVaccines(childId);
   const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
   const [administered, setAdministered] = useState<Record<number, string>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -58,7 +58,12 @@ export default function VaccineScreen() {
       // Revalidate so the API-returned administered_at is shown going forward
       await mutate();
     } catch (error) {
-      if (__DEV__) console.error('[Vaccines] markVaccineDone error:', error);
+      if (__DEV__) {
+        console.error(
+          '[Vaccines] markVaccineDone error:',
+          error instanceof Error ? error.message : error,
+        );
+      }
       // Rollback optimistic update
       setAdministered((prev) => {
         const next = { ...prev };
@@ -74,8 +79,17 @@ export default function VaccineScreen() {
   };
 
   // Derive done status: prefer API-returned administered_at, fall back to local optimistic state
-  const isDoneForVaccine = (v: (typeof safeVaccines)[0]) =>
-    Boolean(v.administered_at || administered[v.id]);
+  const isDoneForVaccine = (v: (typeof safeVaccines)[0]) => {
+    const status = (v.status ?? '').toLowerCase();
+    return Boolean(
+      v.administered_at ||
+      v.date_administered ||
+      administered[v.id] ||
+      status === 'done' ||
+      status === 'completed' ||
+      status === 'administered',
+    );
+  };
 
   const total = safeVaccines.length;
   const done = safeVaccines.filter(isDoneForVaccine).length;
@@ -159,11 +173,17 @@ export default function VaccineScreen() {
 
         {isLoading ? (
           <LoadingSpinner label="Aşı takvimi yükleniyor..." />
+        ) : error ? (
+          <EmptyState
+            icon="alert-circle-outline"
+            title="Aşı bilgileri yüklenemedi"
+            description="Lütfen bağlantınızı kontrol edip tekrar deneyin."
+          />
         ) : safeVaccines.length === 0 ? (
           <EmptyState
             icon="medical-outline"
             title="Aşı bilgisi bulunamadı"
-            description="Aşı takvimi henüz yüklenemedi."
+            description="Bu profil için henüz aşı kaydı bulunmuyor."
           />
         ) : (
           <>
@@ -186,7 +206,15 @@ export default function VaccineScreen() {
               <VaccineCard
                 key={vaccine.id}
                 vaccine={vaccine}
-                administeredAt={vaccine.administered_at || administered[vaccine.id]}
+                administeredAt={
+                  vaccine.administered_at ||
+                  vaccine.date_administered ||
+                  administered[vaccine.id]
+                }
+                overdue={
+                  vaccine.is_overdue ||
+                  (vaccine.status ?? '').toLowerCase() === 'overdue'
+                }
                 onMarkDone={activeChild ? handleMarkDone : undefined}
               />
             ))}

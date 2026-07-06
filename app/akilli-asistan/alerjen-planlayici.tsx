@@ -5,11 +5,9 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import useSWR from 'swr';
 import { ToolHeader } from '../../src/components/tools/ToolHeader';
@@ -21,22 +19,6 @@ import { getAllergenPlannerConfig, generateAllergenPlan } from '../../src/servic
 import type { AllergenPlannerConfig, AllergenTrialPlan } from '../../src/lib/types';
 import { API_ENDPOINTS } from '../../src/lib/constants';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatDateISO(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function displayDate(isoDate: string): string {
-  const parts = isoDate.split('-');
-  if (parts.length !== 3) return isoDate;
-  const [y, mo, d] = parts;
-  return `${d}.${mo}.${y}`;
-}
-
 type Stage = 'intro' | 'form' | 'result';
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
@@ -46,9 +28,7 @@ export default function AlerjenPlanlayiciScreen() {
   const { activeChild } = useActiveChild();
 
   const [stage, setStage] = useState<Stage>('intro');
-  const [selectedAllergenIds, setSelectedAllergenIds] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedAllergenId, setSelectedAllergenId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [plan, setPlan] = useState<AllergenTrialPlan | null>(null);
 
@@ -71,20 +51,18 @@ export default function AlerjenPlanlayiciScreen() {
 
   // ─── Allergen toggle ────────────────────────────────────────────────────────
 
-  const toggleAllergen = (id: string) => {
-    setSelectedAllergenIds((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id],
-    );
+  const selectAllergen = (id: string) => {
+    setSelectedAllergenId((prev) => (prev === id ? null : id));
   };
 
   // ─── Submit ─────────────────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
-    if (selectedAllergenIds.length === 0) {
+    if (!selectedAllergenId) {
       Toast.show({
         type: 'error',
         text1: 'Alerjen seçin',
-        text2: 'Lütfen en az bir alerjen seçin.',
+        text2: 'Lütfen bir alerjen seçin.',
       });
       return;
     }
@@ -92,14 +70,18 @@ export default function AlerjenPlanlayiciScreen() {
     setIsSubmitting(true);
     try {
       const result = await generateAllergenPlan({
-        allergen_ids: selectedAllergenIds,
+        allergen_id: selectedAllergenId,
         child_id: activeChild?.id,
-        start_date: formatDateISO(startDate),
       });
       setPlan(result);
       setStage('result');
     } catch (error) {
-      if (__DEV__) console.error('[AlerjenPlanlayici] generateAllergenPlan error:', error);
+      if (__DEV__) {
+        console.error(
+          '[AlerjenPlanlayici] generateAllergenPlan error:',
+          error instanceof Error ? error.message : error,
+        );
+      }
       Toast.show({
         type: 'error',
         text1: 'Bir hata oluştu',
@@ -112,8 +94,7 @@ export default function AlerjenPlanlayiciScreen() {
 
   const handleReset = () => {
     setPlan(null);
-    setSelectedAllergenIds([]);
-    setStartDate(new Date());
+    setSelectedAllergenId(null);
     setStage('form');
   };
 
@@ -183,8 +164,7 @@ export default function AlerjenPlanlayiciScreen() {
             <View className="bg-white rounded-2xl p-4 border border-gray-100 gap-3">
               {(
                 [
-                  { icon: 'shield', text: 'Alerjenleri çoklu seçerek planlayın' },
-                  { icon: 'calendar-days', text: 'Başlangıç tarihi belirleyin' },
+                  { icon: 'shield', text: 'Tek bir alerjen seçerek detaylı plan alın' },
                   { icon: 'list-ol', text: 'Gün gün doz ve talimat listesi' },
                   { icon: 'triangle-exclamation', text: 'Acil durum belirtileri ve öneriler' },
                 ] as const
@@ -240,15 +220,15 @@ export default function AlerjenPlanlayiciScreen() {
             <View className="bg-white rounded-2xl p-4 border border-gray-100">
               <Text className="text-sm font-semibold text-dark mb-1">Alerjenler</Text>
               <Text className="text-xs text-gray-500 mb-3">
-                Plan oluşturmak istediğiniz alerjenleri seçin (birden fazla seçebilirsiniz).
+                Plan oluşturmak istediğiniz bir alerjeni seçin.
               </Text>
               <View className="gap-2">
                 {config.allergens.map((allergen) => {
-                  const isSelected = selectedAllergenIds.includes(allergen.id);
+                  const isSelected = selectedAllergenId === allergen.id;
                   return (
                     <TouchableOpacity
                       key={allergen.id}
-                      onPress={() => toggleAllergen(allergen.id)}
+                      onPress={() => selectAllergen(allergen.id)}
                       activeOpacity={0.8}
                       className={`flex-row items-center gap-3 p-3 rounded-xl border ${
                         isSelected
@@ -288,44 +268,6 @@ export default function AlerjenPlanlayiciScreen() {
                   );
                 })}
               </View>
-            </View>
-
-            {/* Start date */}
-            <View className="bg-white rounded-2xl p-4 border border-gray-100">
-              <Text className="text-sm font-semibold text-dark mb-2">Başlangıç Tarihi</Text>
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                activeOpacity={0.8}
-                className="bg-gray-50 rounded-xl px-4 py-3 border border-gray-200 flex-row items-center gap-2"
-              >
-                <Icon name="calendar-days" size={16} color="#6B7280" />
-                <Text className="text-base text-dark">{displayDate(formatDateISO(startDate))}</Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <>
-                  <DateTimePicker
-                    value={startDate}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    minimumDate={new Date()}
-                    onChange={(_event, selected) => {
-                      if (Platform.OS === 'android') {
-                        setShowDatePicker(false);
-                      }
-                      if (selected) setStartDate(selected);
-                    }}
-                  />
-                  {Platform.OS === 'ios' && (
-                    <TouchableOpacity
-                      onPress={() => setShowDatePicker(false)}
-                      activeOpacity={0.8}
-                      className="mt-2 bg-red-600 rounded-xl py-2 items-center"
-                    >
-                      <Text className="text-white font-semibold text-sm">Tamam</Text>
-                    </TouchableOpacity>
-                  )}
-                </>
-              )}
             </View>
 
             {/* Active child info */}
@@ -374,26 +316,13 @@ export default function AlerjenPlanlayiciScreen() {
             </View>
             <Text className="text-xl font-bold text-white">Planınız Hazır!</Text>
             <Text className="text-white/80 text-sm mt-1 text-center">
-              Alerjen deneme planınız oluşturuldu.
+              {plan.allergen?.name ?? 'Alerjen'} için deneme planınız oluşturuldu.
             </Text>
           </View>
 
           <View className="px-4 pt-4 gap-4">
-            {/* General notes */}
-            {plan.notes ? (
-              <View className="bg-white rounded-2xl p-4 border border-gray-100">
-                <View className="flex-row items-center gap-2 mb-2">
-                  <View className="w-8 h-8 rounded-full bg-red-100 items-center justify-center">
-                    <Icon name="info-circle" size={15} color="#DC2626" />
-                  </View>
-                  <Text className="text-sm font-bold text-dark">Genel Notlar</Text>
-                </View>
-                <Text className="text-sm text-gray-700 leading-5">{plan.notes}</Text>
-              </View>
-            ) : null}
-
             {/* Schedule */}
-            {plan.schedule && plan.schedule.length > 0 ? (
+            {plan.introduction_plan?.days && plan.introduction_plan.days.length > 0 ? (
               <View className="bg-white rounded-2xl p-4 border border-gray-100">
                 <View className="flex-row items-center gap-2 mb-4">
                   <View className="w-8 h-8 rounded-full bg-red-100 items-center justify-center">
@@ -401,29 +330,38 @@ export default function AlerjenPlanlayiciScreen() {
                   </View>
                   <Text className="text-sm font-bold text-dark">Günlük Plan</Text>
                 </View>
-                {plan.schedule.map((day, index) => (
+                {plan.introduction_plan.days.map((day, index) => (
                   <View
                     key={index}
                     className={`flex-row items-start gap-3 py-3 ${
-                      index < plan.schedule.length - 1 ? 'border-b border-gray-100' : ''
+                      index < plan.introduction_plan.days.length - 1 ? 'border-b border-gray-100' : ''
                     }`}
                   >
                     <View className="w-8 h-8 rounded-full bg-red-600 items-center justify-center flex-shrink-0">
                       <Text className="text-white text-xs font-bold">{day.day}</Text>
                     </View>
                     <View className="flex-1">
-                      <Text className="text-sm font-semibold text-dark">{day.allergen}</Text>
-                      {day.amount ? (
-                        <Text className="text-xs text-red-600 font-medium mt-0.5">
-                          {day.amount}
-                        </Text>
-                      ) : null}
-                      {day.instructions ? (
-                        <Text className="text-xs text-gray-600 leading-4 mt-1">
-                          {day.instructions}
-                        </Text>
-                      ) : null}
+                      <Text className="text-sm font-semibold text-dark">{day.amount}</Text>
+                      {day.form ? <Text className="text-xs text-red-600 mt-0.5">Form: {day.form}</Text> : null}
+                      {day.time ? <Text className="text-xs text-gray-500 mt-0.5">Zaman: {day.time}</Text> : null}
+                      {day.notes ? <Text className="text-xs text-gray-600 leading-4 mt-1">{day.notes}</Text> : null}
                     </View>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+
+            {/* Warning signs */}
+            {plan.warning_signs && plan.warning_signs.length > 0 ? (
+              <View className="bg-amber-50 rounded-2xl p-4 border border-amber-200">
+                <View className="flex-row items-center gap-2 mb-3">
+                  <Icon name="exclamation-circle" size={18} color="#D97706" />
+                  <Text className="text-sm font-bold text-amber-700">Uyarı Belirtileri</Text>
+                </View>
+                {plan.warning_signs.map((sign, index) => (
+                  <View key={index} className="flex-row items-start gap-2 mb-2">
+                    <View className="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 flex-shrink-0" />
+                    <Text className="flex-1 text-xs text-amber-700 leading-4">{sign}</Text>
                   </View>
                 ))}
               </View>
@@ -450,11 +388,32 @@ export default function AlerjenPlanlayiciScreen() {
               </View>
             ) : null}
 
-            {/* Disclaimer */}
-            {plan.disclaimer ? (
-              <View className="bg-gray-100 rounded-2xl p-4 flex-row items-start gap-2.5">
-                <Icon name="info-circle" size={16} color="#6B7280" />
-                <Text className="flex-1 text-xs text-gray-500 leading-4">{plan.disclaimer}</Text>
+            {/* Stop conditions */}
+            {plan.when_to_stop && plan.when_to_stop.length > 0 ? (
+              <View className="bg-white rounded-2xl p-4 border border-gray-100">
+                <Text className="text-sm font-bold text-dark mb-3">Planı Durdurma Durumları</Text>
+                {plan.when_to_stop.map((item, index) => (
+                  <View key={index} className="flex-row items-start gap-2 mb-2">
+                    <View className="w-1.5 h-1.5 rounded-full bg-gray-600 mt-1.5 flex-shrink-0" />
+                    <Text className="flex-1 text-xs text-gray-700 leading-4">{item}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+
+            {plan.success_criteria ? (
+              <View className="bg-white rounded-2xl p-4 border border-gray-100">
+                <Text className="text-sm font-bold text-dark mb-2">Başarı Kriteri</Text>
+                <Text className="text-xs text-gray-700 leading-4">{plan.success_criteria}</Text>
+              </View>
+            ) : null}
+
+            {plan.related_ingredients && plan.related_ingredients.length > 0 ? (
+              <View className="bg-white rounded-2xl p-4 border border-gray-100">
+                <Text className="text-sm font-bold text-dark mb-2">İlişkili Besinler</Text>
+                <Text className="text-xs text-gray-700 leading-4">
+                  {plan.related_ingredients.join(', ')}
+                </Text>
               </View>
             ) : null}
 

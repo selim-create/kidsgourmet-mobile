@@ -147,16 +147,18 @@ export async function getPercentileResults(
 
 export async function calculateWaterNeed(params: {
   age_months: number;
-  weight_kg?: number;
-  feeding_type?: 'breast' | 'formula' | 'mixed' | 'solid';
+  weight_kg: number;
+  weather?: 'hot' | 'normal' | 'cold';
+  is_breastfed?: boolean;
 }): Promise<WaterNeedResult> {
   const query = new URLSearchParams();
   query.append('age_months', String(params.age_months));
-  if (params.weight_kg !== undefined) {
-    query.append('weight_kg', String(params.weight_kg));
+  query.append('weight_kg', String(params.weight_kg));
+  if (params.weather) {
+    query.append('weather', params.weather);
   }
-  if (params.feeding_type) {
-    query.append('feeding_type', params.feeding_type);
+  if (params.is_breastfed !== undefined) {
+    query.append('is_breastfed', String(params.is_breastfed));
   }
   return api.get<WaterNeedResult>(
     `${API_ENDPOINTS.WATER_CALCULATOR}?${query.toString()}`,
@@ -210,27 +212,50 @@ export async function generateAllergenPlan(
 
 // ─── Food Trials (auth required) ─────────────────────────────────────────────
 
-export async function getFoodTrials(): Promise<FoodTrial[]> {
-  return api.get<FoodTrial[]>(API_ENDPOINTS.FOOD_TRIALS);
+export async function getFoodTrials(childId?: string): Promise<FoodTrial[]> {
+  const endpoint = childId
+    ? `${API_ENDPOINTS.FOOD_TRIALS}?child_id=${encodeURIComponent(childId)}`
+    : API_ENDPOINTS.FOOD_TRIALS;
+  return api.get<FoodTrial[]>(endpoint);
 }
 
 export async function createFoodTrial(input: FoodTrialInput): Promise<FoodTrial> {
-  return api.post<FoodTrial>(API_ENDPOINTS.FOOD_TRIALS, input);
+  return api.post<FoodTrial>(API_ENDPOINTS.FOOD_TRIALS, {
+    child_id: String(input.child_id),
+    ingredient_id: input.ingredient_id,
+    ingredient_name: input.ingredient_name,
+    trial_date: input.trial_date,
+    result: input.result,
+    reaction_notes: input.reaction_notes,
+    amount: input.amount,
+    form: input.form,
+  });
 }
 
 export async function updateFoodTrial(
   id: number,
   input: Partial<FoodTrialInput>,
 ): Promise<FoodTrial> {
-  return api.put<FoodTrial>(API_ENDPOINTS.FOOD_TRIAL(id), input);
+  return api.put<FoodTrial>(API_ENDPOINTS.FOOD_TRIAL(id), {
+    ...(input.child_id !== undefined ? { child_id: String(input.child_id) } : {}),
+    ...(input.ingredient_id !== undefined ? { ingredient_id: input.ingredient_id } : {}),
+    ...(input.ingredient_name !== undefined ? { ingredient_name: input.ingredient_name } : {}),
+    ...(input.trial_date !== undefined ? { trial_date: input.trial_date } : {}),
+    ...(input.result !== undefined ? { result: input.result } : {}),
+    ...(input.reaction_notes !== undefined ? { reaction_notes: input.reaction_notes } : {}),
+    ...(input.amount !== undefined ? { amount: input.amount } : {}),
+    ...(input.form !== undefined ? { form: input.form } : {}),
+  });
 }
 
 export async function deleteFoodTrial(id: number): Promise<void> {
   return api.delete<void>(API_ENDPOINTS.FOOD_TRIAL(id));
 }
 
-export async function getFoodTrialSummary(): Promise<FoodTrialSummary> {
-  return api.get<FoodTrialSummary>(API_ENDPOINTS.FOOD_TRIAL_SUMMARY);
+export async function getFoodTrialSummary(childId: string): Promise<FoodTrialSummary> {
+  return api.get<FoodTrialSummary>(
+    `${API_ENDPOINTS.FOOD_TRIAL_STATS}?child_id=${encodeURIComponent(childId)}`,
+  );
 }
 
 // ─── Bath Planner ─────────────────────────────────────────────────────────────

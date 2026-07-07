@@ -289,7 +289,7 @@ export default function BanyoPlanlayiciScreen() {
                             isSelected ? 'text-white' : 'text-gray-600'
                           }`}
                         >
-                          {typeof rawSeason === 'object' && rawSeason?.label
+                          {typeof rawSeason === 'object' && rawSeason !== null && rawSeason.label
                             ? rawSeason.label
                             : getSeasonLabel(s)}
                         </Text>

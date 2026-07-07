@@ -7,6 +7,7 @@ import type {
   BLWTestResult,
   PercentileMeasurement,
   PercentileResult,
+  PercentileResultItem,
   WaterNeedResult,
   SolidFoodReadinessConfig,
   SolidFoodReadinessResult,
@@ -31,7 +32,7 @@ import type {
   StainSearchResponse,
 } from '../lib/types';
 
-// ─── Tools List ───────────────────────────────────────────────────────────────
+// ─── Tools List ─────────────────────────────────────────────────────────
 
 export async function getTools(): Promise<Tool[]> {
   return api.get<Tool[]>(API_ENDPOINTS.TOOLS, { skipAuth: true });
@@ -41,7 +42,7 @@ export async function getToolBySlug(slug: string): Promise<Tool> {
   return api.get<Tool>(API_ENDPOINTS.TOOL_BY_SLUG(slug), { skipAuth: true });
 }
 
-// ─── BLW Test ─────────────────────────────────────────────────────────────────
+// ─── BLW Test ──────────────────────────────────────────────────────────
 
 export async function getBLWTestConfig(): Promise<BLWTestConfig> {
   return api.get<BLWTestConfig>(API_ENDPOINTS.BLW_TEST_CONFIG, { skipAuth: true });
@@ -67,23 +68,86 @@ export async function getBLWTestResults(childId: number): Promise<BLWTestResult 
   }
 }
 
-// ─── Percentile ───────────────────────────────────────────────────────────────
+// ─── Percentile ─────────────────────────────────────────────────────────
+
+function findPercentile(
+  items: PercentileResultItem[] | undefined,
+  measurementType: PercentileResultItem['measurement_type'],
+): PercentileResultItem | undefined {
+  return items?.find((item) => item.measurement_type === measurementType);
+}
+
+function mapPercentileResponse(response: PercentileResult): PercentileResult {
+  const weight = findPercentile(response.percentiles, 'weight_for_age');
+  const height = findPercentile(response.percentiles, 'height_for_age');
+  const head = findPercentile(response.percentiles, 'head_for_age');
+  const weightForHeight = findPercentile(response.percentiles, 'weight_for_height');
+
+  const interpretations = [weight, height, head, weightForHeight]
+    .map((item) => item?.interpretation?.trim())
+    .filter((value): value is string => Boolean(value));
+
+  return {
+    ...response,
+    child_id: response.child_id,
+    weight_percentile: response.weight_percentile ?? weight?.percentile,
+    height_percentile: response.height_percentile ?? height?.percentile,
+    head_circumference_percentile:
+      response.head_circumference_percentile ?? head?.percentile,
+    bmi_percentile: response.bmi_percentile ?? weightForHeight?.percentile,
+    age_months: response.age_months ?? response.age_in_months,
+    age_days: response.age_days ?? response.age_in_days,
+    gender:
+      response.gender ??
+      (response.measurement?.gender === 'male' || response.measurement?.gender === 'female'
+        ? response.measurement.gender
+        : undefined),
+    birth_date: response.birth_date ?? response.measurement?.birth_date,
+    measurement_date: response.measurement_date ?? response.measurement?.measurement_date,
+    weight_kg: response.weight_kg ?? response.measurement?.weight_kg ?? undefined,
+    height_cm: response.height_cm ?? response.measurement?.height_cm ?? undefined,
+    head_circumference_cm:
+      response.head_circumference_cm ?? response.measurement?.head_circumference_cm ?? undefined,
+    calculated_at: response.calculated_at ?? response.created_at,
+    weight_status: response.weight_status ?? weight?.category,
+    height_status: response.height_status ?? height?.category,
+    head_circumference_status:
+      response.head_circumference_status ?? head?.category,
+    interpretation:
+      response.interpretation ?? (interpretations.length > 0 ? interpretations.join(' · ') : undefined),
+  };
+}
 
 export async function calculatePercentile(
   measurement: PercentileMeasurement,
 ): Promise<PercentileResult> {
-  return api.post<PercentileResult>(API_ENDPOINTS.PERCENTILE_CALCULATE, measurement, {
-    skipAuth: true,
-  });
+  const response = await api.post<PercentileResult>(
+    API_ENDPOINTS.PERCENTILE_CALCULATE,
+    measurement,
+    {
+      skipAuth: true,
+    },
+  );
+  return mapPercentileResponse(response);
 }
 
 export async function savePercentileResult(
   result: PercentileResult,
-  childId?: number,
+  childId?: string | number,
 ): Promise<PercentileResult> {
   return api.post<PercentileResult>(API_ENDPOINTS.PERCENTILE_SAVE, {
-    ...result,
     child_id: childId ?? result.child_id,
+    measurement: {
+      gender: result.measurement?.gender ?? result.gender,
+      birth_date: result.measurement?.birth_date ?? result.birth_date,
+      measurement_date: result.measurement?.measurement_date ?? result.measurement_date,
+      weight_kg: result.measurement?.weight_kg ?? result.weight_kg,
+      height_cm: result.measurement?.height_cm ?? result.height_cm,
+      head_circumference_cm:
+        result.measurement?.head_circumference_cm ?? result.head_circumference_cm,
+    },
+    percentiles: result.percentiles ?? [],
+    red_flags: result.red_flags ?? [],
   });
 }
 
@@ -111,7 +175,8 @@ export async function savePercentileWithRegistration(data: {
 
 export async function getUserPercentileResults(): Promise<PercentileResult[]> {
   try {
-    return await api.get<PercentileResult[]>(API_ENDPOINTS.TOOL_PERCENTILE_RESULTS);
+    const results = await api.get<PercentileResult[]>(API_ENDPOINTS.USER_PERCENTILE_RESULTS);
+    return results.map(mapPercentileResponse);
   } catch {
     return [];
   }
@@ -132,18 +197,19 @@ export async function savePercentile(
 }
 
 export async function getPercentileResults(
-  childId: number,
-): Promise<PercentileResult | null> {
+  childId: string,
+): Promise<PercentileResult[] | null> {
   try {
-    return await api.get<PercentileResult>(
-      `${API_ENDPOINTS.TOOL_PERCENTILE_RESULTS}?child_id=${childId}`,
+    const results = await api.get<PercentileResult[]>(
+      API_ENDPOINTS.CHILD_PERCENTILE_RESULTS(childId),
     );
+    return results.map(mapPercentileResponse);
   } catch {
     return null;
   }
 }
 
-// ─── Water Calculator ─────────────────────────────────────────────────────────
+// ─── Water Calculator ───────────────────────────────────────────────────────
 
 export async function calculateWaterNeed(params: {
   age_months: number;
@@ -196,7 +262,7 @@ export async function getSolidFoodReadiness(
   }
 }
 
-// ─── Allergen Planner ─────────────────────────────────────────────────────────
+// ─── Allergen Planner ───────────────────────────────────────────────────────
 
 export async function getAllergenPlannerConfig(): Promise<AllergenPlannerConfig> {
   return api.get<AllergenPlannerConfig>(API_ENDPOINTS.ALLERGEN_PLANNER_CONFIG, {
@@ -372,7 +438,7 @@ export async function getFoodTrialSummary(childId: string): Promise<FoodTrialSum
   }
 }
 
-// ─── Bath Planner ─────────────────────────────────────────────────────────────
+// ─── Bath Planner ────────────────────────────────────────────────────────
 
 export async function getBathPlannerConfig(): Promise<BathPlannerConfig> {
   return api.get<BathPlannerConfig>(API_ENDPOINTS.BATH_PLANNER_CONFIG, { skipAuth: true });
@@ -384,7 +450,7 @@ export async function generateBathPlan(input: BathPlannerInput): Promise<BathPla
   });
 }
 
-// ─── Hygiene Calculator ───────────────────────────────────────────────────────
+// ─── Hygiene Calculator ──────────────────────────────────────────────────────
 
 export async function calculateHygiene(input: HygieneInput): Promise<HygieneCalculatorResult> {
   return api.post<HygieneCalculatorResult>(API_ENDPOINTS.HYGIENE_CALCULATOR, input, {
@@ -392,7 +458,7 @@ export async function calculateHygiene(input: HygieneInput): Promise<HygieneCalc
   });
 }
 
-// ─── Diaper Calculator ────────────────────────────────────────────────────────
+// ─── Diaper Calculator ──────────────────────────────────────────────────────
 
 export async function calculateDiapers(input: DiaperInput): Promise<DiaperCalculatorResult> {
   return api.post<DiaperCalculatorResult>(API_ENDPOINTS.DIAPER_CALCULATOR, input, {
@@ -404,7 +470,7 @@ export async function calculateRashRisk(input: RashRiskInput): Promise<RashRiskR
   return api.post<RashRiskResult>(API_ENDPOINTS.DIAPER_RASH_RISK, input, { skipAuth: true });
 }
 
-// ─── Air Quality ──────────────────────────────────────────────────────────────
+// ─── Air Quality ────────────────────────────────────────────────────────
 
 export async function analyzeAirQuality(input: AirQualityInput): Promise<AirQualityResult> {
   return api.post<AirQualityResult>(API_ENDPOINTS.AIR_QUALITY_ANALYZE, input, {
@@ -412,7 +478,7 @@ export async function analyzeAirQuality(input: AirQualityInput): Promise<AirQual
   });
 }
 
-// ─── Stain Encyclopedia ───────────────────────────────────────────────────────
+// ─── Stain Encyclopedia ──────────────────────────────────────────────────────
 
 export async function searchStains(query: string): Promise<StainGuide[]> {
   const response = await api.get<StainSearchResponse>(

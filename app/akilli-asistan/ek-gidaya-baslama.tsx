@@ -122,9 +122,37 @@ export default function SolidFoodReadinessScreen() {
 
   const getBucketIdFromScore = (score?: number) => {
     if (score === undefined) return undefined;
-    return config?.result_buckets?.find(
+    const matchedBucket = config?.result_buckets?.find(
       (bucket) => score >= bucket.min_score && score <= bucket.max_score,
-    )?.id;
+    );
+    if (!matchedBucket && config?.result_buckets?.length) {
+      console.warn('[SolidFoodReadiness] no matching bucket for score:', score);
+    }
+    return matchedBucket?.id;
+  };
+
+  const resolveBucketId = (currentResult: SolidFoodReadinessResult | null) => {
+    if (!currentResult) return undefined;
+
+    if (currentResult.result?.id) {
+      return currentResult.result.id;
+    }
+
+    const legacyScore = currentResult.score ?? currentResult.readiness_score;
+    const bucketIdFromScore = getBucketIdFromScore(legacyScore);
+    if (bucketIdFromScore) {
+      return bucketIdFromScore;
+    }
+
+    // Legacy boolean responses only distinguish ready vs not ready.
+    if (currentResult.is_ready === true) {
+      return 'ready';
+    }
+    if (currentResult.is_ready === false) {
+      return 'not_yet';
+    }
+
+    return undefined;
   };
 
   const handleSubmit = async () => {
@@ -161,10 +189,7 @@ export default function SolidFoodReadinessScreen() {
   };
 
   const resultScore = result?.score ?? result?.readiness_score;
-  const bucketId =
-    result?.result?.id ??
-    getBucketIdFromScore(resultScore) ??
-    (result?.is_ready === true ? 'ready' : result?.is_ready === false ? 'not_yet' : undefined);
+  const bucketId = resolveBucketId(result);
   const readinessCfg =
     bucketId && READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]
       ? READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]

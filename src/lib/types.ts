@@ -912,7 +912,9 @@ export interface SolidFoodReadinessResult {
   score?: number;
   result?: SolidFoodReadinessBucket;
   timestamp?: string;
+  /** Legacy saved payloads may still store numeric ids, while newer endpoints can return string ids. */
   id?: number | string;
+  /** Legacy saved payloads may still store numeric ids, while newer endpoints can return string ids. */
   child_id?: number | string;
   /** @deprecated Prefer `result.id` for new kg-core responses. */
   is_ready?: boolean;

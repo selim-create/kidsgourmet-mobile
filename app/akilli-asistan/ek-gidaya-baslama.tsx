@@ -26,6 +26,7 @@ import type {
 type Stage = 'intro' | 'test' | 'result';
 
 const READINESS_CONFIG = {
+  // Keys intentionally mirror kg-core bucket ids.
   ready: {
     emoji: '✅',
     label: 'Hazır!',
@@ -122,13 +123,29 @@ export default function SolidFoodReadinessScreen() {
 
   const getBucketIdFromScore = (score?: number) => {
     if (score === undefined) return undefined;
-    const matchedBucket = config?.result_buckets?.find(
-      (bucket) => score >= bucket.min_score && score <= bucket.max_score,
-    );
+    const matchedBuckets =
+      config?.result_buckets?.filter(
+        (bucket) => score >= bucket.min_score && score <= bucket.max_score,
+      ) ?? [];
+    if (matchedBuckets.length > 1) {
+      console.warn('[SolidFoodReadiness] overlapping buckets for score:', score);
+    }
+    const matchedBucket = matchedBuckets[0];
     if (!matchedBucket && config?.result_buckets?.length) {
       console.warn('[SolidFoodReadiness] no matching bucket for score:', score);
     }
     return matchedBucket?.id;
+  };
+
+  const getPromptText = (
+    question: SolidFoodReadinessConfig['questions'][number],
+    questionIndex: number,
+  ) => {
+    if (question.question || question.text) {
+      return question.question ?? question.text ?? '';
+    }
+    console.warn('[SolidFoodReadiness] missing prompt text for question:', question.id);
+    return `Soru ${questionIndex + 1}`;
   };
 
   const resolveBucketId = (currentResult: SolidFoodReadinessResult | null) => {
@@ -149,6 +166,7 @@ export default function SolidFoodReadinessScreen() {
       return 'ready';
     }
     if (currentResult.is_ready === false) {
+      console.warn('[SolidFoodReadiness] falling back from legacy boolean result to not_yet bucket');
       return 'not_yet';
     }
 
@@ -299,7 +317,7 @@ export default function SolidFoodReadinessScreen() {
             <View className="gap-3 mb-6">
               {config.questions.map((question, index) => {
                 const selectedOptionId = answers[question.id];
-                const promptText = question.question ?? question.text ?? '';
+                const promptText = getPromptText(question, index);
                 return (
                   <View
                     key={question.id}

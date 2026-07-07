@@ -909,9 +909,16 @@ export interface BLWTestResult {
 }
 
 export interface SolidFoodReadinessResult {
-  id?: number;
-  child_id?: number;
-  is_ready: boolean;
+  score?: number;
+  result?: SolidFoodReadinessBucket;
+  timestamp?: string;
+  /** Legacy saved payloads may still store numeric ids, while newer endpoints can return string ids. */
+  id?: number | string;
+  /** Legacy saved payloads may still store numeric ids, while newer endpoints can return string ids. */
+  child_id?: number | string;
+  /** @deprecated Prefer `result.id` for new kg-core responses. */
+  is_ready?: boolean;
+  /** @deprecated Prefer `score` for new kg-core responses. */
   readiness_score?: number;
   factors?: {
     can_sit_unsupported?: boolean;
@@ -1021,14 +1028,37 @@ export interface WaterNeedResult {
 
 // ─── Solid Food Readiness Types ───────────────────────────────────────────────
 
-export interface SolidFoodReadinessQuestion {
+export interface SolidFoodReadinessOption {
   id: string;
   text: string;
+  value: number;
+}
+
+export interface SolidFoodReadinessQuestion {
+  id: string;
+  /** kg-core sends the prompt text in `question`. `text` kept optional for backward compat. */
+  question?: string;
+  text?: string;
   description?: string;
+  weight?: number;
+  options?: SolidFoodReadinessOption[];
+}
+
+export interface SolidFoodReadinessBucket {
+  id: string;
+  min_score: number;
+  max_score: number;
+  title: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  recommendations?: string[];
 }
 
 export interface SolidFoodReadinessConfig {
   questions: SolidFoodReadinessQuestion[];
+  result_buckets?: SolidFoodReadinessBucket[];
+  disclaimer?: string;
 }
 
 export interface SolidFoodResultBucket {

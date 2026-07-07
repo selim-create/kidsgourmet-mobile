@@ -188,7 +188,7 @@ export const API_ENDPOINTS = {
 
   // Food Trials (auth required)
   FOOD_TRIALS: '/kg/v1/tools/food-trials',
-  FOOD_TRIAL: (id: number) => `/kg/v1/tools/food-trials/${id}`,
+  FOOD_TRIAL: (id: number | string) => `/kg/v1/tools/food-trials/${id}`,
   FOOD_TRIAL_STATS: '/kg/v1/tools/food-trials/stats',
   FOOD_TRIAL_SUMMARY: '/kg/v1/tools/food-trials/stats',
   /** Web-aligned alias for FOOD_TRIALS (POST to create a trial) */

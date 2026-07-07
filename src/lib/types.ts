@@ -1090,7 +1090,7 @@ export interface AllergenTrialPlan {
 // ─── Food Trial Types ─────────────────────────────────────────────────────────
 
 export interface FoodTrial {
-  id: number;
+  id: number | string;
   child_id: string;
   ingredient_id?: number;
   ingredient_name?: string;
@@ -1135,10 +1135,15 @@ export interface BathPlannerAgeGroup {
   max_months?: number;
 }
 
+export interface BathPlannerOption {
+  id: string;
+  label: string;
+}
+
 export interface BathPlannerConfig {
-  seasons: string[];
+  seasons: Array<string | BathPlannerOption>;
   age_groups: BathPlannerAgeGroup[];
-  skin_types?: string[];
+  skin_types?: Array<string | BathPlannerOption>;
 }
 
 export interface BathPlannerInput {

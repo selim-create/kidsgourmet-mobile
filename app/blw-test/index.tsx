@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,18 +12,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useBLWResults } from '../../src/hooks/useBLWResults';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { submitBLWTest } from '../../src/services/blw-service';
+import { getBLWTestConfig } from '../../src/services/tool-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { COLORS } from '../../src/lib/constants';
 import { getAgeInMonths } from '../../src/hooks/useChildProfile';
-
-const BLW_QUESTIONS = [
-  { id: 'sits_unsupported', question: 'Desteksiz oturabilir mi?' },
-  { id: 'head_control', question: 'Baş kontrolü tam mı?' },
-  { id: 'shows_interest', question: 'Yetişkinlerin yemesini izliyor mu?' },
-  { id: 'tongue_thrust_gone', question: 'Dil itme refleksi geçti mi?' },
-  { id: 'reaches_for_food', question: 'Yiyeceğe uzanıp tutabiliyor mu?' },
-  { id: 'brings_to_mouth', question: 'Elindeki şeyi ağzına götürebiliyor mu?' },
-] as const;
+import type { BLWTestConfig } from '../../src/lib/types';
 
 const READINESS_COLORS = {
   ready: { bg: '#ECFDF5', text: '#065F46', border: '#059669', emoji: '✅' },
@@ -34,7 +27,9 @@ const READINESS_COLORS = {
 export default function BLWTestScreen() {
   const { activeChild } = useActiveChild();
   const { blwResult, isLoading, error } = useBLWResults();
-  const [answers, setAnswers] = useState<Record<string, boolean>>({});
+  const [config, setConfig] = useState<BLWTestConfig | null>(null);
+  const [isConfigLoading, setIsConfigLoading] = useState(true);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localResult, setLocalResult] = useState<{
     readiness_level: keyof typeof READINESS_COLORS;
@@ -45,13 +40,36 @@ export default function BLWTestScreen() {
   const ageMonths = activeChild ? getAgeInMonths(activeChild.birth_date) : 0;
   const isEligible = ageMonths >= 4 && ageMonths <= 12;
 
-  const toggleAnswer = (id: string) => {
-    setAnswers((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
+  const questions = config?.questions ?? [];
   const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === BLW_QUESTIONS.length;
-  const score = Object.values(answers).filter(Boolean).length;
+  const allAnswered = questions.length > 0 && answeredCount === questions.length;
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsConfigLoading(true);
+    getBLWTestConfig()
+      .then((cfg) => {
+        if (!cancelled) setConfig(cfg);
+      })
+      .catch(() => {
+        // Config stays null; submit button stays disabled
+      })
+      .finally(() => {
+        if (!cancelled) setIsConfigLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const computeScore = (): number => {
+    if (!config) return 0;
+    return config.questions.reduce((total, q) => {
+      const optionId = answers[q.id];
+      const option = q.options?.find((o) => o.id === optionId);
+      return total + (option?.value ?? 0);
+    }, 0);
+  };
 
   const handleSubmit = async () => {
     if (!activeChild) return;
@@ -62,14 +80,20 @@ export default function BLWTestScreen() {
     setIsSubmitting(true);
     try {
       const res = await submitBLWTest({ child_id: activeChild.id, answers });
+      const readiness_level = res.readiness_level as keyof typeof READINESS_COLORS;
       setLocalResult({
-        readiness_level: (res.readiness_level as keyof typeof READINESS_COLORS) ?? (score >= 5 ? 'ready' : score >= 3 ? 'almost_ready' : 'not_ready'),
-        score: res.score ?? score,
+        readiness_level: readiness_level in READINESS_COLORS ? readiness_level : 'not_ready',
+        score: res.score ?? computeScore(),
         recommendations: res.recommendations,
       });
     } catch {
       // Use local calculation if API fails
-      const level: keyof typeof READINESS_COLORS = score >= 5 ? 'ready' : score >= 3 ? 'almost_ready' : 'not_ready';
+      const score = computeScore();
+      const thresholds = config?.thresholds ?? { ready: 80, almost_ready: 50 };
+      const level: keyof typeof READINESS_COLORS =
+        score >= thresholds.ready ? 'ready' :
+        score >= thresholds.almost_ready ? 'almost_ready' :
+        'not_ready';
       setLocalResult({ readiness_level: level, score });
     } finally {
       setIsSubmitting(false);
@@ -150,7 +174,7 @@ export default function BLWTestScreen() {
               {ageMonths < 4 ? `${activeChild.name} henüz ${ageMonths} aylık.` : `${activeChild.name} ${ageMonths} aylık — katı gıdaya geçiş dönemini tamamladı.`}
             </Text>
           </View>
-        ) : isLoading ? (
+        ) : isLoading || isConfigLoading ? (
           <LoadingSpinner label="Yükleniyor..." />
         ) : (
           <View>
@@ -176,7 +200,7 @@ export default function BLWTestScreen() {
                     Son test sonucu
                   </Text>
                   <Text style={{ fontSize: 12, color: READINESS_COLORS[displayResult.readiness_level]?.text }}>
-                    Skor: {displayResult.score} / {BLW_QUESTIONS.length}
+                    Skor: {displayResult.score}
                   </Text>
                 </View>
               </View>
@@ -199,7 +223,7 @@ export default function BLWTestScreen() {
                   {localResult.readiness_level === 'ready' ? 'Hazır!' : localResult.readiness_level === 'almost_ready' ? 'Neredeyse Hazır' : 'Henüz Değil'}
                 </Text>
                 <Text style={{ fontSize: 13, color: READINESS_COLORS[localResult.readiness_level].text }}>
-                  Skor: {localResult.score} / {BLW_QUESTIONS.length}
+                  Skor: {localResult.score}
                 </Text>
                 {localResult.recommendations?.map((rec, i) => (
                   <Text key={i} style={{ fontSize: 12, color: READINESS_COLORS[localResult.readiness_level].text, marginTop: 6 }}>
@@ -216,8 +240,8 @@ export default function BLWTestScreen() {
                   Aşağıdaki soruları yanıtlayın
                 </Text>
                 <View style={{ gap: 10, marginBottom: 20 }}>
-                  {BLW_QUESTIONS.map((q) => {
-                    const val = answers[q.id];
+                  {questions.map((q) => {
+                    const selectedOptionId = answers[q.id];
                     return (
                       <View
                         key={q.id}
@@ -233,43 +257,33 @@ export default function BLWTestScreen() {
                         }}
                       >
                         <Text style={{ fontSize: 14, color: '#374151', marginBottom: 10 }}>
-                          {q.question}
+                          {q.question ?? q.text}
                         </Text>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                          <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPress={() => setAnswers((prev) => ({ ...prev, [q.id]: true }))}
-                            style={{
-                              flex: 1,
-                              paddingVertical: 8,
-                              borderRadius: 8,
-                              alignItems: 'center',
-                              backgroundColor: val === true ? '#DCFCE7' : '#F3F4F6',
-                              borderWidth: 1,
-                              borderColor: val === true ? '#22C55E' : '#E5E7EB',
-                            }}
-                          >
-                            <Text style={{ fontSize: 13, fontWeight: '600', color: val === true ? '#16A34A' : '#9CA3AF' }}>
-                              ✅ Evet
-                            </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPress={() => setAnswers((prev) => ({ ...prev, [q.id]: false }))}
-                            style={{
-                              flex: 1,
-                              paddingVertical: 8,
-                              borderRadius: 8,
-                              alignItems: 'center',
-                              backgroundColor: val === false ? '#FEE2E2' : '#F3F4F6',
-                              borderWidth: 1,
-                              borderColor: val === false ? '#EF4444' : '#E5E7EB',
-                            }}
-                          >
-                            <Text style={{ fontSize: 13, fontWeight: '600', color: val === false ? '#DC2626' : '#9CA3AF' }}>
-                              ❌ Hayır
-                            </Text>
-                          </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                          {q.options?.map((opt) => {
+                            const isSelected = selectedOptionId === opt.id;
+                            return (
+                              <TouchableOpacity
+                                key={opt.id}
+                                activeOpacity={0.8}
+                                onPress={() => setAnswers((prev) => ({ ...prev, [q.id]: opt.id }))}
+                                style={{
+                                  flex: 1,
+                                  minWidth: '40%',
+                                  paddingVertical: 8,
+                                  borderRadius: 8,
+                                  alignItems: 'center',
+                                  backgroundColor: isSelected ? '#DCFCE7' : '#F3F4F6',
+                                  borderWidth: 1,
+                                  borderColor: isSelected ? '#22C55E' : '#E5E7EB',
+                                }}
+                              >
+                                <Text style={{ fontSize: 13, fontWeight: '600', color: isSelected ? '#16A34A' : '#9CA3AF' }}>
+                                  {opt.text}
+                                </Text>
+                              </TouchableOpacity>
+                            );
+                          })}
                         </View>
                       </View>
                     );
@@ -291,7 +305,7 @@ export default function BLWTestScreen() {
                     <Ionicons name="hourglass-outline" size={18} color="#fff" />
                   ) : (
                     <Text style={{ color: allAnswered ? '#fff' : '#9CA3AF', fontSize: 15, fontWeight: '700' }}>
-                      Sonucu Gör ({answeredCount}/{BLW_QUESTIONS.length})
+                      Sonucu Gör ({answeredCount}/{questions.length})
                     </Text>
                   )}
                 </TouchableOpacity>

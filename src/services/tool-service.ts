@@ -44,6 +44,19 @@ export async function getToolBySlug(slug: string): Promise<Tool> {
 
 // ─── BLW Test ──────────────────────────────────────────────────────────
 
+/**
+ * Transform frontend answer array to the backend's expected format.
+ * Frontend: [{ question_id: 'q1', option_id: 'q1_a', score: 100 }, ...]
+ * Backend:  { 'q1': 'q1_a', 'q2': 'q2_a', ... }
+ */
+function transformAnswersForBackend(answers: BLWTestAnswer[]): Record<string, string> {
+  const transformed: Record<string, string> = {};
+  answers.forEach((answer) => {
+    transformed[answer.question_id] = answer.option_id;
+  });
+  return transformed;
+}
+
 export async function getBLWTestConfig(): Promise<BLWTestConfig> {
   return api.get<BLWTestConfig>(API_ENDPOINTS.BLW_TEST_CONFIG, { skipAuth: true });
 }
@@ -53,7 +66,7 @@ export async function submitBLWTest(
   childId?: number,
 ): Promise<BLWTestResult> {
   return api.post<BLWTestResult>(API_ENDPOINTS.BLW_TEST_SUBMIT, {
-    answers,
+    answers: transformAnswersForBackend(answers),
     child_id: childId,
   });
 }

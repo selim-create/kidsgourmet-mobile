@@ -36,9 +36,9 @@ const READINESS_CONFIG = {
     badgeBorder: '#86EFAC',
     badgeText: '#166534',
   },
-  not_ready: {
-    emoji: '⏳',
-    label: 'Henüz Hazır Değil',
+  almost_ready: {
+    emoji: '⌛',
+    label: 'Neredeyse Hazır',
     bgClass: 'bg-amber-50',
     borderClass: 'border-amber-200',
     textClass: 'text-amber-800',
@@ -46,7 +46,20 @@ const READINESS_CONFIG = {
     badgeBorder: '#FCD34D',
     badgeText: '#92400E',
   },
+  not_yet: {
+    emoji: '⏸',
+    label: 'Biraz Daha Zaman',
+    bgClass: 'bg-orange-50',
+    borderClass: 'border-orange-200',
+    textClass: 'text-orange-800',
+    badgeBg: '#FFEDD5',
+    badgeBorder: '#FDBA74',
+    badgeText: '#9A3412',
+  },
 } as const;
+
+const FALLBACK_DISCLAIMER =
+  'Bu test genel bir rehber sunmaktadır. Kesin karar için çocuk doktorunuza danışın.';
 
 const styles = StyleSheet.create({
   questionCard: {
@@ -64,7 +77,7 @@ export default function SolidFoodReadinessScreen() {
   const [config, setConfig] = useState<SolidFoodReadinessConfig | null>(null);
   const [configLoading, setConfigLoading] = useState(false);
   const [previousResult, setPreviousResult] = useState<SolidFoodReadinessResult | null>(null);
-  const [answers, setAnswers] = useState<Record<string, boolean>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SolidFoodReadinessResult | null>(null);
 
@@ -98,8 +111,8 @@ export default function SolidFoodReadinessScreen() {
     }
   };
 
-  const setAnswer = (questionId: string, value: boolean) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+  const setAnswer = (questionId: string, optionId: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
   const totalQuestions = config?.questions?.length ?? 0;
@@ -140,11 +153,18 @@ export default function SolidFoodReadinessScreen() {
     setConfig(null);
   };
 
-  const readinessCfg = result
-    ? result.is_ready
-      ? READINESS_CONFIG.ready
-      : READINESS_CONFIG.not_ready
-    : null;
+  const bucketId =
+    result?.result?.id ??
+    (result?.is_ready === true ? 'ready' : result?.is_ready === false ? 'not_yet' : undefined);
+  const readinessCfg =
+    bucketId && READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]
+      ? READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]
+      : null;
+  const resultScore = result?.score ?? result?.readiness_score;
+  const resultNotes = result?.result?.description ?? result?.notes;
+  const resultRecommendations = result?.result?.recommendations ?? result?.recommendations;
+  const resultDisclaimer = result?.disclaimer ?? config?.disclaimer ?? FALLBACK_DISCLAIMER;
+  const previousScore = previousResult?.score ?? previousResult?.readiness_score;
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['bottom']}>
@@ -172,13 +192,12 @@ export default function SolidFoodReadinessScreen() {
                     Önceki sonucunuz
                   </Text>
                   <Text className="text-sm text-orange-700">
-                    {previousResult.is_ready
-                      ? '✅ Hazır — Bebeğiniz ek gıdaya hazır görünüyordu.'
-                      : '⏳ Henüz Hazır Değil — Biraz daha beklemek önerilmişti.'}
+                    {previousResult.result?.title ??
+                      (previousResult.is_ready ? 'Hazır' : 'Değerlendirildi')}
                   </Text>
-                  {previousResult.readiness_score !== undefined && (
+                  {previousScore !== undefined && (
                     <Text className="text-xs text-orange-600 mt-1">
-                      Skor: {previousResult.readiness_score}
+                      Skor: {previousScore}
                     </Text>
                   )}
                 </View>
@@ -246,7 +265,8 @@ export default function SolidFoodReadinessScreen() {
             {/* Questions */}
             <View className="gap-3 mb-6">
               {config.questions.map((question, index) => {
-                const val = answers[question.id];
+                const selectedOptionId = answers[question.id];
+                const promptText = question.question ?? question.text ?? '';
                 return (
                   <View
                     key={question.id}
@@ -257,48 +277,37 @@ export default function SolidFoodReadinessScreen() {
                       Soru {index + 1}
                     </Text>
                     <Text className="text-sm font-medium text-dark mb-3 leading-5">
-                      {question.text}
+                      {promptText}
                     </Text>
                     {question.description ? (
                       <Text className="text-xs text-gray-500 mb-3 leading-4">
                         {question.description}
                       </Text>
                     ) : null}
-                    <View className="flex-row gap-2">
-                      <TouchableOpacity
-                        onPress={() => setAnswer(question.id, true)}
-                        activeOpacity={0.8}
-                        className={`flex-1 py-2 rounded-xl items-center border ${
-                          val === true
-                            ? 'bg-green-50 border-green-400'
-                            : 'bg-gray-50 border-gray-200'
-                        }`}
-                      >
-                        <Text
-                          className={`text-sm font-semibold ${
-                            val === true ? 'text-green-700' : 'text-gray-400'
-                          }`}
-                        >
-                          ✅ Evet
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => setAnswer(question.id, false)}
-                        activeOpacity={0.8}
-                        className={`flex-1 py-2 rounded-xl items-center border ${
-                          val === false
-                            ? 'bg-red-50 border-red-400'
-                            : 'bg-gray-50 border-gray-200'
-                        }`}
-                      >
-                        <Text
-                          className={`text-sm font-semibold ${
-                            val === false ? 'text-red-600' : 'text-gray-400'
-                          }`}
-                        >
-                          ❌ Hayır
-                        </Text>
-                      </TouchableOpacity>
+                    <View className="gap-2">
+                      {(question.options ?? []).map((option) => {
+                        const isSelected = selectedOptionId === option.id;
+                        return (
+                          <TouchableOpacity
+                            key={option.id}
+                            onPress={() => setAnswer(question.id, option.id)}
+                            activeOpacity={0.8}
+                            className={`w-full px-4 py-3 rounded-xl border ${
+                              isSelected
+                                ? 'bg-orange-50 border-orange-400'
+                                : 'bg-gray-50 border-gray-200'
+                            }`}
+                          >
+                            <Text
+                              className={`text-sm font-medium ${
+                                isSelected ? 'text-orange-700' : 'text-gray-600'
+                              }`}
+                            >
+                              {option.text}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </View>
                   </View>
                 );
@@ -346,33 +355,33 @@ export default function SolidFoodReadinessScreen() {
                 className="text-2xl font-bold mb-2 text-center"
                 style={{ color: readinessCfg.badgeText }}
               >
-                {readinessCfg.label}
+                {result.result?.title ?? readinessCfg.label}
               </Text>
-              {result.readiness_score !== undefined && (
+              {resultScore !== undefined && (
                 <View className="bg-white/60 rounded-xl px-4 py-2 mt-1">
                   <Text
                     className="text-sm font-medium text-center"
                     style={{ color: readinessCfg.badgeText }}
                   >
-                    Hazırlık Skoru: {result.readiness_score}
+                    Hazırlık Skoru: {resultScore}
                   </Text>
                 </View>
               )}
             </View>
 
             {/* Notes */}
-            {result.notes ? (
+            {resultNotes ? (
               <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4 flex-row gap-3">
                 <Icon name="info-circle" size={18} color="#F97316" />
-                <Text className="flex-1 text-sm text-dark leading-5">{result.notes}</Text>
+                <Text className="flex-1 text-sm text-dark leading-5">{resultNotes}</Text>
               </View>
             ) : null}
 
             {/* Recommendations */}
-            {result.recommendations && result.recommendations.length > 0 ? (
+            {resultRecommendations && resultRecommendations.length > 0 ? (
               <View className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
                 <Text className="text-sm font-semibold text-dark mb-3">Öneriler</Text>
-                {result.recommendations.map((rec, i) => (
+                {resultRecommendations.map((rec, i) => (
                   <View key={rec || String(i)} className="flex-row gap-2 mb-2">
                     <Icon name="circle-check" size={14} color="#F97316" />
                     <Text className="flex-1 text-sm text-gray-700 leading-5">{rec}</Text>
@@ -382,21 +391,12 @@ export default function SolidFoodReadinessScreen() {
             ) : null}
 
             {/* Disclaimer */}
-            {result.disclaimer ? (
-              <View className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-4 flex-row gap-3">
-                <Icon name="triangle-exclamation" size={16} color="#D97706" />
-                <Text className="flex-1 text-xs text-amber-800 leading-5">
-                  {result.disclaimer}
-                </Text>
-              </View>
-            ) : (
-              <View className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-4 flex-row gap-3">
-                <Icon name="triangle-exclamation" size={16} color="#D97706" />
-                <Text className="flex-1 text-xs text-amber-800 leading-5">
-                  Bu test genel bir rehber sunmaktadır. Kesin karar için çocuk doktorunuza danışın.
-                </Text>
-              </View>
-            )}
+            <View className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-4 flex-row gap-3">
+              <Icon name="triangle-exclamation" size={16} color="#D97706" />
+              <Text className="flex-1 text-xs text-amber-800 leading-5">
+                {resultDisclaimer}
+              </Text>
+            </View>
 
             {/* Sponsor */}
             {result.sponsor ? (

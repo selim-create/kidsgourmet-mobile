@@ -305,6 +305,22 @@ export default function AlerjenPlanlayiciScreen() {
   // ─── Result Stage ─────────────────────────────────────────────────────────────
 
   if (stage === 'result' && plan) {
+    const relatedIngredients = (plan.related_ingredients ?? [])
+      .map((item) => {
+        if (typeof item === 'string') {
+          const name = item.trim();
+          return name ? { name } : null;
+        }
+        if (!item || typeof item !== 'object') return null;
+        const name = typeof item.name === 'string' ? item.name.trim() : '';
+        if (!name) return null;
+        return {
+          name,
+          warning: typeof item.warning === 'string' ? item.warning.trim() : '',
+        };
+      })
+      .filter((item): item is { name: string; warning?: string } => item !== null);
+
     return (
       <SafeAreaView className="flex-1 bg-gray-50" edges={['bottom']}>
         <ToolHeader title="Alerjen Deneme Planlayıcı" />
@@ -408,12 +424,37 @@ export default function AlerjenPlanlayiciScreen() {
               </View>
             ) : null}
 
-            {plan.related_ingredients && plan.related_ingredients.length > 0 ? (
+            {relatedIngredients.length > 0 ? (
               <View className="bg-white rounded-2xl p-4 border border-gray-100">
-                <Text className="text-sm font-bold text-dark mb-2">İlişkili Besinler</Text>
-                <Text className="text-xs text-gray-700 leading-4">
-                  {plan.related_ingredients.join(', ')}
-                </Text>
+                <Text className="text-sm font-bold text-dark mb-3">İlişkili Besinler</Text>
+                <View className="gap-2">
+                  {relatedIngredients.map((ingredient, index) => (
+                    <View
+                      key={`${ingredient.name}-${index}`}
+                      className="bg-gray-50 rounded-xl p-3 border border-gray-100"
+                    >
+                      <View
+                        className="flex-row items-center gap-2"
+                        accessible
+                        accessibilityLabel="Uyarı"
+                      >
+                        <Icon
+                          name="triangle-exclamation"
+                          size={14}
+                          color="#6B7280"
+                        />
+                        <Text className="text-sm font-semibold text-dark flex-1">
+                          {ingredient.name}
+                        </Text>
+                      </View>
+                      {ingredient.warning ? (
+                        <Text className="text-xs text-gray-600 mt-1 leading-4">
+                          {ingredient.warning}
+                        </Text>
+                      ) : null}
+                    </View>
+                  ))}
+                </View>
               </View>
             ) : null}
 

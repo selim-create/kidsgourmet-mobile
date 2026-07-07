@@ -10,7 +10,7 @@ interface VaccineCardProps {
   administeredAt?: string;
   /** Whether the vaccine is overdue */
   overdue?: boolean;
-  onMarkDone?: (vaccineId: number) => void;
+  onMarkDone?: (vaccineId: number | string) => void;
 }
 
 export function VaccineCard({
@@ -19,14 +19,40 @@ export function VaccineCard({
   overdue = false,
   onMarkDone,
 }: VaccineCardProps) {
-  const isDone = Boolean(administeredAt);
+  const normalizedStatus = (vaccine.status ?? '').toLowerCase();
+  const isDone = Boolean(
+    administeredAt ||
+      normalizedStatus === 'done' ||
+      normalizedStatus === 'completed' ||
+      normalizedStatus === 'administered',
+  );
+  const isSkipped = normalizedStatus === 'skipped';
+  const isDelayed = normalizedStatus === 'delayed';
 
-  const statusColor = isDone ? '#16A34A' : overdue ? '#DC2626' : '#6B7280';
-  const statusBg = isDone ? '#DCFCE7' : overdue ? '#FEE2E2' : '#F3F4F6';
-  const statusLabel = isDone ? 'Yapıldı' : overdue ? 'Gecikmiş' : 'Bekliyor';
+  const statusColor = isDone
+    ? '#16A34A'
+    : isSkipped
+      ? '#6B7280'
+      : overdue || isDelayed
+        ? '#DC2626'
+        : '#6B7280';
+  const statusBg = isDone
+    ? '#DCFCE7'
+    : isSkipped
+      ? '#F3F4F6'
+      : overdue || isDelayed
+        ? '#FEE2E2'
+        : '#F3F4F6';
+  const statusLabel = isDone
+    ? 'Yapıldı'
+    : isSkipped
+      ? 'Atlandı'
+      : overdue || isDelayed
+        ? 'Gecikmiş'
+        : 'Bekliyor';
   const statusIcon: 'checkmark-circle' | 'alert-circle' | 'time' = isDone
     ? 'checkmark-circle'
-    : overdue
+    : overdue || isDelayed
     ? 'alert-circle'
     : 'time';
 
@@ -115,6 +141,12 @@ export function VaccineCard({
           {administeredAt ? (
             <Text className="text-green-600 text-xs mt-1">
               ✅ {new Date(administeredAt).toLocaleDateString('tr-TR')} tarihinde yapıldı
+            </Text>
+          ) : null}
+
+          {!administeredAt && vaccine.scheduled_date ? (
+            <Text className="text-gray-500 text-xs mt-1">
+              Planlanan: {new Date(vaccine.scheduled_date).toLocaleDateString('tr-TR')}
             </Text>
           ) : null}
         </View>

@@ -212,11 +212,87 @@ export async function generateAllergenPlan(
 
 // ─── Food Trials (auth required) ─────────────────────────────────────────────
 
+function normalizeFoodTrial(item: unknown): FoodTrial | null {
+  if (!item || typeof item !== 'object') return null;
+  const record = item as Record<string, unknown>;
+  const id =
+    typeof record.id === 'number'
+      ? record.id
+      : typeof record.id === 'string'
+        ? Number(record.id)
+        : Number.NaN;
+  if (Number.isNaN(id)) return null;
+
+  const result = record.result;
+  const validResult =
+    result === 'success' ||
+    result === 'mild_reaction' ||
+    result === 'reaction' ||
+    result === 'severe_reaction'
+      ? result
+      : 'success';
+  const ingredientId =
+    typeof record.ingredient_id === 'number'
+      ? record.ingredient_id
+      : typeof record.ingredient_id === 'string'
+        ? Number(record.ingredient_id)
+        : undefined;
+
+  return {
+    ...(record as Partial<FoodTrial>),
+    id,
+    child_id:
+      record.child_id !== undefined && record.child_id !== null
+        ? String(record.child_id)
+        : '',
+    ingredient_id:
+      ingredientId !== undefined && !Number.isNaN(ingredientId)
+        ? ingredientId
+        : undefined,
+    ingredient_name:
+      typeof record.ingredient_name === 'string' ? record.ingredient_name : undefined,
+    trial_date: typeof record.trial_date === 'string' ? record.trial_date : '',
+    result: validResult,
+    reaction: typeof record.reaction === 'string' ? record.reaction : undefined,
+    reaction_notes:
+      typeof record.reaction_notes === 'string' ? record.reaction_notes : undefined,
+    amount: typeof record.amount === 'string' ? record.amount : undefined,
+    form: typeof record.form === 'string' ? record.form : undefined,
+    retry_after:
+      typeof record.retry_after === 'string' ? record.retry_after : undefined,
+    is_new: typeof record.is_new === 'boolean' ? record.is_new : undefined,
+    created_at:
+      typeof record.created_at === 'string' ? record.created_at : undefined,
+    updated_at:
+      typeof record.updated_at === 'string' ? record.updated_at : undefined,
+  };
+}
+
 export async function getFoodTrials(childId?: string): Promise<FoodTrial[]> {
   const endpoint = childId
     ? `${API_ENDPOINTS.FOOD_TRIALS}?child_id=${encodeURIComponent(childId)}`
     : API_ENDPOINTS.FOOD_TRIALS;
-  return api.get<FoodTrial[]>(endpoint);
+  try {
+    const response = await api.get<unknown>(endpoint);
+    const rawTrials =
+      Array.isArray(response)
+        ? response
+        : response && typeof response === 'object' && Array.isArray((response as { trials?: unknown }).trials)
+          ? (response as { trials: unknown[] }).trials
+          : [];
+
+    return rawTrials
+      .map(normalizeFoodTrial)
+      .filter((trial): trial is FoodTrial => trial !== null);
+  } catch (error) {
+    if (__DEV__) {
+      console.error(
+        '[ToolService] getFoodTrials error:',
+        error instanceof Error ? error.message : error,
+      );
+    }
+    throw error;
+  }
 }
 
 export async function createFoodTrial(input: FoodTrialInput): Promise<FoodTrial> {
@@ -253,9 +329,41 @@ export async function deleteFoodTrial(id: number): Promise<void> {
 }
 
 export async function getFoodTrialSummary(childId: string): Promise<FoodTrialSummary> {
-  return api.get<FoodTrialSummary>(
-    `${API_ENDPOINTS.FOOD_TRIAL_STATS}?child_id=${encodeURIComponent(childId)}`,
-  );
+  try {
+    const response = await api.get<unknown>(
+      `${API_ENDPOINTS.FOOD_TRIAL_STATS}?child_id=${encodeURIComponent(childId)}`,
+    );
+    const payload =
+      response && typeof response === 'object' && (response as { data?: unknown }).data
+        ? (response as { data: unknown }).data
+        : response;
+
+    const summary =
+      payload && typeof payload === 'object'
+        ? (payload as Partial<FoodTrialSummary>)
+        : {};
+
+    return {
+      total_trials: Number(summary.total_trials ?? 0),
+      success: Number(summary.success ?? 0),
+      mild_reaction: Number(summary.mild_reaction ?? 0),
+      reaction: Number(summary.reaction ?? 0),
+      severe_reaction: Number(summary.severe_reaction ?? 0),
+      recent_trials: Array.isArray(summary.recent_trials)
+        ? summary.recent_trials
+            .map(normalizeFoodTrial)
+            .filter((trial): trial is FoodTrial => trial !== null)
+        : [],
+    };
+  } catch (error) {
+    if (__DEV__) {
+      console.error(
+        '[ToolService] getFoodTrialSummary error:',
+        error instanceof Error ? error.message : error,
+      );
+    }
+    throw error;
+  }
 }
 
 // ─── Bath Planner ─────────────────────────────────────────────────────────────

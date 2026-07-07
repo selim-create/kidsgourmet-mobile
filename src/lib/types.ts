@@ -658,19 +658,32 @@ export interface FoodIntroductionItem {
 // ─── Vaccine Types ────────────────────────────────────────────────────────────
 
 export interface Vaccine {
-  id: number;
-  vaccine_id?: number;
+  id: number | string;
+  vaccine_id?: number | string;
+  vaccine_code?: string;
   name: string;
+  name_short?: string;
   recommended_age_months?: number;
   doses?: number;
   description?: string;
+  timing_rule?: string;
   is_mandatory?: boolean;
   is_overdue?: boolean;
   /** ISO date string — present when fetched via VACCINES_BY_CHILD endpoint */
   administered_at?: string;
   date_administered?: string;
+  scheduled_date?: string;
+  actual_date?: string;
   /** Status string returned by child-specific endpoint */
   status?: string;
+  child_id?: string | number;
+  vaccine?: {
+    code?: string;
+    name?: string;
+    name_short?: string;
+    description?: string;
+    timing_rule?: string;
+  };
 }
 
 // ─── Dashboard Types ──────────────────────────────────────────────────────────
@@ -1065,7 +1078,13 @@ export interface AllergenTrialPlan {
   emergency_signs: string[];
   when_to_stop: string[];
   success_criteria?: string;
-  related_ingredients?: string[];
+  related_ingredients?: (
+    | string
+    | {
+        name?: string;
+        warning?: string;
+      }
+  )[];
 }
 
 // ─── Food Trial Types ─────────────────────────────────────────────────────────
@@ -1077,9 +1096,12 @@ export interface FoodTrial {
   ingredient_name?: string;
   trial_date: string;
   result: 'success' | 'mild_reaction' | 'reaction' | 'severe_reaction';
+  reaction?: string;
   reaction_notes?: string;
   amount?: string;
   form?: string;
+  retry_after?: string;
+  is_new?: boolean;
   created_at?: string;
   updated_at?: string;
 }

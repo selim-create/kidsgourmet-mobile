@@ -21,9 +21,9 @@ import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 export default function VaccineScreen() {
   const { activeChild } = useActiveChild();
   const childId = activeChild?.id;
-  const { vaccines, isLoading, error, mutate } = useVaccines(childId);
+  const { vaccines, childBirthDate, isLoading, error, mutate } = useVaccines(childId);
   const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
-  const [administered, setAdministered] = useState<Record<number, string>>({});
+  const [administered, setAdministered] = useState<Record<string, string>>({});
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -32,7 +32,7 @@ export default function VaccineScreen() {
     setRefreshing(false);
   };
 
-  const handleMarkDone = async (vaccineId: number) => {
+  const handleMarkDone = async (vaccineId: number | string) => {
     if (!childId) {
       Toast.show({
         type: 'error',
@@ -41,12 +41,23 @@ export default function VaccineScreen() {
       });
       return;
     }
+    const numericVaccineId =
+      typeof vaccineId === 'number' ? vaccineId : Number(vaccineId);
+    if (Number.isNaN(numericVaccineId)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Aşı kaydı işaretlenemedi',
+        text2: 'Bu aşı kaydı işaretleme için uygun değil.',
+      });
+      return;
+    }
+    const vaccineKey = String(vaccineId);
     const dateAdministered = new Date().toISOString();
     // Optimistic update — show done immediately, rollback on API failure
-    setAdministered((prev) => ({ ...prev, [vaccineId]: dateAdministered }));
+    setAdministered((prev) => ({ ...prev, [vaccineKey]: dateAdministered }));
     try {
       await markVaccineDone({
-        vaccine_id: vaccineId,
+        vaccine_id: numericVaccineId,
         child_id: childId,
         date_administered: dateAdministered,
       });
@@ -67,7 +78,7 @@ export default function VaccineScreen() {
       // Rollback optimistic update
       setAdministered((prev) => {
         const next = { ...prev };
-        delete next[vaccineId];
+        delete next[vaccineKey];
         return next;
       });
       Toast.show({
@@ -81,10 +92,12 @@ export default function VaccineScreen() {
   // Derive done status: prefer API-returned administered_at, fall back to local optimistic state
   const isDoneForVaccine = (v: (typeof safeVaccines)[0]) => {
     const status = (v.status ?? '').toLowerCase();
+    const vaccineKey = String(v.id);
     return Boolean(
       v.administered_at ||
       v.date_administered ||
-      administered[v.id] ||
+      v.actual_date ||
+      administered[vaccineKey] ||
       status === 'done' ||
       status === 'completed' ||
       status === 'administered',
@@ -180,11 +193,19 @@ export default function VaccineScreen() {
             description="Lütfen bağlantınızı kontrol edip tekrar deneyin."
           />
         ) : safeVaccines.length === 0 ? (
-          <EmptyState
-            icon="medical-outline"
-            title="Aşı bilgisi bulunamadı"
-            description="Bu profil için henüz aşı kaydı bulunmuyor."
-          />
+          activeChild && !childBirthDate ? (
+            <EmptyState
+              icon="information-circle-outline"
+              title="Doğum tarihi eksik"
+              description="Bu çocuğun doğum tarihi eksik olduğu için aşı takvimi oluşturulamıyor. Lütfen çocuk profiline doğum tarihi ekleyin."
+            />
+          ) : (
+            <EmptyState
+              icon="medical-outline"
+              title="Aşı kaydı bulunamadı"
+              description="Bu profil için henüz aşı kaydı bulunmuyor."
+            />
+          )
         ) : (
           <>
             {/* Overdue warning */}
@@ -209,7 +230,8 @@ export default function VaccineScreen() {
                 administeredAt={
                   vaccine.administered_at ||
                   vaccine.date_administered ||
-                  administered[vaccine.id]
+                  vaccine.actual_date ||
+                  administered[String(vaccine.id)]
                 }
                 overdue={
                   vaccine.is_overdue ||

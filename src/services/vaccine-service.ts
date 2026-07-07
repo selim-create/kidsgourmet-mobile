@@ -222,9 +222,14 @@ export async function getVaccinesByChild(childId: string): Promise<VaccineEnvelo
 }
 
 export async function markVaccineDone(data: {
-  vaccine_id: number;
-  child_id: string;
-  date_administered?: string;
+  record_id: number;
+  actual_date: string; // 'YYYY-MM-DD'
+  notes?: string;
 }): Promise<void> {
-  return api.post(API_ENDPOINTS.VACCINES_MARK_DONE, data);
+  const body: { record_id: number; actual_date: string; notes?: string } = {
+    record_id: data.record_id,
+    actual_date: data.actual_date,
+    ...(data.notes ? { notes: data.notes } : {}),
+  };
+  return api.post(API_ENDPOINTS.VACCINES_MARK_DONE, body);
 }

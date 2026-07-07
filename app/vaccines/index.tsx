@@ -59,14 +59,13 @@ export default function VaccineScreen() {
       return;
     }
     const vaccineKey = String(vaccineId);
-    const dateAdministered = new Date().toISOString();
+    const dateAdministered = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
     // Optimistic update — show done immediately, rollback on API failure
     setAdministered((prev) => ({ ...prev, [vaccineKey]: dateAdministered }));
     try {
       await markVaccineDone({
-        vaccine_id: numericVaccineId,
-        child_id: childId,
-        date_administered: dateAdministered,
+        record_id: numericVaccineId,
+        actual_date: dateAdministered,
       });
       Toast.show({
         type: 'success',

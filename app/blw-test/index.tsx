@@ -29,6 +29,7 @@ export default function BLWTestScreen() {
   const { blwResult, isLoading, error } = useBLWResults();
   const [config, setConfig] = useState<BLWTestConfig | null>(null);
   const [isConfigLoading, setIsConfigLoading] = useState(true);
+  const [configError, setConfigError] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localResult, setLocalResult] = useState<{
@@ -47,12 +48,14 @@ export default function BLWTestScreen() {
   useEffect(() => {
     let cancelled = false;
     setIsConfigLoading(true);
+    setConfigError(false);
     getBLWTestConfig()
       .then((cfg) => {
         if (!cancelled) setConfig(cfg);
       })
       .catch(() => {
-        // Config stays null; submit button stays disabled
+        if (!cancelled) setConfigError(true);
+        if (__DEV__) console.error('[BLWTest] Failed to load test config');
       })
       .finally(() => {
         if (!cancelled) setIsConfigLoading(false);
@@ -88,6 +91,7 @@ export default function BLWTestScreen() {
       });
     } catch {
       // Use local calculation if API fails
+      if (__DEV__) console.error('[BLWTest] Submit failed, using local calculation');
       const score = computeScore();
       const thresholds = config?.thresholds ?? { ready: 80, almost_ready: 50 };
       const level: keyof typeof READINESS_COLORS =
@@ -176,6 +180,23 @@ export default function BLWTestScreen() {
           </View>
         ) : isLoading || isConfigLoading ? (
           <LoadingSpinner label="Yükleniyor..." />
+        ) : configError ? (
+          <View
+            style={{
+              backgroundColor: '#FEF2F2',
+              borderRadius: 12,
+              padding: 16,
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons name="cloud-offline-outline" size={28} color="#DC2626" />
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#991B1B', marginTop: 8, textAlign: 'center' }}>
+              Test sorularına şu an ulaşılamıyor
+            </Text>
+            <Text style={{ fontSize: 12, color: '#B91C1C', marginTop: 4, textAlign: 'center' }}>
+              Lütfen bağlantınızı kontrol edin ve tekrar deneyin.
+            </Text>
+          </View>
         ) : (
           <View>
             {/* Previous result banner */}

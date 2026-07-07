@@ -158,6 +158,7 @@ export default function SafetyCheckScreen() {
         });
         return;
       } catch {
+        if (__DEV__) console.error('[SafetyCheck] API call failed, falling back to client-side');
         // Fall through to client-side calculation below
       }
     }

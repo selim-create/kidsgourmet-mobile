@@ -215,13 +215,15 @@ export async function generateAllergenPlan(
 function normalizeFoodTrial(item: unknown): FoodTrial | null {
   if (!item || typeof item !== 'object') return null;
   const record = item as Record<string, unknown>;
-  const id =
-    typeof record.id === 'number'
-      ? record.id
-      : typeof record.id === 'string'
-        ? Number(record.id)
-        : Number.NaN;
-  if (Number.isNaN(id)) return null;
+  const rawId = record.id;
+  let id: number | string;
+  if (typeof rawId === 'number' && Number.isFinite(rawId)) {
+    id = rawId;
+  } else if (typeof rawId === 'string' && rawId.trim() !== '') {
+    id = rawId.trim();
+  } else {
+    return null;
+  }
 
   const result = record.result;
   if (
@@ -313,7 +315,7 @@ export async function createFoodTrial(input: FoodTrialInput): Promise<FoodTrial>
 }
 
 export async function updateFoodTrial(
-  id: number,
+  id: number | string,
   input: Partial<FoodTrialInput>,
 ): Promise<FoodTrial> {
   return api.put<FoodTrial>(API_ENDPOINTS.FOOD_TRIAL(id), {
@@ -328,7 +330,7 @@ export async function updateFoodTrial(
   });
 }
 
-export async function deleteFoodTrial(id: number): Promise<void> {
+export async function deleteFoodTrial(id: number | string): Promise<void> {
   return api.delete<void>(API_ENDPOINTS.FOOD_TRIAL(id));
 }
 

@@ -19,6 +19,19 @@ import type { BathPlannerConfig, BathPlannerResult } from '../../src/lib/types';
 
 type Stage = 'intro' | 'form' | 'result';
 
+type BathOption = string | { id: string; label: string };
+
+function optionValue(opt: BathOption): string {
+  return typeof opt === 'string' ? opt : opt.id;
+}
+
+function optionLabel(opt: BathOption): string {
+  if (typeof opt === 'string') {
+    return opt.charAt(0).toUpperCase() + opt.slice(1);
+  }
+  return opt.label;
+}
+
 const DEFAULT_SKIN_TYPES = [
   { value: 'normal', label: 'Normal' },
   { value: 'sensitive', label: 'Hassas' },
@@ -35,6 +48,7 @@ const SEASON_LABELS: Record<string, string> = {
 };
 
 function getSeasonLabel(season: string): string {
+  if (typeof season !== 'string') return String(season ?? '');
   return SEASON_LABELS[season.toLowerCase()] ?? season;
 }
 
@@ -57,7 +71,7 @@ export default function BanyoPlanlayiciScreen() {
       .then((cfg) => {
         setConfig(cfg);
         if (cfg.seasons && cfg.seasons.length > 0) {
-          setSeason(cfg.seasons[0]);
+          setSeason(optionValue(cfg.seasons[0] as BathOption));
         }
       })
       .catch(() => {
@@ -194,10 +208,10 @@ export default function BanyoPlanlayiciScreen() {
   // ─── Form Stage ───────────────────────────────────────────────────────────────
 
   if (stage === 'form') {
-    const skinTypeOptions = config.skin_types
+    const skinTypeOptions = config.skin_types && config.skin_types.length > 0
       ? config.skin_types.map((v) => ({
-          value: v,
-          label: v.charAt(0).toUpperCase() + v.slice(1),
+          value: optionValue(v as BathOption),
+          label: optionLabel(v as BathOption),
         }))
       : DEFAULT_SKIN_TYPES;
 
@@ -258,7 +272,8 @@ export default function BanyoPlanlayiciScreen() {
               <View className="bg-white rounded-2xl p-4 border border-gray-100">
                 <Text className="text-sm font-semibold text-dark mb-3">Mevsim</Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {config.seasons.map((s) => {
+                  {config.seasons.map((rawSeason) => {
+                    const s = optionValue(rawSeason as BathOption);
                     const isSelected = season === s;
                     return (
                       <TouchableOpacity
@@ -274,7 +289,9 @@ export default function BanyoPlanlayiciScreen() {
                             isSelected ? 'text-white' : 'text-gray-600'
                           }`}
                         >
-                          {getSeasonLabel(s)}
+                          {typeof rawSeason === 'object' && rawSeason !== null && rawSeason.label
+                            ? rawSeason.label
+                            : getSeasonLabel(s)}
                         </Text>
                       </TouchableOpacity>
                     );

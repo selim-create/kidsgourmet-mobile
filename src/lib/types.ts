@@ -914,7 +914,9 @@ export interface SolidFoodReadinessResult {
   timestamp?: string;
   id?: number | string;
   child_id?: number | string;
+  /** @deprecated Prefer `result.id` for new kg-core responses. */
   is_ready?: boolean;
+  /** @deprecated Prefer `score` for new kg-core responses. */
   readiness_score?: number;
   factors?: {
     can_sit_unsupported?: boolean;

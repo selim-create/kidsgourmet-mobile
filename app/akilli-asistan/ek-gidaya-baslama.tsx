@@ -47,7 +47,7 @@ const READINESS_CONFIG = {
     badgeText: '#92400E',
   },
   not_yet: {
-    emoji: '⏸',
+    emoji: '🕒',
     label: 'Biraz Daha Zaman',
     bgClass: 'bg-orange-50',
     borderClass: 'border-orange-200',
@@ -120,6 +120,13 @@ export default function SolidFoodReadinessScreen() {
   const allAnswered = totalQuestions > 0 && answeredCount === totalQuestions;
   const progress = totalQuestions > 0 ? answeredCount / totalQuestions : 0;
 
+  const getBucketIdFromScore = (score?: number) => {
+    if (score === undefined) return undefined;
+    return config?.result_buckets?.find(
+      (bucket) => score >= bucket.min_score && score <= bucket.max_score,
+    )?.id;
+  };
+
   const handleSubmit = async () => {
     if (!allAnswered) {
       Toast.show({
@@ -153,14 +160,15 @@ export default function SolidFoodReadinessScreen() {
     setConfig(null);
   };
 
+  const resultScore = result?.score ?? result?.readiness_score;
   const bucketId =
     result?.result?.id ??
+    getBucketIdFromScore(resultScore) ??
     (result?.is_ready === true ? 'ready' : result?.is_ready === false ? 'not_yet' : undefined);
   const readinessCfg =
     bucketId && READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]
       ? READINESS_CONFIG[bucketId as keyof typeof READINESS_CONFIG]
       : null;
-  const resultScore = result?.score ?? result?.readiness_score;
   const resultNotes = result?.result?.description ?? result?.notes;
   const resultRecommendations = result?.result?.recommendations ?? result?.recommendations;
   const resultDisclaimer = result?.disclaimer ?? config?.disclaimer ?? FALLBACK_DISCLAIMER;

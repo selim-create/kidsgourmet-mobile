@@ -164,7 +164,12 @@ export const API_ENDPOINTS = {
 
   // Percentile
   TOOL_PERCENTILE: '/kg/v1/tools/percentile',
-  TOOL_PERCENTILE_RESULTS: '/kg/v1/tools/percentile/results',
+  /**
+   * kg-core exposes the user's saved percentile results at
+   * /kg/v1/user/percentile-results (PercentileController::register_routes).
+   * The old /kg/v1/tools/percentile/results path does NOT exist and returns 404.
+   */
+  TOOL_PERCENTILE_RESULTS: '/kg/v1/user/percentile-results',
   PERCENTILE_CALCULATE: '/kg/v1/tools/percentile/calculate',
   PERCENTILE_SAVE: '/kg/v1/tools/percentile/save',
 

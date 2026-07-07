@@ -5,7 +5,8 @@ import { API_ENDPOINTS } from '../lib/constants';
 
 type VaccinesHookData = {
   vaccines: Vaccine[];
-  birthDate?: string;
+  birthDate?: string | null;
+  hasChildData?: boolean;
 };
 
 export function useVaccines(childId?: string) {
@@ -16,13 +17,14 @@ export function useVaccines(childId?: string) {
 
   const fetcher = resolvedChildId
     ? async (): Promise<VaccinesHookData> => getVaccinesByChild(resolvedChildId)
-    : async (): Promise<VaccinesHookData> => ({ vaccines: await getVaccines() });
+    : async (): Promise<VaccinesHookData> => ({ vaccines: await getVaccines(), hasChildData: false });
 
   const { data, error, isLoading, mutate } = useSWR<VaccinesHookData>(key, fetcher);
 
   return {
     vaccines: Array.isArray(data?.vaccines) ? data.vaccines : [],
     childBirthDate: data?.birthDate,
+    hasChildScheduleData: Boolean(data?.hasChildData),
     isLoading,
     error,
     mutate,

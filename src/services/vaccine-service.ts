@@ -2,12 +2,13 @@ import api from '../lib/api';
 import { API_ENDPOINTS } from '../lib/constants';
 import type { Vaccine } from '../lib/types';
 
-type VaccineEnvelope = {
+export type VaccineEnvelope = {
   vaccines: Vaccine[];
-  birthDate?: string;
+  birthDate: string | null;
+  hasChildData: boolean;
 };
 
-function toNumberIfPossible(value: unknown): number | undefined {
+function tryParseNumber(value: unknown): number | undefined {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string' && value.trim() !== '') {
     const num = Number(value);
@@ -28,13 +29,11 @@ function normalizeVaccine(item: unknown): Vaccine | null {
     record.id ??
     record.vaccine_id ??
     record.vaccine_code ??
-    nested?.code ??
-    nested?.name ??
-    nested?.name_short;
+    nested?.code;
   if (rawId === undefined || rawId === null) return null;
+  if (typeof rawId !== 'string' && typeof rawId !== 'number') return null;
 
-  const parsedId = toNumberIfPossible(rawId);
-  const id: number | string = parsedId ?? String(rawId);
+  const id: number | string = tryParseNumber(rawId) ?? String(rawId);
 
   const name =
     typeof record.name === 'string'
@@ -51,14 +50,14 @@ function normalizeVaccine(item: unknown): Vaccine | null {
   const vaccineIdCandidate = record.vaccine_id ?? record.id;
   const normalizedVaccineId =
     vaccineIdCandidate !== undefined && vaccineIdCandidate !== null
-      ? toNumberIfPossible(vaccineIdCandidate) ?? String(vaccineIdCandidate)
+      ? tryParseNumber(vaccineIdCandidate) ?? String(vaccineIdCandidate)
       : undefined;
 
   const recommendedAge =
-    toNumberIfPossible(record.recommended_age_months) ??
-    toNumberIfPossible(nested?.recommended_age_months);
+    tryParseNumber(record.recommended_age_months) ??
+    tryParseNumber(nested?.recommended_age_months);
 
-  const doses = toNumberIfPossible(record.doses) ?? toNumberIfPossible(nested?.doses);
+  const doses = tryParseNumber(record.doses) ?? tryParseNumber(nested?.doses);
 
   const status = typeof record.status === 'string' ? record.status : undefined;
 
@@ -193,7 +192,7 @@ export async function getVaccinesByChild(childId: string): Promise<VaccineEnvelo
   try {
     const payload = await api.get<unknown>(API_ENDPOINTS.VACCINES_BY_CHILD(childId));
     if (!payload || typeof payload !== 'object') {
-      return { vaccines: [] };
+      return { vaccines: [], birthDate: null, hasChildData: false };
     }
 
     const root = payload as Record<string, unknown>;
@@ -207,8 +206,9 @@ export async function getVaccinesByChild(childId: string): Promise<VaccineEnvelo
       vaccines,
       birthDate:
         typeof childData.birth_date === 'string' && childData.birth_date.trim() !== ''
-          ? childData.birth_date
-          : undefined,
+          ? childData.birth_date.trim()
+          : null,
+      hasChildData: true,
     };
   } catch (error) {
     if (__DEV__) {

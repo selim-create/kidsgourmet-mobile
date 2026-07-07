@@ -433,8 +433,16 @@ export default function AlerjenPlanlayiciScreen() {
                       key={`${ingredient.name}-${index}`}
                       className="bg-gray-50 rounded-xl p-3 border border-gray-100"
                     >
-                      <View className="flex-row items-center gap-2">
-                        <Icon name="triangle-exclamation" size={14} color="#6B7280" />
+                      <View
+                        className="flex-row items-center gap-2"
+                        accessible
+                        accessibilityLabel="Uyarı"
+                      >
+                        <Icon
+                          name="triangle-exclamation"
+                          size={14}
+                          color="#6B7280"
+                        />
                         <Text className="text-sm font-semibold text-dark flex-1">
                           {ingredient.name}
                         </Text>

@@ -224,35 +224,39 @@ function normalizeFoodTrial(item: unknown): FoodTrial | null {
   if (Number.isNaN(id)) return null;
 
   const result = record.result;
-  const validResult =
-    result === 'success' ||
-    result === 'mild_reaction' ||
-    result === 'reaction' ||
-    result === 'severe_reaction'
-      ? result
-      : 'success';
+  if (
+    result !== 'success' &&
+    result !== 'mild_reaction' &&
+    result !== 'reaction' &&
+    result !== 'severe_reaction'
+  ) {
+    return null;
+  }
   const ingredientId =
     typeof record.ingredient_id === 'number'
       ? record.ingredient_id
       : typeof record.ingredient_id === 'string'
         ? Number(record.ingredient_id)
         : undefined;
+  const childId =
+    record.child_id !== undefined && record.child_id !== null
+      ? String(record.child_id).trim()
+      : '';
+  const trialDate = typeof record.trial_date === 'string' ? record.trial_date.trim() : '';
+  if (!childId || !trialDate) return null;
 
   return {
     ...(record as Partial<FoodTrial>),
     id,
-    child_id:
-      record.child_id !== undefined && record.child_id !== null
-        ? String(record.child_id)
-        : '',
+    child_id: childId,
     ingredient_id:
       ingredientId !== undefined && !Number.isNaN(ingredientId)
         ? ingredientId
         : undefined,
     ingredient_name:
       typeof record.ingredient_name === 'string' ? record.ingredient_name : undefined,
-    trial_date: typeof record.trial_date === 'string' ? record.trial_date : '',
-    result: validResult,
+    trial_date: trialDate,
+    result,
     reaction: typeof record.reaction === 'string' ? record.reaction : undefined,
     reaction_notes:
       typeof record.reaction_notes === 'string' ? record.reaction_notes : undefined,

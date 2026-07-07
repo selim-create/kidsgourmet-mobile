@@ -21,7 +21,14 @@ import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 export default function VaccineScreen() {
   const { activeChild } = useActiveChild();
   const childId = activeChild?.id;
-  const { vaccines, childBirthDate, isLoading, error, mutate } = useVaccines(childId);
+  const {
+    vaccines,
+    childBirthDate,
+    hasChildScheduleData,
+    isLoading,
+    error,
+    mutate,
+  } = useVaccines(childId);
   const safeVaccines = Array.isArray(vaccines) ? vaccines : [];
   const [administered, setAdministered] = useState<Record<string, string>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -47,7 +54,7 @@ export default function VaccineScreen() {
       Toast.show({
         type: 'error',
         text1: 'Aşı kaydı işaretlenemedi',
-        text2: 'Bu aşı kaydı işaretleme için uygun değil.',
+        text2: 'Aşı kaydı güncellenemedi. Lütfen tekrar deneyin.',
       });
       return;
     }
@@ -193,7 +200,7 @@ export default function VaccineScreen() {
             description="Lütfen bağlantınızı kontrol edip tekrar deneyin."
           />
         ) : safeVaccines.length === 0 ? (
-          activeChild && !childBirthDate ? (
+          activeChild && hasChildScheduleData && childBirthDate === null ? (
             <EmptyState
               icon="information-circle-outline"
               title="Doğum tarihi eksik"

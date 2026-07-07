@@ -1,4 +1,4 @@
-// ─── Core Types ───────────────────────────────────────────────────────────────
+// ─── Core Types ─────────────────────────────────────────────────────────
 
 export interface SocialLinks {
   instagram?: string;
@@ -91,7 +91,7 @@ export interface Child {
   current_weight_kg?: number | null;
 }
 
-// ─── Recipe Types ──────────────────────────────────────────────────────────────
+// ─── Recipe Types ────────────────────────────────────────────────────────
 
 export interface RecipeExpert {
   name: string;
@@ -237,7 +237,7 @@ export interface Author {
   is_expert?: boolean;
 }
 
-// ─── Taxonomy Types ────────────────────────────────────────────────────────────
+// ─── Taxonomy Types ───────────────────────────────────────────────────────
 
 export interface AgeGroup {
   id: number;
@@ -277,7 +277,7 @@ export interface Tag {
   slug: string;
 }
 
-// ─── Blog Types ────────────────────────────────────────────────────────────────
+// ─── Blog Types ─────────────────────────────────────────────────────────
 
 export type SponsorImage = string | { id?: number | null; url?: string | null } | null;
 
@@ -297,7 +297,7 @@ export interface SponsorData {
   sponsor_cta?: { text?: string; url?: string };
 }
 
-// ─── Embed Types ──────────────────────────────────────────────────────────────
+// ─── Embed Types ────────────────────────────────────────────────────────
 
 export interface BaseEmbedItem {
   id: number;
@@ -379,7 +379,7 @@ export interface BlogCategory {
   description?: string;
 }
 
-// ─── Meal Plan Types ───────────────────────────────────────────────────────────
+// ─── Meal Plan Types ───────────────────────────────────────────────────────
 
 export interface MealPlan {
   id?: number;
@@ -403,7 +403,7 @@ export interface MealPlanEntry {
   is_completed?: boolean;
 }
 
-// ─── Search Types ──────────────────────────────────────────────────────────────
+// ─── Search Types ────────────────────────────────────────────────────────
 
 export interface SearchResult {
   recipes?: Recipe[];
@@ -500,7 +500,7 @@ export interface SearchParams {
   per_page?: number;
 }
 
-// ─── Nutrition Types ───────────────────────────────────────────────────────────
+// ─── Nutrition Types ───────────────────────────────────────────────────────
 
 export interface NutritionSummary {
   date?: string;
@@ -516,7 +516,7 @@ export interface NutritionSummary {
   missing_nutrients?: Array<string | { name: string; percent?: number; deficiency?: string }>;
 }
 
-// ─── Safety Types ─────────────────────────────────────────────────────────────
+// ─── Safety Types ────────────────────────────────────────────────────────
 
 export interface SafetyCheck {
   ingredient: string;
@@ -547,7 +547,7 @@ export interface BatchSafetyResult {
   result: SafetyCheckResult;
 }
 
-// ─── Comment Types ────────────────────────────────────────────────────────────
+// ─── Comment Types ────────────────────────────────────────────────────────
 
 export interface CommentAuthor {
   id: number;
@@ -572,7 +572,7 @@ export interface Comment {
   replies?: Comment[];
 }
 
-// ─── API Response Types ────────────────────────────────────────────────────────
+// ─── API Response Types ──────────────────────────────────────────────────────
 
 export interface ApiResponse<T> {
   data?: T;
@@ -655,7 +655,7 @@ export interface FoodIntroductionItem {
   image?: string;
 }
 
-// ─── Vaccine Types ────────────────────────────────────────────────────────────
+// ─── Vaccine Types ────────────────────────────────────────────────────────
 
 export interface Vaccine {
   id: number | string;
@@ -686,7 +686,7 @@ export interface Vaccine {
   };
 }
 
-// ─── Dashboard Types ──────────────────────────────────────────────────────────
+// ─── Dashboard Types ───────────────────────────────────────────────────────
 
 export interface DashboardData {
   featured_recipes?: Recipe[];
@@ -713,7 +713,7 @@ export interface DashboardAlert {
   action_url?: string;
 }
 
-// ─── Auth Types ────────────────────────────────────────────────────────────────
+// ─── Auth Types ─────────────────────────────────────────────────────────
 
 export interface LoginCredentials {
   username: string; // email OR username
@@ -749,7 +749,7 @@ export interface AuthResponse {
   account_pending_deletion?: boolean;
 }
 
-// ─── Favorites Types ──────────────────────────────────────────────────────────
+// ─── Favorites Types ───────────────────────────────────────────────────────
 
 export interface FavoriteCollection {
   id: number;
@@ -815,7 +815,7 @@ export interface ShoppingList {
   updated_at?: string;
 }
 
-// ─── Growth Types ─────────────────────────────────────────────────────────────
+// ─── Growth Types ────────────────────────────────────────────────────────
 
 export interface GrowthRecord {
   id: string;
@@ -872,9 +872,29 @@ export interface GrowthChartData {
   };
 }
 
+export interface PercentileResultItem {
+  measurement_type:
+    | 'weight_for_age'
+    | 'height_for_age'
+    | 'head_for_age'
+    | 'weight_for_height'
+    | string;
+  value: number;
+  percentile: number;
+  z_score: number;
+  category: 'very_low' | 'low' | 'normal' | 'high' | 'very_high' | string;
+  interpretation?: string;
+}
+
+export interface PercentileRedFlag {
+  type: string;
+  message: string;
+  severity?: 'warning' | 'critical' | string;
+}
+
 export interface PercentileResult {
-  id?: number;
-  child_id?: number;
+  id?: number | string;
+  child_id?: number | string;
   weight_percentile?: number;
   height_percentile?: number;
   head_circumference_percentile?: number;
@@ -893,6 +913,20 @@ export interface PercentileResult {
   height_status?: string;
   head_circumference_status?: string;
   bmi?: number;
+  /** Raw kg-core /tools/percentile/calculate response fields */
+  percentiles?: PercentileResultItem[];
+  red_flags?: PercentileRedFlag[];
+  age_in_days?: number;
+  age_in_months?: number;
+  measurement?: {
+    gender?: 'male' | 'female' | string;
+    birth_date?: string;
+    measurement_date?: string;
+    weight_kg?: number | null;
+    height_cm?: number | null;
+    head_circumference_cm?: number | null;
+  };
+  created_at?: string;
 }
 
 // ─── BLW / Solid Food Types ───────────────────────────────────────────────────
@@ -933,7 +967,7 @@ export interface SolidFoodReadinessResult {
   checked_at?: string;
 }
 
-// ─── Allergen Types ───────────────────────────────────────────────────────────
+// ─── Allergen Types ───────────────────────────────────────────────────────
 
 export interface Allergen {
   id: number;
@@ -953,7 +987,7 @@ export interface ChildAllergen {
   notes?: string;
 }
 
-// ─── Tool Types ───────────────────────────────────────────────────────────────
+// ─── Tool Types ─────────────────────────────────────────────────────────
 
 export interface Tool {
   id: number;
@@ -970,7 +1004,7 @@ export interface Tool {
   is_sponsored?: boolean;
 }
 
-// ─── BLW Test Types ───────────────────────────────────────────────────────────
+// ─── BLW Test Types ───────────────────────────────────────────────────────
 
 export interface BLWTestQuestion {
   id: string;
@@ -1000,7 +1034,7 @@ export interface BLWResultBucket {
   color?: string;
 }
 
-// ─── Percentile Types ─────────────────────────────────────────────────────────
+// ─── Percentile Types ───────────────────────────────────────────────────────
 
 export interface PercentileMeasurement {
   child_id?: number;
@@ -1012,7 +1046,7 @@ export interface PercentileMeasurement {
   head_circumference_cm?: number;
 }
 
-// ─── Water Calculator Types ───────────────────────────────────────────────────
+// ─── Water Calculator Types ───────────────────────────────────────────────
 
 export interface WaterNeedResult {
   daily_fluid_need_ml: number;
@@ -1026,7 +1060,7 @@ export interface WaterNeedResult {
   warning: string | null;
 }
 
-// ─── Solid Food Readiness Types ───────────────────────────────────────────────
+// ─── Solid Food Readiness Types ──────────────────────────────────────────
 
 export interface SolidFoodReadinessOption {
   id: string;
@@ -1068,7 +1102,7 @@ export interface SolidFoodResultBucket {
   recommendations?: string[];
 }
 
-// ─── Allergen Planner Types ───────────────────────────────────────────────────
+// ─── Allergen Planner Types ───────────────────────────────────────────────
 
 export interface AllergenPlannerConfig {
   allergens: Array<{
@@ -1117,7 +1151,7 @@ export interface AllergenTrialPlan {
   )[];
 }
 
-// ─── Food Trial Types ─────────────────────────────────────────────────────────
+// ─── Food Trial Types ─────────────────────────────────────────────────────
 
 export interface FoodTrial {
   id: number | string;
@@ -1156,7 +1190,7 @@ export interface FoodTrialSummary {
   recent_trials?: FoodTrial[];
 }
 
-// ─── Bath Planner Types ───────────────────────────────────────────────────────
+// ─── Bath Planner Types ───────────────────────────────────────────────────
 
 export interface BathPlannerAgeGroup {
   slug: string;
@@ -1193,7 +1227,7 @@ export interface BathPlannerResult {
   disclaimer?: string;
 }
 
-// ─── Hygiene Calculator Types ─────────────────────────────────────────────────
+// ─── Hygiene Calculator Types ─────────────────────────────────────────────
 
 export interface HygieneInput {
   baby_age_months: number;
@@ -1209,7 +1243,7 @@ export interface HygieneCalculatorResult {
   sponsor?: ToolSponsorData;
 }
 
-// ─── Shared Tool Types ────────────────────────────────────────────────────────
+// ─── Shared Tool Types ────────────────────────────────────────────────────
 
 export interface ToolSponsorData {
   name: string;
@@ -1219,7 +1253,7 @@ export interface ToolSponsorData {
   [key: string]: unknown;
 }
 
-// ─── Diaper Calculator Types ──────────────────────────────────────────────────
+// ─── Diaper Calculator Types ──────────────────────────────────────────────
 
 export interface DiaperInput {
   baby_weight_kg: number;
@@ -1254,7 +1288,7 @@ export interface RashRiskResult {
   sponsor?: ToolSponsorData;
 }
 
-// ─── Air Quality Types ────────────────────────────────────────────────────────
+// ─── Air Quality Types ────────────────────────────────────────────────────
 
 export interface AirQualityInput {
   home_type: string;
@@ -1296,7 +1330,7 @@ export interface AirQualityResult {
   sponsor?: ToolSponsorData;
 }
 
-// ─── Stain Encyclopedia Types ─────────────────────────────────────────────────
+// ─── Stain Encyclopedia Types ─────────────────────────────────────────────
 
 export interface StainGuide {
   id: number;
@@ -1319,7 +1353,6 @@ export interface StainSearchResponse {
 }
 
 
-
 export interface MealSlot {
   id?: number;
   meal_type_slug: string;
@@ -1337,7 +1370,7 @@ export interface MealPlanSlot {
   slots: MealSlot[];
 }
 
-// ─── Consent Types ────────────────────────────────────────────────────────────
+// ─── Consent Types ────────────────────────────────────────────────────────
 
 export type ConsentType =
   | 'terms'
@@ -1386,7 +1419,7 @@ export interface UserConsentHistoryResponse {
   history?: UserConsentHistoryEntry[];
 }
 
-// ─── Public Profile Types ──────────────────────────────────────────────────────
+// ─── Public Profile Types ─────────────────────────────────────────────────
 
 export interface PublicProfileQuestion {
   id: number;
@@ -1482,7 +1515,7 @@ export interface ExpertPublicProfile {
   asked_questions?: ExpertAskedQuestionSlim[];
 }
 
-// ─── Community Types ──────────────────────────────────────────────────────────
+// ─── Community Types ──────────────────────────────────────────────────────
 
 export interface Circle {
   id: number;

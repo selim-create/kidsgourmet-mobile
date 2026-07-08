@@ -14,11 +14,13 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { ingredientService } from '../../src/services/ingredient-service';
+import { checkIngredientSafety } from '../../src/services/safety-service';
 import { getAgeInMonths } from '../../src/hooks/useChildProfile';
 import { COLORS } from '../../src/lib/constants';
 import type { IngredientGuideItem } from '../../src/lib/types';
 import {
   SAFETY_CONFIGS,
+  getSafetyLevel,
   type SafetyLevel,
   DISCLAIMER_TITLE,
   DISCLAIMER_LINES,
@@ -127,7 +129,7 @@ export default function SafetyCheckScreen() {
 
   // ─── Evaluate safety ─────────────────────────────────────────────────────────
 
-  const handleCheck = () => {
+  const handleCheck = async () => {
     if (!selectedIngredient) {
       setQueryError('Lütfen listeden bir gıda seçin.');
       return;
@@ -142,6 +144,26 @@ export default function SafetyCheckScreen() {
       }
     }
 
+    // Try Safety API first when active child and ingredient ID are available
+    if (activeChild && selectedIngredient.id != null) {
+      try {
+        const apiResult = await checkIngredientSafety(selectedIngredient.id, activeChild.id);
+        const level = getSafetyLevel(apiResult);
+        const startAge = selectedIngredient.start_age ?? 'Belirtilmemiş';
+        setResult({
+          level,
+          ingredientName: selectedIngredient.name,
+          startAge,
+          babyAgeMonths: ageMonths,
+        });
+        return;
+      } catch {
+        if (__DEV__) console.error('[SafetyCheck] API call failed, falling back to client-side');
+        // Fall through to client-side calculation below
+      }
+    }
+
+    // Client-side fallback
     const startAgeMonths = parseStartAgeMonths(selectedIngredient.start_age);
     if (startAgeMonths === null) {
       // Cannot determine safety without start_age data

@@ -142,7 +142,7 @@ export const API_ENDPOINTS = {
   VACCINES_MARK_DONE: '/kg/v1/health/vaccines/mark-done',
   VACCINES_SCHEDULE_VERSIONS: '/kg/v1/health/vaccines/schedule-versions',
   VACCINES_UPDATE_STATUS: '/kg/v1/health/vaccines/update-status',
-  VACCINES_ADD_PRIVATE: '/kg/v1/health/vaccines/private/add',
+  VACCINES_ADD_PRIVATE: '/kg/v1/health/vaccines/add-private',
   VACCINES_SIDE_EFFECTS: '/kg/v1/health/vaccines/side-effects',
   VACCINES_UPCOMING: (childId: string) => `/kg/v1/health/vaccines/upcoming?child_id=${childId}`,
   VACCINES_HISTORY: (childId: string) => `/kg/v1/health/vaccines/history?child_id=${childId}`,
@@ -158,7 +158,7 @@ export const API_ENDPOINTS = {
 
   // BLW Test
   TOOL_BLW_TEST: '/kg/v1/tools/blw-test',
-  TOOL_BLW_RESULTS: '/kg/v1/tools/blw-test/results',
+  TOOL_BLW_RESULTS: '/kg/v1/user/blw-results',
   BLW_TEST_CONFIG: '/kg/v1/tools/blw-test/config',
   BLW_TEST_SUBMIT: '/kg/v1/tools/blw-test/submit',
 
@@ -175,7 +175,7 @@ export const API_ENDPOINTS = {
 
   // Solid Food Readiness
   TOOL_SOLID_FOOD: '/kg/v1/tools/solid-food-readiness',
-  TOOL_SOLID_FOOD_RESULTS: '/kg/v1/tools/solid-food-readiness/results',
+  TOOL_SOLID_FOOD_RESULTS: '/kg/v1/user/solid-food-results',
   SOLID_FOOD_READINESS_CONFIG: '/kg/v1/tools/solid-food-readiness/config',
   SOLID_FOOD_READINESS_SUBMIT: '/kg/v1/tools/solid-food-readiness/submit',
   /** Web-aligned aliases for SOLID_FOOD_READINESS_* */

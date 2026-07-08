@@ -15,8 +15,8 @@ export async function getBLWTestResults(
 }
 
 export async function submitBLWTest(data: {
-  child_id: string | number;
-  answers: Record<string, boolean>;
+  child_id?: string | number;
+  answers: Record<string, string>;
 }): Promise<BLWTestResult> {
   return api.post<BLWTestResult>(API_ENDPOINTS.BLW_TEST_SUBMIT, data);
 }

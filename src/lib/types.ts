@@ -1006,11 +1006,23 @@ export interface Tool {
 
 // ─── BLW Test Types ───────────────────────────────────────────────────────
 
-export interface BLWTestQuestion {
+export interface BLWTestOption {
   id: string;
   text: string;
+  value: number;
+  is_red_flag?: boolean;
+  red_flag_message?: string;
+}
+
+export interface BLWTestQuestion {
+  id: string;
+  /** Display text for the question (API field). */
+  question?: string;
+  /** Legacy alias for `question`. Prefer `question` for new API responses. */
+  text?: string;
   category?: string;
   description?: string;
+  options?: BLWTestOption[];
 }
 
 export interface BLWTestConfig {
@@ -1019,11 +1031,14 @@ export interface BLWTestConfig {
     ready: number;
     almost_ready: number;
   };
+  result_buckets?: BLWResultBucket[];
+  disclaimer_text?: string;
 }
 
 export interface BLWTestAnswer {
   question_id: string;
-  answer: boolean;
+  option_id: string;
+  score: number;
 }
 
 export interface BLWResultBucket {

@@ -191,7 +191,7 @@ export function AppHeader({
               <TouchableOpacity
                 style={styles.iconButton}
                 activeOpacity={0.7}
-                onPress={() => router.push('/(tabs)/profile')}
+                onPress={() => router.push('/bildirimler' as never)}
               >
                 <Ionicons name="notifications-outline" size={22} color={iconColor} />
               </TouchableOpacity>
@@ -262,7 +262,7 @@ export function AppHeader({
                 <TouchableOpacity
                   style={styles.favButton}
                   activeOpacity={0.75}
-                  onPress={() => router.push('/profile/preferences')}
+                  onPress={() => router.push('/bildirimler' as never)}
                 >
                   <View style={styles.bellBottomWrap}>
                     <Ionicons name="notifications-outline" size={20} color={COLORS.primary} />

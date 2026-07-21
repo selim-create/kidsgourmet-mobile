@@ -97,12 +97,18 @@ export function RecipeCard({ recipe, onPress, compact = false }: RecipeCardProps
             overflow: 'hidden',
           }}
         >
-          <Image
-            source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
-            style={{ width: '100%', height: imageHeight }}
-            contentFit="cover"
-            placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
-          />
+          {recipe.featured_image || recipe.thumbnail ? (
+            <Image
+              source={{ uri: recipe.featured_image ?? recipe.thumbnail }}
+              style={{ width: '100%', height: imageHeight }}
+              contentFit="cover"
+              placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
+            />
+          ) : (
+            <View style={{ width: '100%', height: imageHeight, backgroundColor: '#FFF0E8', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="restaurant-outline" size={imageHeight * 0.3} color="#FF8A65" />
+            </View>
+          )}
         </View>
 
         {/* Age Group Badge — top left overlay, asymmetric corners, web-matched pastel colors */}

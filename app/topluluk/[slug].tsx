@@ -42,6 +42,7 @@ import {
   formatRelativeTime,
   stripHtml,
 } from '../../src/utils/helpers';
+import { getAuthorRoute } from '../../src/utils/authorLink';
 
 type VoteKind = 'up' | 'down';
 
@@ -387,7 +388,18 @@ export default function DiscussionDetailScreen() {
             <Avatar uri={comment.author?.avatar_url} name={authorName} size={34} />
             <View style={styles.commentAuthorInfo}>
               <View style={styles.commentNameRow}>
-                <Text style={styles.commentAuthorName}>{authorName}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    const route = comment.author?.username
+                      ? getAuthorRoute({ is_expert: comment.author.is_expert, username: comment.author.username })
+                      : null;
+                    if (route) router.push(route as never);
+                  }}
+                  activeOpacity={0.7}
+                  disabled={!comment.author?.username}
+                >
+                  <Text style={styles.commentAuthorName}>{authorName}</Text>
+                </TouchableOpacity>
                 {isExpert && (
                   <View style={styles.commentExpertBadge}>
                     <Ionicons name="checkmark-circle" size={12} color="#16A34A" />
@@ -576,9 +588,20 @@ export default function DiscussionDetailScreen() {
                   size={40}
                 />
                 <View style={styles.discussionAuthorInfo}>
-                  <Text style={styles.discussionAuthorName}>
-                    {discussion?.author?.display_name ?? discussion?.author?.name ?? 'Anonim'}
-                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const route = discussion?.author
+                        ? getAuthorRoute({ is_expert: discussion.author.is_expert, username: discussion.author.username })
+                        : null;
+                      if (route) router.push(route as never);
+                    }}
+                    activeOpacity={0.7}
+                    disabled={!discussion?.author?.username}
+                  >
+                    <Text style={styles.discussionAuthorName}>
+                      {discussion?.author?.display_name ?? discussion?.author?.name ?? 'Anonim'}
+                    </Text>
+                  </TouchableOpacity>
                   <Text style={styles.discussionMeta}>
                     {formatRelativeTime(discussion?.created_at)}
                   </Text>

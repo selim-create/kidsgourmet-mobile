@@ -14,7 +14,7 @@ import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useMealPlan } from '../../src/hooks/useMealPlan';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
-import { Badge } from '../../src/components/ui/Badge';
+import { MealCard } from '../../src/components/ui/MealCard';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
 import { AppHeader } from '../../src/components/ui/AppHeader';
@@ -157,29 +157,13 @@ export default function MealPlanScreen() {
                 </View>
 
                 {dayMeals.length > 0 ? (
-                  dayMeals.map((meal, idx) => (
-                    <View
-                      key={idx}
-                      className="flex-row items-center py-2 border-b border-gray-50 last:border-0"
-                    >
-                      <View
-                        className={`w-2 h-2 rounded-full mr-3 ${
-                          meal.is_completed ? 'bg-success' : 'bg-gray-300'
-                        }`}
-                      />
-                      <View className="flex-1">
-                        <Text className="text-dark text-sm font-medium">
-                          {meal.recipe?.title ?? meal.custom_meal ?? 'Öğün'}
-                        </Text>
-                        <Text className="text-gray-400 text-xs">
-                          {meal.meal_type?.name}
-                        </Text>
-                      </View>
-                      {meal.is_completed ? (
-                        <Badge variant="success" size="sm">✓</Badge>
-                      ) : null}
-                    </View>
-                  ))
+                   dayMeals.map((meal, idx) => (
+                     <MealCard
+                       key={idx}
+                       meal={meal}
+                       onPress={meal.recipe?.slug ? () => router.push(`/(tabs)/recipes/${meal.recipe!.slug}` as never) : undefined}
+                     />
+                   ))
                 ) : (
                   <View className="py-2">
                     <Text className="text-gray-300 text-sm text-center">

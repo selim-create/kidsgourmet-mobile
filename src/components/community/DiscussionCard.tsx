@@ -25,7 +25,8 @@ interface DiscussionCardProps {
   style?: StyleProp<ViewStyle>;
 }
 
-function getProfileSlug(user: { id?: number; slug?: string }): string | null {
+function getProfileSlug(user: { id?: number; slug?: string; username?: string }): string | null {
+  if (user.username && user.username.trim().length > 0) return user.username;
   if (user.slug && user.slug.trim().length > 0) return user.slug;
   if (typeof user.id === 'number') return String(user.id);
   return null;

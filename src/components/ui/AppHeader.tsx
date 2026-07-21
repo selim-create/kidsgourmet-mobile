@@ -98,7 +98,7 @@ export function AppHeader({
   // ── Avatar / child press handling ───────────────────────────────────────────
   const handleAvatarPress = () => {
     if (isAuthenticated) {
-      setChildSheetVisible(true);
+      router.push('/(tabs)/profile');
     } else {
       router.push('/(auth)/login');
     }
@@ -106,14 +106,14 @@ export function AppHeader({
 
   const handleAvatarLongPress = () => {
     if (isAuthenticated) {
-      router.push('/(tabs)/profile');
+      setChildSheetVisible(true);
     } else {
       router.push('/(auth)/login');
     }
   };
 
-  // ── Bottom row: show when auth and has children (or "add child" pill) ───────
-  const showBottomRow = isAuthenticated && showChildSwitcher;
+  // ── Bottom row: show when auth and has children (or "add child" pill), or when not authenticated ──
+  const showBottomRow = showChildSwitcher;
 
   // ── Collapsible bottom row animated style (via shared hook to avoid duplication) ──
   const animatedBottomRowStyle = useBottomRowStyle(scrollY);
@@ -185,15 +185,21 @@ export function AppHeader({
           {/* Smart search pill (flexible width) */}
           {showSearchPill && variant !== 'compact' && <SmartSearchPill />}
 
-          {/* Notification bell */}
-          <View style={styles.bellWrap}>
-            <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}>
-              <Ionicons name="notifications-outline" size={22} color={iconColor} />
-            </TouchableOpacity>
-            <View style={styles.dotPositioned}>
-              <NotificationDot size={7} visible={false} />
+          {/* Notification bell — shown in top row only when bottom row is hidden (compact/detail) */}
+          {!showBottomRow && (
+            <View style={styles.bellWrap}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                activeOpacity={0.7}
+                onPress={() => router.push('/(tabs)/profile')}
+              >
+                <Ionicons name="notifications-outline" size={22} color={iconColor} />
+              </TouchableOpacity>
+              <View style={styles.dotPositioned}>
+                <NotificationDot size={7} visible={false} />
+              </View>
             </View>
-          </View>
+          )}
 
           {/* Child / user avatar button */}
           <TouchableOpacity
@@ -216,26 +222,57 @@ export function AppHeader({
         {/* ── Bottom row (collapsible, ~48px) ─────────────────────────────── */}
         {showBottomRow && (
           <Animated.View style={[styles.bottomRow, animatedBottomRowStyle as any]}>
-            {children.length > 0 ? (
-              <ChildSwitcherPill />
+            {isAuthenticated ? (
+              children.length > 0 ? (
+                <ChildSwitcherPill />
+              ) : (
+                /* No children yet — show "+ Çocuk ekle" pill */
+                <TouchableOpacity
+                  style={styles.addChildPill}
+                  activeOpacity={0.75}
+                  onPress={() => router.push('/(tabs)/profile')}
+                >
+                  <Ionicons name="add-circle-outline" size={16} color={COLORS.primary} />
+                  <Text style={styles.addChildText}>Çocuk ekle</Text>
+                </TouchableOpacity>
+              )
             ) : (
-              /* No children yet — show "+ Çocuk ekle" pill */
-              <TouchableOpacity
-                style={styles.addChildPill}
-                activeOpacity={0.75}
-                onPress={() => router.push('/(tabs)/profile')}
-              >
-                <Ionicons name="add-circle-outline" size={16} color={COLORS.primary} />
-                <Text style={styles.addChildText}>Çocuk ekle</Text>
-              </TouchableOpacity>
+              /* Unauthenticated — show Login / Register CTA buttons */
+              <View style={styles.authCtaRow}>
+                <TouchableOpacity
+                  style={styles.authCtaLogin}
+                  activeOpacity={0.8}
+                  onPress={() => router.push('/(auth)/login')}
+                >
+                  <Text style={styles.authCtaLoginText}>Giriş Yap</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.authCtaRegister}
+                  activeOpacity={0.8}
+                  onPress={() => router.push('/(auth)/register')}
+                >
+                  <Text style={styles.authCtaRegisterText}>Kayıt Ol</Text>
+                </TouchableOpacity>
+              </View>
             )}
 
-            {/* Favorites count */}
+            {/* Notification bell + Favorites count */}
             <View style={styles.favWrap}>
+              {isAuthenticated && (
+                <TouchableOpacity
+                  style={styles.favButton}
+                  activeOpacity={0.75}
+                  onPress={() => router.push('/profile/preferences')}
+                >
+                  <View style={styles.bellBottomWrap}>
+                    <Ionicons name="notifications-outline" size={20} color={COLORS.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.favButton}
                 activeOpacity={0.75}
-                onPress={() => router.push('/(tabs)/favorites')}
+                onPress={() => isAuthenticated ? router.push('/(tabs)/favorites') : router.push('/(auth)/login')}
               >
                 <Ionicons name="heart-outline" size={20} color={COLORS.primary} />
                 {favorites.length > 0 && (
@@ -342,12 +379,17 @@ const styles = StyleSheet.create({
   },
   favWrap: {
     marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   favButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     padding: 6,
+    position: 'relative',
+  },
+  bellBottomWrap: {
     position: 'relative',
   },
   favBadge: {
@@ -366,6 +408,36 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 9,
     fontWeight: '700',
+  },
+  authCtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  authCtaLogin: {
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+  },
+  authCtaLoginText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  authCtaRegister: {
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  authCtaRegisterText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.dark,
   },
   detailTitle: {
     flex: 1,

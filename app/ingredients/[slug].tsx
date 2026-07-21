@@ -24,6 +24,7 @@ import { IngredientFAQ } from '../../src/components/ingredients/IngredientFAQ';
 import { useIngredientFavorites } from '../../src/hooks/useIngredientFavorites';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { COLORS } from '../../src/lib/constants';
+import { stripHtml } from '../../src/utils/helpers';
 import type { IngredientGuideItem } from '../../src/lib/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -106,7 +107,7 @@ function TipCard({
   return (
     <Card style={{ marginBottom: 16 }}>
       <SectionHeader icon={icon} title={title} />
-      <Text style={{ fontSize: 14, color: '#374151', lineHeight: 22 }}>{text}</Text>
+      <Text style={{ fontSize: 14, color: '#374151', lineHeight: 22 }}>{stripHtml(text)}</Text>
     </Card>
   );
 }
@@ -439,7 +440,7 @@ export default function IngredientBySlugScreen() {
           {ingredient.description ? (
             <View style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 14, color: '#374151', lineHeight: 23 }}>
-                {ingredient.description}
+                {stripHtml(ingredient.description)}
               </Text>
               <View
                 style={{ height: 1, backgroundColor: '#F3F4F6', marginTop: 16 }}
@@ -463,7 +464,7 @@ export default function IngredientBySlugScreen() {
             <Card style={{ marginBottom: 16 }}>
               <SectionHeader icon="heart-outline" title="Faydaları" />
               <View style={{ gap: 6 }}>
-                {ingredient.benefits
+                {stripHtml(ingredient.benefits)
                   .split(/\.\s+|\n/)
                   .map((s) => s.trim())
                   .filter(Boolean)

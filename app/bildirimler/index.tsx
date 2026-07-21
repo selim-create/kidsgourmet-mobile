@@ -40,6 +40,13 @@ const NOTIFICATION_COLORS: Record<AppNotification['type'], string> = {
   system: '#6B7280',
 };
 
+const NOTIFICATION_BG_COLORS: Record<AppNotification['type'], string> = {
+  recipe: 'rgba(255,138,101,0.1)',
+  community: 'rgba(124,58,237,0.1)',
+  plan: 'rgba(22,163,74,0.1)',
+  system: 'rgba(107,114,128,0.1)',
+};
+
 function NotificationItem({
   item,
   onPress,
@@ -58,7 +65,7 @@ function NotificationItem({
       onPress={() => onPress(item)}
       activeOpacity={0.75}
     >
-      <View style={[styles.notifIconWrap, { backgroundColor: `${iconColor}18` }]}>
+      <View style={[styles.notifIconWrap, { backgroundColor: NOTIFICATION_BG_COLORS[item.type] }]}>
         <Ionicons name={iconName} size={22} color={iconColor} />
       </View>
       <View style={styles.notifContent}>

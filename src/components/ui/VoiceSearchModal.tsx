@@ -61,8 +61,8 @@ export function VoiceSearchModal({ visible, onClose }: VoiceSearchModalProps) {
 
   const handleMicPress = () => {
     setIsListening((prev) => !prev);
-    // TODO: Integrate @react-native-voice/voice or expo-speech-recognition
-    // when a native build is available. For now the field is focused for manual input.
+    // Voice recognition requires a native module (e.g. @react-native-voice/voice) and a custom build.
+    // Until integrated, the modal falls back to manual text input — the keyboard is auto-focused.
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -96,7 +96,9 @@ export function VoiceSearchModal({ visible, onClose }: VoiceSearchModalProps) {
           {/* Title */}
           <Text style={styles.title}>Sesli Arama</Text>
           <Text style={styles.subtitle}>
-            {isListening ? 'Dinleniyor... Sorgunuzu yazın veya söyleyin.' : 'Aramak istediğinizi yazın ya da mikrofona basın.'}
+            {isListening
+              ? 'Lütfen aramak istediğinizi klavyeden yazın.'
+              : 'Aramak istediğinizi yazın ya da mikrofona basın.'}
           </Text>
 
           {/* Mic button */}

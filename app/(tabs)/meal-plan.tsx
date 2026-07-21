@@ -85,7 +85,8 @@ export default function MealPlanScreen() {
               await generateMealPlan({ child_id: childId, week_start: weekStart });
               await mutate();
               Toast.show({ type: 'success', text1: 'Plan oluşturuldu!' });
-            } catch {
+            } catch (err) {
+              console.error('[MealPlan] Generate error:', err);
               Toast.show({ type: 'error', text1: 'Plan oluşturulamadı.' });
             } finally {
               setGenerating(false);

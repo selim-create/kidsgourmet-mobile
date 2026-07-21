@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as AuthSession from 'expo-auth-session';
@@ -159,10 +160,15 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <View className="bg-primary pt-12 pb-10 px-6 items-center">
-            <Text className="text-white text-4xl font-bold mb-1">🥗</Text>
-            <Text className="text-white text-2xl font-bold">KidsGourmet</Text>
-            <Text className="text-white/80 text-sm mt-1">
+          <View style={{ backgroundColor: '#FFF8E1', paddingTop: 48, paddingBottom: 40, paddingHorizontal: 24, alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => router.replace('/(tabs)')} activeOpacity={0.8}>
+              <Image
+                source={require('../../assets/images/kg-logo-full-dark.png')}
+                style={{ width: 180, height: 50 }}
+                contentFit="contain"
+              />
+            </TouchableOpacity>
+            <Text style={{ color: '#6B7280', fontSize: 14, marginTop: 8 }}>
               Çocuğunuz için en sağlıklı tarifler
             </Text>
           </View>
@@ -254,10 +260,13 @@ export default function LoginScreen() {
               )}
             </View>
 
-            <View className="flex-row items-center justify-center mt-6">
-              <Text className="text-gray-500 text-sm">Hesabınız yok mu? </Text>
-              <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                <Text className="text-primary font-semibold text-sm">
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 24, gap: 8 }}>
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>Hesabınız yok mu?</Text>
+              <TouchableOpacity
+                style={{ backgroundColor: '#F3F4F6', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 16, borderWidth: 1, borderColor: '#E5E7EB' }}
+                onPress={() => router.push('/(auth)/register')}
+              >
+                <Text style={{ color: '#1F2937', fontWeight: '700', fontSize: 14 }}>
                   Kayıt Ol
                 </Text>
               </TouchableOpacity>

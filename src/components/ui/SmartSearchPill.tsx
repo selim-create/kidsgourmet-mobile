@@ -55,10 +55,9 @@ export function SmartSearchPill() {
         <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
           {suggestions[index]}
         </Text>
-        {/* TODO: implement voice search */}
-        <View style={styles.micWrap}>
+        <TouchableOpacity style={styles.micWrap} activeOpacity={0.7} onPress={() => setModalVisible(true)}>
           <Ionicons name="mic-outline" size={15} color={COLORS.gray[400]} />
-        </View>
+        </TouchableOpacity>
       </TouchableOpacity>
 
       <SearchModal visible={modalVisible} onClose={() => setModalVisible(false)} />

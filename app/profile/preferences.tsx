@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Switch,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -43,32 +42,6 @@ export default function PreferencesScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* Membership card */}
-        <LinearGradient
-          colors={['#7C3AED', '#4F46E5']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 16, marginBottom: 20 }}
-        >
-          <View className="p-5">
-            <View className="flex-row items-center mb-2">
-              <Ionicons name="star" size={20} color="#FDE68A" />
-              <Text className="text-yellow-200 font-bold text-base ml-2">
-                KidsGourmet Free
-              </Text>
-            </View>
-            <Text className="text-white/80 text-sm">Premium aktif değil</Text>
-            <TouchableOpacity
-              className="mt-4 bg-white/20 rounded-xl py-2.5 items-center"
-              activeOpacity={0.8}
-            >
-              <Text className="text-white font-semibold text-sm">
-                Premium'a Geç →
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-
         {/* Notification settings */}
         <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
           <View className="px-4 py-3 border-b border-gray-50">

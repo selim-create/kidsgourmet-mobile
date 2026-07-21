@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useActiveChild } from '../../contexts/ActiveChildContext';
 import { COLORS } from '../../lib/constants';
 import { SearchModal } from './SearchModal';
+import { VoiceSearchModal } from './VoiceSearchModal';
 
 function buildSuggestions(childName?: string, ageMonths?: number): string[] {
   const name = childName ?? 'Minik';
@@ -20,6 +21,7 @@ export function SmartSearchPill() {
   const { activeChild } = useActiveChild();
   const [index, setIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [voiceModalVisible, setVoiceModalVisible] = useState(false);
 
   let ageMonths: number | undefined;
   if (activeChild?.birth_date) {
@@ -55,12 +57,13 @@ export function SmartSearchPill() {
         <Text style={styles.placeholder} numberOfLines={1} ellipsizeMode="tail">
           {suggestions[index]}
         </Text>
-        <TouchableOpacity style={styles.micWrap} activeOpacity={0.7} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={styles.micWrap} activeOpacity={0.7} onPress={() => setVoiceModalVisible(true)}>
           <Ionicons name="mic-outline" size={15} color={COLORS.gray[400]} />
         </TouchableOpacity>
       </TouchableOpacity>
 
       <SearchModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <VoiceSearchModal visible={voiceModalVisible} onClose={() => setVoiceModalVisible(false)} />
     </>
   );
 }

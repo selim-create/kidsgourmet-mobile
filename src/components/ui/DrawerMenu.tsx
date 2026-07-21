@@ -89,7 +89,7 @@ const MENU_SECTIONS: MenuSection[] = [
     title: 'Hesap',
     items: [
       { label: 'Profilim', icon: 'person-outline', route: '/(tabs)/profile' },
-      { label: 'Bildirimler', icon: 'notifications-outline', route: '/(tabs)/profile' }, // TODO: dedicated notifications page
+      { label: 'Bildirimler', icon: 'notifications-outline', route: '/bildirimler' },
       { label: 'Ayarlar', icon: 'settings-outline', route: '/(tabs)/profile' }, // TODO: dedicated settings page
     ],
   },

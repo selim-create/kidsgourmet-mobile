@@ -6,18 +6,23 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useActiveChild } from '../../src/contexts/ActiveChildContext';
 import { useMealPlan } from '../../src/hooks/useMealPlan';
+import { generateMealPlan } from '../../src/services/meal-plan-service';
 import { LoadingSpinner } from '../../src/components/ui/LoadingSpinner';
 import { Card } from '../../src/components/ui/Card';
 import { MealCard } from '../../src/components/ui/MealCard';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Button } from '../../src/components/ui/Button';
 import { AppHeader } from '../../src/components/ui/AppHeader';
+import { COLORS } from '../../src/lib/constants';
+import Toast from 'react-native-toast-message';
 
 function getWeekOffsetLabel(offset: number): string {
   if (offset === 0) return 'Bu Hafta';
@@ -37,17 +42,60 @@ function getISOWeek(date: Date): { year: number; week: number } {
   return { year: d.getFullYear(), week };
 }
 
+function getMondayOfISOWeek(year: number, week: number): Date {
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7;
+  const mondayWeek1 = new Date(jan4);
+  mondayWeek1.setUTCDate(jan4.getUTCDate() - jan4Day + 1);
+  const monday = new Date(mondayWeek1);
+  monday.setUTCDate(mondayWeek1.getUTCDate() + (week - 1) * 7);
+  return monday;
+}
+
 export default function MealPlanScreen() {
   const { isAuthenticated } = useAuth();
   const { activeChild } = useActiveChild();
   const now = new Date();
   const { year, week } = getISOWeek(now);
   const [weekOffset, setWeekOffset] = useState(0);
+  const [generating, setGenerating] = useState(false);
 
   const currentWeek = week + weekOffset;
   const childId = activeChild?.id ? String(activeChild.id) : undefined;
   const { mealPlan, isLoading, mutate } = useMealPlan(childId, year, currentWeek);
   const [refreshing, setRefreshing] = useState(false);
+
+  const weekStart = getMondayOfISOWeek(year, currentWeek).toISOString().split('T')[0];
+
+  const handleGenerate = async () => {
+    if (!childId) {
+      Toast.show({ type: 'error', text1: 'Önce çocuk profili seçin.' });
+      return;
+    }
+    Alert.alert(
+      'Plan Oluştur',
+      'Bu hafta için yeni bir yemek planı oluşturulsun mu?',
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Oluştur',
+          onPress: async () => {
+            setGenerating(true);
+            try {
+              await generateMealPlan({ child_id: childId, week_start: weekStart });
+              await mutate();
+              Toast.show({ type: 'success', text1: 'Plan oluşturuldu!' });
+            } catch (err) {
+              console.error('[MealPlan] Generate error:', err);
+              Toast.show({ type: 'error', text1: 'Plan oluşturulamadı.' });
+            } finally {
+              setGenerating(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -106,6 +154,25 @@ export default function MealPlanScreen() {
           style={styles.navButton}
         >
           <Ionicons name="chevron-forward" size={18} color="#455A64" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Plan Oluştur butonu */}
+      <View style={styles.generateRow}>
+        <TouchableOpacity
+          onPress={handleGenerate}
+          disabled={generating || !childId}
+          style={[styles.generateButton, (!childId || generating) && { opacity: 0.6 }]}
+          activeOpacity={0.8}
+        >
+          {generating ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Ionicons name="refresh-outline" size={16} color="#fff" />
+          )}
+          <Text style={styles.generateButtonText}>
+            {generating ? 'Oluşturuluyor...' : 'Plan Oluştur'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -186,9 +253,9 @@ export default function MealPlanScreen() {
             <EmptyState
               icon="calendar-outline"
               title="Bu hafta için plan yok"
-              description="Tarifler bölümünden yemek ekleyerek haftalık planınızı oluşturun"
-              actionLabel="Tariflere Git"
-              onAction={() => router.push('/(tabs)/recipes')}
+              description="'Plan Oluştur' butonuna tıklayarak haftalık planınızı otomatik oluşturun"
+              actionLabel="Plan Oluştur"
+              onAction={handleGenerate}
             />
           )}
         </ScrollView>
@@ -215,5 +282,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  generateRow: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });

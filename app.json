@@ -20,13 +20,6 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Çocuğunuzun veya profilinizin fotoğrafını seçmek için galeri erişimine ihtiyacımız var.",
         "NSCameraUsageDescription": "Çocuğunuzun veya profilinizin fotoğrafını çekmek için kamera erişimine ihtiyacımız var.",
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.944387456679-nuv4qnlq1lvrdpl1llp31sf30n8mm1j3"
-            ]
-          }
-        ],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -69,7 +62,13 @@
           "fonts": []
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.944387456679-nuv4qnlq1lvrdpl1llp31sf30n8mm1j3"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

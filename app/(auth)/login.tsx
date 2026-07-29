@@ -12,16 +12,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import Constants from 'expo-constants';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
 import { signInWithGoogle, signInWithApple } from '../../src/services/auth-service';
 import Toast from 'react-native-toast-message';
-
-WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const { login, refreshUser } = useAuth();
@@ -35,44 +31,27 @@ export default function LoginScreen() {
   const handleGooglePress = async () => {
     try {
       setIsLoading(true);
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
 
-      const clientId = Platform.select({
-        ios: Constants.expoConfig?.extra?.googleIosClientId as string | undefined,
-        android: Constants.expoConfig?.extra?.googleAndroidClientId as string | undefined,
-        default: Constants.expoConfig?.extra?.googleWebClientId as string | undefined,
-      });
+      if (!idToken) {
+        throw new Error('Google id_token alınamadı');
+      }
 
-      if (!clientId) {
-        Toast.show({ type: 'info', text1: 'Google giriş bu platformda kullanılamıyor' });
+      const authResult = await signInWithGoogle(idToken);
+      if (authResult.token) {
+        await refreshUser();
+        router.replace('/(tabs)');
+      }
+    } catch (err: unknown) {
+      if (
+        err instanceof Error &&
+        'code' in err &&
+        (err as { code: string }).code === statusCodes.SIGN_IN_CANCELLED
+      ) {
         return;
       }
-
-      const redirectUri = AuthSession.makeRedirectUri({
-        scheme: 'kidsgourmet',
-        path: 'redirect',
-      });
-
-      const discovery = await AuthSession.fetchDiscoveryAsync('https://accounts.google.com');
-
-      const authRequest = new AuthSession.AuthRequest({
-        clientId,
-        scopes: ['openid', 'profile', 'email'],
-        redirectUri,
-        responseType: AuthSession.ResponseType.IdToken,
-        usePKCE: false,
-      });
-
-      const result = await authRequest.promptAsync(discovery);
-
-      if (result.type === 'success' && result.params?.id_token) {
-        const authResult = await signInWithGoogle(result.params.id_token);
-        if (authResult.token) {
-          await refreshUser();
-          router.replace('/(tabs)');
-        }
-      }
-    } catch (err) {
-      console.warn('[GoogleAuth] Error:', err);
       Toast.show({
         type: 'error',
         text1: 'Google ile giriş başarısız',

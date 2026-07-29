@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { Image } from 'expo-image';
 import Toast from 'react-native-toast-message';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SWRProvider } from '../src/providers/SWRProvider';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { ActiveChildProvider } from '../src/contexts/ActiveChildContext';
@@ -13,6 +14,11 @@ import { FavoritesProvider } from '../src/contexts/FavoritesContext';
 import { ErrorBoundary } from '../src/components/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
+
+GoogleSignin.configure({
+  iosClientId: '944387456679-nuv4qnlq1lvrdpl1llp31sf30n8mm1j3.apps.googleusercontent.com',
+  webClientId: '944387456679-mis73fvvfhh7p715mm50j45v61l01ljh.apps.googleusercontent.com',
+});
 
 // react-native-render-html v6 + React 18.3 incompatibility (harmless defaultProps deprecation warnings)
 LogBox.ignoreLogs([

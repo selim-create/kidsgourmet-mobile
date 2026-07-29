@@ -78,6 +78,7 @@ export default function RegisterScreen() {
         scopes: ['openid', 'profile', 'email'],
         redirectUri,
         responseType: AuthSession.ResponseType.IdToken,
+        usePKCE: false,
       });
 
       const result = await authRequest.promptAsync(discovery);
